@@ -25,9 +25,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Changed to flex-start for smaller screens */
+            padding: 20px 10px; /* Added padding */
             pointer-events: auto;
             z-index: 20;
+            height: 100vh; /* Ensure it covers full viewport height */
+            overflow-y: auto; /* Allow scrolling if content overflows vertically */
         }
         .hidden {
             display: none !important;
@@ -69,7 +72,8 @@
 
     <!-- 1. MAIN MENU SCREEN -->
     <div id="main-menu" class="screen bg-gray-900 text-white">
-        <div class="max-w-md w-full p-8 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl text-center relative overflow-hidden">
+        <!-- Content container made responsive -->
+        <div class="max-w-md w-full p-8 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl text-center relative overflow-hidden my-auto">
             <!-- Decorative BG elements -->
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500"></div>
             
@@ -180,6 +184,9 @@ const TROOP_SPEED = 2.8;
 const TROOP_SIZE = 4;
 const NODE_RADIUS = 24;
 
+// New Grace Period Constant
+const AI_START_DELAY = 5; // AI waits 5 seconds before making aggressive moves
+
 const DIFFICULTIES = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.8 },
     medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 1.0 },
@@ -218,7 +225,6 @@ class Node {
 
     update(dt) {
         let rate = BASE_GROWTH_RATE;
-        // AI handicap/boost
         if (this.owner !== PLAYER_ID && this.owner !== NEUTRAL_ID) {
             rate *= DIFFICULTIES[currentDifficulty].growthMod;
         }
@@ -397,9 +403,6 @@ function showScreen(screen) {
 function goToMainMenu() {
     gameState = 'MENU';
     showScreen(uiMainMenu);
-    // Render background battle for visual flair (optional, or just clear)
-    // We will just keep the animation loop running but logic paused? 
-    // Nah, let's clear canvas
     CTX.fillStyle = '#111827';
     CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
 }
@@ -417,7 +420,7 @@ function startGame() {
     
     generateMap();
     
-    showScreen(uiGame); // Show minimal HUD
+    showScreen(uiGame); 
     lastTime = performance.now();
     requestAnimationFrame(loop);
 }
@@ -426,8 +429,6 @@ function pauseGame() {
     if (gameState === 'PLAYING') {
         gameState = 'PAUSED';
         showScreen(uiPause);
-        uiGame.classList.remove('hidden'); // Keep pause button visible/clickable underneath? 
-        // Actually, the overlay covers it.
     }
 }
 
@@ -435,7 +436,7 @@ function resumeGame() {
     if (gameState === 'PAUSED') {
         gameState = 'PLAYING';
         showScreen(uiGame);
-        lastTime = performance.now(); // Reset delta time
+        lastTime = performance.now(); 
         requestAnimationFrame(loop);
     }
 }
@@ -496,10 +497,6 @@ function generateMap() {
 
 function loop(timestamp) {
     if (gameState !== 'PLAYING') {
-        // If paused or menu, we might still want to draw the last frame?
-        // But the overlay handles the visuals. 
-        // We stop the loop here to save battery, or keep drawing if we want background animations.
-        // For simplicity, we stop logic but maybe draw once.
         return;
     }
 
@@ -513,7 +510,7 @@ function loop(timestamp) {
 }
 
 function update(dt) {
-    gameTime += dt;
+    gameTime += dt; // Time tracking
 
     nodes.forEach(n => n.update(dt));
     
@@ -542,10 +539,11 @@ function update(dt) {
     particles.forEach(p => p.update());
     particles = particles.filter(p => p.life > 0);
 
-    // AI
+    // AI Logic with Delay Check
     aiTimer += dt * 1000;
     const diffSettings = DIFFICULTIES[currentDifficulty];
-    if (aiTimer > diffSettings.aiInterval) {
+    
+    if (gameTime > AI_START_DELAY && aiTimer > diffSettings.aiInterval) { 
         runSmartAI(diffSettings);
         aiTimer = 0;
     }
@@ -569,16 +567,16 @@ function runSmartAI(settings) {
             nodes.forEach(other => {
                 if (node.id === other.id) return;
                 const dist = Math.hypot(node.x - other.x, node.y - other.y);
-                if (dist > 350) return; // Vision range
+                if (dist > 350) return; 
 
                 let score = 0;
                 if (other.owner === NEUTRAL_ID) score += 50 - other.population; 
                 else if (other.owner !== node.owner) {
                     let popDiff = node.population - other.population;
                     score += popDiff * 2; 
-                    if (currentDifficulty === 'hard' && other.owner === PLAYER_ID) score += 120; // Hate player
+                    if (currentDifficulty === 'hard' && other.owner === PLAYER_ID) score += 120;
                 } else {
-                    if (other.population < 10) score += 20; // Reinforce
+                    if (other.population < 10) score += 20;
                 }
                 score -= dist * 0.1; 
                 targets.push({ node: other, score: score });
@@ -598,7 +596,7 @@ function sendTroops(source, target, percent) {
     
     for (let i = 0; i < amount; i++) {
         setTimeout(() => {
-            if (gameState === 'PLAYING') { // Only spawn if still playing
+            if (gameState === 'PLAYING') {
                 troops.push(new Troop(source.owner, source, target));
             }
         }, i * 30);
