@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>World Conquest IO - Ultimate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #111827;
+            touch-action: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        canvas {
+            display: block;
+        }
+        /* UI Layers */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            z-index: 20;
+        }
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Custom Scrollbar/Inputs */
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(234, 179, 8, 0.8); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        /* Minimal In-Game UI */
+        #game-ui {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 1. MAIN MENU SCREEN -->
+    <div id="main-menu" class="screen bg-gray-900 text-white">
+        <div class="max-w-md w-full p-8 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl text-center relative overflow-hidden">
+            <!-- Decorative BG elements -->
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500"></div>
+            
+            <h1 class="text-5xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 tracking-tighter">CONQUEST IO</h1>
+            <p class="text-gray-400 mb-8 text-sm tracking-widest uppercase">Total Domination Simulator</p>
+
+            <div class="bg-gray-900 rounded-lg p-6 text-left mb-6 border border-gray-700 shadow-inner">
+                <h3 class="text-yellow-500 font-bold mb-3 text-sm uppercase tracking-wider border-b border-gray-700 pb-2">How to Conquer</h3>
+                <ul class="space-y-3 text-sm text-gray-300">
+                    <li class="flex items-start"><span class="mr-2">🔵</span> <b>Drag</b> from base to attack.</li>
+                    <li class="flex items-start"><span class="mr-2">🔗</span> <b>Drag Through</b> allies to chain attack.</li>
+                    <li class="flex items-start"><span class="mr-2">⚡</span> <b>Double Tap</b> any node to send 50% army from ALL bases (Nuke).</li>
+                    <li class="flex items-start"><span class="mr-2">💀</span> Troops die on collision!</li>
+                </ul>
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">Difficulty Level</label>
+                <div class="relative">
+                    <select id="difficultySelect" class="block w-full bg-gray-700 border border-gray-600 text-white py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-gray-600 focus:border-gray-500 transition-colors cursor-pointer hover:bg-gray-650">
+                        <option value="easy">Easy (Chill Expansion)</option>
+                        <option value="medium" selected>Medium (Balanced War)</option>
+                        <option value="hard">Impossible (Ruthless AI)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="startBtn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-4 px-4 rounded-xl shadow-lg transform transition hover:scale-105 active:scale-95 text-lg animate-pulse-glow">
+                ⚔️ START WAR
+            </button>
+        </div>
+        <p class="absolute bottom-4 text-gray-600 text-xs">Built for Strategists</p>
+    </div>
+
+    <!-- 2. IN-GAME UI (Minimal) -->
+    <div id="game-ui" class="hidden">
+        <button id="pauseBtn" class="w-12 h-12 bg-gray-800 bg-opacity-60 hover:bg-opacity-90 text-white rounded-full shadow-lg backdrop-blur-sm border border-gray-600 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+            <span class="text-xl font-bold">⏸️</span>
+        </button>
+    </div>
+
+    <!-- 3. PAUSE MENU SCREEN -->
+    <div id="pause-menu" class="screen hidden bg-black bg-opacity-80 backdrop-blur-sm z-50">
+        <div class="bg-gray-900 p-8 rounded-xl border border-gray-600 text-center shadow-2xl min-w-[300px]">
+            <h2 class="text-3xl font-black text-white mb-8 tracking-widest">PAUSED</h2>
+            <div class="flex flex-col gap-4">
+                <button id="resumeBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+                    Resume Game
+                </button>
+                <button id="restartInGameBtn" class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+                    Restart Map
+                </button>
+                <button id="quitBtn" class="bg-red-900 hover:bg-red-800 text-gray-300 hover:text-white font-bold py-3 px-6 rounded-lg border border-red-800 transition-transform active:scale-95">
+                    Quit to Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. GAME OVER SCREEN -->
+    <div id="game-over-screen" class="screen hidden bg-black bg-opacity-85 z-50">
+        <div class="bg-gray-900 p-10 rounded-2xl border-2 border-yellow-500 text-center shadow-2xl transform transition-all max-w-sm w-full relative overflow-hidden">
+            <!-- Shine effect -->
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white to-transparent opacity-5 pointer-events-none"></div>
+            
+            <h2 id="winnerText" class="text-5xl font-black text-white mb-4 drop-shadow-lg">VICTORY</h2>
+            <p id="scoreText" class="text-gray-300 mb-8 text-lg">The world is yours.</p>
+            
+            <div class="flex flex-col gap-3">
+                <button id="playAgainBtn" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(234,179,8,0.4)]">
+                    PLAY AGAIN
+                </button>
+                <button id="menuBtn" class="bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Main Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/** * --- CORE CONSTANTS ---
+ */
+const CANVAS = document.getElementById('gameCanvas');
+const CTX = CANVAS.getContext('2d');
+const COLORS = [
+    '#3B82F6', // 0: Player (Blue)
+    '#EF4444', // 1: Red
+    '#10B981', // 2: Green
+    '#F59E0B', // 3: Yellow
+    '#8B5CF6', // 4: Purple
+    '#EC4899', // 5: Pink
+    '#06B6D4', // 6: Cyan
+    '#F97316', // 7: Orange
+    '#84CC16', // 8: Lime
+    '#6366F1', // 9: Indigo
+    '#14B8A6', // 10: Teal
+    '#4B5563'  // 11: Neutral (Dark Grey)
+];
+const NEUTRAL_ID = 11;
+const PLAYER_ID = 0;
+
+// Config
+const NODE_COUNT = 40;
+const MIN_DISTANCE = 70;
+const MAX_POPULATION = 200;
+const BASE_GROWTH_RATE = 1.5;
+const TROOP_SPEED = 2.8;
+const TROOP_SIZE = 4;
+const NODE_RADIUS = 24;
+
+const DIFFICULTIES = {
+    easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.8 },
+    medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 1.0 },
+    hard: { aiInterval: 400, aiAggression: 0.95, growthMod: 1.2 }
+};
+
+// Game State
+let nodes = [];
+let troops = [];
+let particles = [];
+let dragSources = []; 
+let dragCurrent = { x: 0, y: 0 };
+let isDragging = false;
+
+let lastTime = 0;
+let aiTimer = 0;
+let gameTime = 0;
+let gameState = 'MENU'; // MENU, PLAYING, PAUSED, GAMEOVER
+let currentDifficulty = 'medium';
+
+/**
+ * --- CLASSES ---
+ */
+class Node {
+    constructor(id, x, y, ownerId, pop) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.owner = ownerId;
+        this.population = pop;
+        this.radius = NODE_RADIUS;
+        this.maxPop = MAX_POPULATION;
+        this.growthTimer = 0;
+        this.pulse = Math.random() * Math.PI;
+    }
+
+    update(dt) {
+        let rate = BASE_GROWTH_RATE;
+        // AI handicap/boost
+        if (this.owner !== PLAYER_ID && this.owner !== NEUTRAL_ID) {
+            rate *= DIFFICULTIES[currentDifficulty].growthMod;
+        }
+
+        if (this.owner !== NEUTRAL_ID && this.population < this.maxPop) {
+            this.growthTimer += dt;
+            if (this.growthTimer > 1 / rate) {
+                this.population++;
+                this.growthTimer = 0;
+            }
+        }
+        this.pulse += dt * 2;
+    }
+
+    draw() {
+        CTX.beginPath();
+        const r = this.owner === PLAYER_ID ? this.radius + Math.sin(this.pulse)*1.5 : this.radius;
+        
+        CTX.arc(this.x, this.y, r, 0, Math.PI * 2);
+        CTX.fillStyle = COLORS[this.owner];
+        
+        if (this.owner === PLAYER_ID) {
+            CTX.shadowBlur = 20;
+            CTX.shadowColor = '#60A5FA';
+        } else {
+            CTX.shadowBlur = 10;
+            CTX.shadowColor = 'rgba(0,0,0,0.3)';
+        }
+        
+        CTX.fill();
+        CTX.shadowBlur = 0;
+        
+        // Stroke
+        CTX.lineWidth = 3;
+        CTX.strokeStyle = (this.owner === NEUTRAL_ID) ? '#6B7280' : '#ffffff';
+        if(this.owner === PLAYER_ID) CTX.strokeStyle = '#BFDBFE';
+        
+        if (dragSources.includes(this)) {
+            CTX.strokeStyle = '#FCD34D'; // Yellow highlight
+            CTX.lineWidth = 5;
+        }
+
+        CTX.stroke();
+        CTX.closePath();
+
+        // Text
+        CTX.fillStyle = '#fff';
+        CTX.font = 'bold 13px sans-serif';
+        CTX.textAlign = 'center';
+        CTX.textBaseline = 'middle';
+        CTX.fillText(Math.floor(this.population), this.x, this.y);
+    }
+}
+
+class Troop {
+    constructor(owner, startNode, targetNode) {
+        this.owner = owner;
+        this.x = startNode.x;
+        this.y = startNode.y;
+        this.target = targetNode;
+        this.isPlayer = (owner === PLAYER_ID);
+        
+        const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x);
+        const spread = (Math.random() - 0.5) * 0.6;
+        
+        this.vx = Math.cos(angle + spread) * TROOP_SPEED;
+        this.vy = Math.sin(angle + spread) * TROOP_SPEED;
+        
+        this.dead = false;
+        this.color = COLORS[this.owner];
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        const dx = this.target.x - this.x;
+        const dy = this.target.y - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        if (dist > 10) {
+            this.vx += (dx/dist * 0.15);
+            this.vy += (dy/dist * 0.15);
+            const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+            this.vx = (this.vx / speed) * TROOP_SPEED;
+            this.vy = (this.vy / speed) * TROOP_SPEED;
+        }
+
+        if (dist < this.target.radius) {
+            this.hitTarget();
+            this.dead = true;
+        }
+    }
+
+    hitTarget() {
+        if (this.target.owner === this.owner) {
+            this.target.population++;
+        } else {
+            this.target.population--;
+            if (this.target.population <= 0) {
+                this.target.owner = this.owner;
+                this.target.population = 1;
+                createExplosion(this.target.x, this.target.y, COLORS[this.owner], 15);
+            }
+        }
+    }
+
+    draw() {
+        CTX.beginPath();
+        CTX.arc(this.x, this.y, TROOP_SIZE, 0, Math.PI * 2);
+        CTX.fillStyle = this.color;
+        CTX.fill();
+        
+        if (this.isPlayer) {
+            CTX.lineWidth = 1.5;
+            CTX.strokeStyle = '#ffffff';
+            CTX.stroke();
+        }
+        CTX.closePath();
+    }
+}
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.life = 1.0;
+        this.decay = 0.03 + Math.random() * 0.03;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= this.decay;
+    }
+    draw() {
+        CTX.globalAlpha = Math.max(0, this.life);
+        CTX.fillStyle = this.color;
+        CTX.beginPath();
+        CTX.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+        CTX.fill();
+        CTX.globalAlpha = 1.0;
+    }
+}
+
+/**
+ * --- UI & FLOW CONTROL ---
+ */
+function resize() {
+    CANVAS.width = window.innerWidth;
+    CANVAS.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+
+// --- Screens ---
+const uiMainMenu = document.getElementById('main-menu');
+const uiGame = document.getElementById('game-ui');
+const uiPause = document.getElementById('pause-menu');
+const uiGameOver = document.getElementById('game-over-screen');
+
+function showScreen(screen) {
+    uiMainMenu.classList.add('hidden');
+    uiGame.classList.add('hidden');
+    uiPause.classList.add('hidden');
+    uiGameOver.classList.add('hidden');
+    
+    screen.classList.remove('hidden');
+}
+
+// --- Actions ---
+
+function goToMainMenu() {
+    gameState = 'MENU';
+    showScreen(uiMainMenu);
+    // Render background battle for visual flair (optional, or just clear)
+    // We will just keep the animation loop running but logic paused? 
+    // Nah, let's clear canvas
+    CTX.fillStyle = '#111827';
+    CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
+}
+
+function startGame() {
+    resize();
+    gameState = 'PLAYING';
+    currentDifficulty = document.getElementById('difficultySelect').value;
+    
+    nodes = [];
+    troops = [];
+    particles = [];
+    dragSources = [];
+    gameTime = 0;
+    
+    generateMap();
+    
+    showScreen(uiGame); // Show minimal HUD
+    lastTime = performance.now();
+    requestAnimationFrame(loop);
+}
+
+function pauseGame() {
+    if (gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        showScreen(uiPause);
+        uiGame.classList.remove('hidden'); // Keep pause button visible/clickable underneath? 
+        // Actually, the overlay covers it.
+    }
+}
+
+function resumeGame() {
+    if (gameState === 'PAUSED') {
+        gameState = 'PLAYING';
+        showScreen(uiGame);
+        lastTime = performance.now(); // Reset delta time
+        requestAnimationFrame(loop);
+    }
+}
+
+function gameOver(win) {
+    gameState = 'GAMEOVER';
+    showScreen(uiGameOver);
+    
+    const title = document.getElementById('winnerText');
+    const sub = document.getElementById('scoreText');
+    
+    if (win) {
+        title.innerText = "VICTORY!";
+        title.className = "text-5xl font-black text-yellow-400 mb-4 drop-shadow-lg";
+        sub.innerText = "The world bows to you.";
+    } else {
+        title.innerText = "DEFEAT";
+        title.className = "text-5xl font-black text-red-600 mb-4 drop-shadow-lg";
+        sub.innerText = "Your empire has fallen.";
+    }
+}
+
+/**
+ * --- GAME LOGIC ---
+ */
+function generateMap() {
+    let attempts = 0;
+    while (nodes.length < NODE_COUNT && attempts < 2000) {
+        attempts++;
+        const margin = 60;
+        const x = margin + Math.random() * (CANVAS.width - margin * 2);
+        const y = margin + Math.random() * (CANVAS.height - margin * 2);
+        
+        let valid = true;
+        for (let n of nodes) {
+            if (Math.hypot(n.x - x, n.y - y) < MIN_DISTANCE) {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid) {
+            let owner = NEUTRAL_ID;
+            let pop = 10 + Math.floor(Math.random() * 25);
+
+            if (nodes.length === 0) {
+                owner = PLAYER_ID;
+                pop = 60;
+            } else if (nodes.length <= 10) {
+                owner = nodes.length;
+                pop = 40;
+            }
+
+            nodes.push(new Node(nodes.length, x, y, owner, pop));
+        }
+    }
+}
+
+function loop(timestamp) {
+    if (gameState !== 'PLAYING') {
+        // If paused or menu, we might still want to draw the last frame?
+        // But the overlay handles the visuals. 
+        // We stop the loop here to save battery, or keep drawing if we want background animations.
+        // For simplicity, we stop logic but maybe draw once.
+        return;
+    }
+
+    const dt = (timestamp - lastTime) / 1000;
+    lastTime = timestamp;
+
+    update(dt);
+    draw();
+    
+    requestAnimationFrame(loop);
+}
+
+function update(dt) {
+    gameTime += dt;
+
+    nodes.forEach(n => n.update(dt));
+    
+    troops.forEach(t => t.update());
+    troops = troops.filter(t => !t.dead);
+
+    // Collision
+    for (let i = 0; i < troops.length; i++) {
+        let t1 = troops[i];
+        if (t1.dead) continue;
+        for (let j = i + 1; j < troops.length; j++) {
+            let t2 = troops[j];
+            if (t2.dead) continue;
+            if (t1.owner === t2.owner) continue;
+
+            if (Math.abs(t1.x - t2.x) > TROOP_SIZE*2 || Math.abs(t1.y - t2.y) > TROOP_SIZE*2) continue;
+            if ((t1.x - t2.x)**2 + (t1.y - t2.y)**2 < (TROOP_SIZE * 2)**2) {
+                t1.dead = true;
+                t2.dead = true;
+                createExplosion((t1.x+t2.x)/2, (t1.y+t2.y)/2, '#FFF', 2);
+                break; 
+            }
+        }
+    }
+
+    particles.forEach(p => p.update());
+    particles = particles.filter(p => p.life > 0);
+
+    // AI
+    aiTimer += dt * 1000;
+    const diffSettings = DIFFICULTIES[currentDifficulty];
+    if (aiTimer > diffSettings.aiInterval) {
+        runSmartAI(diffSettings);
+        aiTimer = 0;
+    }
+
+    checkWinCondition();
+}
+
+function createExplosion(x, y, color, count) {
+    for(let i=0; i<count; i++) {
+        particles.push(new Particle(x, y, color));
+    }
+}
+
+function runSmartAI(settings) {
+    const aggression = settings.aiAggression;
+
+    nodes.forEach(node => {
+        if (node.owner !== NEUTRAL_ID && node.owner !== PLAYER_ID) {
+            if (node.population < 10) return;
+            let targets = [];
+            nodes.forEach(other => {
+                if (node.id === other.id) return;
+                const dist = Math.hypot(node.x - other.x, node.y - other.y);
+                if (dist > 350) return; // Vision range
+
+                let score = 0;
+                if (other.owner === NEUTRAL_ID) score += 50 - other.population; 
+                else if (other.owner !== node.owner) {
+                    let popDiff = node.population - other.population;
+                    score += popDiff * 2; 
+                    if (currentDifficulty === 'hard' && other.owner === PLAYER_ID) score += 120; // Hate player
+                } else {
+                    if (other.population < 10) score += 20; // Reinforce
+                }
+                score -= dist * 0.1; 
+                targets.push({ node: other, score: score });
+            });
+            targets.sort((a, b) => b.score - a.score);
+            if (targets.length > 0 && (targets[0].score > 15 || Math.random() < aggression)) {
+                sendTroops(node, targets[0].node, 0.5); 
+            }
+        }
+    });
+}
+
+function sendTroops(source, target, percent) {
+    if (source.population < 2) return;
+    let amount = Math.floor(source.population * percent);
+    source.population -= amount;
+    
+    for (let i = 0; i < amount; i++) {
+        setTimeout(() => {
+            if (gameState === 'PLAYING') { // Only spawn if still playing
+                troops.push(new Troop(source.owner, source, target));
+            }
+        }, i * 30);
+    }
+}
+
+function sendGlobalAssault(targetNode) {
+    nodes.forEach(n => {
+        if (n.owner === PLAYER_ID && n !== targetNode) {
+            sendTroops(n, targetNode, 0.5);
+            createExplosion(n.x, n.y, '#3B82F6', 5);
+        }
+    });
+    createExplosion(targetNode.x, targetNode.y, '#FF0000', 10);
+}
+
+function checkWinCondition() {
+    const owners = new Set(nodes.map(n => n.owner));
+    if (!owners.has(PLAYER_ID)) {
+        const playerTroops = troops.some(t => t.owner === PLAYER_ID);
+        if (!playerTroops) gameOver(false);
+    } else if (owners.size === 1 && owners.has(PLAYER_ID)) {
+        gameOver(true);
+    } else if (owners.size === 2 && owners.has(PLAYER_ID) && owners.has(NEUTRAL_ID)) {
+         const aiTroops = troops.some(t => t.owner !== PLAYER_ID && t.owner !== NEUTRAL_ID);
+        if (!aiTroops) gameOver(true);
+    }
+}
+
+/**
+ * --- DRAWING ---
+ */
+function draw() {
+    CTX.fillStyle = '#111827';
+    CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
+
+    // Connections
+    CTX.lineWidth = 1;
+    CTX.strokeStyle = '#374151';
+    CTX.beginPath();
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            const d = (nodes[i].x - nodes[j].x)**2 + (nodes[i].y - nodes[j].y)**2;
+            if (d < 40000) { 
+                CTX.moveTo(nodes[i].x, nodes[i].y);
+                CTX.lineTo(nodes[j].x, nodes[j].y);
+            }
+        }
+    }
+    CTX.stroke();
+
+    // Nodes
+    nodes.forEach(n => n.draw());
+
+    // Hint Arrow
+    if (gameTime < 3 && gameState === 'PLAYING') {
+        const playerNodes = nodes.filter(n => n.owner === PLAYER_ID);
+        if (playerNodes.length > 0) {
+            const p = playerNodes[0];
+            CTX.save();
+            CTX.translate(p.x, p.y - 50 - Math.sin(gameTime * 5) * 10);
+            CTX.fillStyle = '#FCD34D'; 
+            CTX.beginPath();
+            CTX.moveTo(-10, 0);
+            CTX.lineTo(10, 0);
+            CTX.lineTo(0, 20);
+            CTX.fill();
+            CTX.font = "bold 16px sans-serif";
+            CTX.fillText("YOU", 0, -10);
+            CTX.restore();
+        }
+    }
+
+    // Drag Path
+    if (isDragging && dragSources.length > 0) {
+        CTX.beginPath();
+        CTX.lineWidth = 4;
+        CTX.strokeStyle = '#FCD34D'; 
+        CTX.lineCap = 'round';
+        CTX.lineJoin = 'round';
+        CTX.setLineDash([10, 10]);
+        CTX.moveTo(dragSources[0].x, dragSources[0].y);
+        for (let i = 1; i < dragSources.length; i++) {
+            CTX.lineTo(dragSources[i].x, dragSources[i].y);
+        }
+        CTX.lineTo(dragCurrent.x, dragCurrent.y);
+        CTX.stroke();
+        CTX.setLineDash([]);
+        CTX.closePath();
+    }
+
+    troops.forEach(t => t.draw());
+    particles.forEach(p => p.draw());
+}
+
+/**
+ * --- INPUTS ---
+ */
+function getPos(e) {
+    const rect = CANVAS.getBoundingClientRect();
+    if(e.touches) {
+        return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+function handleStart(x, y) {
+    if (gameState !== 'PLAYING') return;
+    for (let n of nodes) {
+        if (Math.hypot(n.x - x, n.y - y) < n.radius * 1.2 && n.owner === PLAYER_ID) {
+            isDragging = true;
+            dragSources = [n];
+            dragCurrent = { x, y };
+            return;
+        }
+    }
+}
+
+function handleMove(x, y) {
+    if (isDragging) {
+        dragCurrent = { x, y };
+        for (let n of nodes) {
+            if (n.owner === PLAYER_ID && !dragSources.includes(n)) {
+                if (Math.hypot(n.x - x, n.y - y) < n.radius * 1.2) {
+                    dragSources.push(n);
+                }
+            }
+        }
+    }
+}
+
+function handleEnd(x, y) {
+    if (isDragging && dragSources.length > 0) {
+        let target = null;
+        for (let n of nodes) {
+            if (Math.hypot(n.x - x, n.y - y) < n.radius * 2) {
+                target = n;
+                break;
+            }
+        }
+        if (target) {
+            dragSources.forEach(source => {
+                if (source !== target) sendTroops(source, target, 0.5); 
+            });
+        }
+    }
+    isDragging = false;
+    dragSources = [];
+}
+
+function handleDoubleTap(x, y) {
+    if (gameState !== 'PLAYING') return;
+    for (let n of nodes) {
+        if (Math.hypot(n.x - x, n.y - y) < n.radius * 1.5) {
+            sendGlobalAssault(n);
+            createExplosion(x, y, '#fff', 5);
+            return;
+        }
+    }
+}
+
+// Listeners
+CANVAS.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
+window.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+window.addEventListener('mouseup', e => handleEnd(e.clientX, e.clientY));
+CANVAS.addEventListener('dblclick', e => handleDoubleTap(e.clientX, e.clientY));
+
+let lastTap = 0;
+CANVAS.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const pos = getPos(e);
+    const now = new Date().getTime();
+    if (now - lastTap < 300) handleDoubleTap(pos.x, pos.y);
+    lastTap = now;
+    handleStart(pos.x, pos.y);
+}, {passive: false});
+window.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const pos = getPos(e);
+    handleMove(pos.x, pos.y);
+}, {passive: false});
+window.addEventListener('touchend', e => {
+    const pos = e.changedTouches[0];
+    handleEnd(pos.clientX, pos.clientY);
+});
+
+// Button Wiring
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('pauseBtn').addEventListener('click', pauseGame);
+document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+document.getElementById('restartInGameBtn').addEventListener('click', startGame);
+document.getElementById('quitBtn').addEventListener('click', goToMainMenu);
+document.getElementById('playAgainBtn').addEventListener('click', startGame);
+document.getElementById('menuBtn').addEventListener('click', goToMainMenu);
+
+// Init
+goToMainMenu();
+resize();
+
+</script>
+</body>
+</html>
+
