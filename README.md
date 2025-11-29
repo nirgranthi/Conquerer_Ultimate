@@ -1,5 +1,22 @@
 # Conquerer_Ultimate
 
+<a href="https://nirgranthi.github.io/Conquerer_Ultimate/" style="
+  display:inline-block;
+  padding:0.6rem 1.2rem;
+  font-size:1.25rem;
+  margin-bottom:1.5rem;
+  background:#0d6efd;
+  color:#fff;
+  border-radius:0.375rem;
+  text-decoration:none;
+  font-family:system-ui,sans-serif;
+" onmouseover="this.style.background='#0b5ed7'"
+  onmouseout="this.style.background='#0d6efd'">
+  ▶ Play it!
+</a>
+
+
+
 👑 Conquest IO: Total Domination
 Duniya ko conquer karne ke liye ready ho jao! Conquest IO ek high-stakes, massive scale strategy game hai jahan 10 se zyada countries ek hi map par ladti hain.
 Game Ka Funda: Idle raho toh population badhegi. Attack launch karo, zameen cheeno, aur dushman ko gher lo. Simple, but brutal.
