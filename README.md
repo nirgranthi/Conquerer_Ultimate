@@ -14,7 +14,7 @@ The Core Loop: hold territory to grow your population. Launch attacks to seize n
  * 🤖 Adaptive AI: Choose your challenge. Play on Easy for a chill expansion experience or switch to Impossible to face a ruthless, aggressive AI strategist.
  * 💥 Real-Time Collisions: Physics matters. Troops die instantly if they collide with enemy units mid-path. Path planning and timing are everything!
  * 📱 Cross-Platform: Fully optimized for both Desktop (Mouse) and Mobile (Touch). Play anywhere without lag.
- * ✨ Pure Warfare: A clean, distraction-free interface focused entirely on strategy. No ads, no clutter—just war.
+ * ✨ Pure Warfare: A clean, distraction-free interface focused entirely on strategy.
 
 🎮 How to Play
  * Drag from your base to an enemy base to attack.
