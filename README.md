@@ -5,13 +5,19 @@
 </a>
 
 👑 Conquest IO: Total Domination
-Duniya ko conquer karne ke liye ready ho jao! Conquest IO ek high-stakes, massive scale strategy game hai jahan 10 se zyada countries ek hi map par ladti hain.
-Game Ka Funda: Idle raho toh population badhegi. Attack launch karo, zameen cheeno, aur dushman ko gher lo. Simple, but brutal.
+Get ready to conquer the world! Conquest IO is a high-stakes, massive-scale abstract strategy game where over 10 civilizations battle for supremacy on a single map.
+The Core Loop: hold territory to grow your population. Launch attacks to seize new lands and outmaneuver your enemies. It's simple to learn, but brutal to master.
+🔥 Key Features
+ * 🔗 Multi-Base Chain Attacks: Why attack with just one base? Drag through your allied nodes to chain-select them and launch a coordinated, massive assault on your target.
+ * ⚡ Global Assault (The Nuke): Double Tap any enemy or neutral node to command 50% of troops from ALL your bases to attack that single target instantly.
+ * 🤖 Adaptive AI: Choose your challenge. Play on Easy for a chill expansion experience or switch to Impossible to face a ruthless, aggressive AI strategist.
+ * 💥 Real-Time Collisions: Physics matters. Troops die instantly if they collide with enemy units mid-path. Path planning and timing are everything!
+ * 📱 Cross-Platform: Fully optimized for both Desktop (Mouse) and Mobile (Touch). Play anywhere without lag.
+ * ✨ Pure Warfare: A clean, distraction-free interface focused entirely on strategy. No ads, no clutter—just war.
+🎮 How to Play
+ * Drag from your base to an enemy base to attack.
+ * Drag through multiple bases to select them all.
+ * Double Click/Tap a target to launch a Global Assault.
+ * Capture all nodes to win!
+Show them who the true World Conqueror is!
 
-🔥 Features:
- * Multi-Base Chain Attack: Sirf ek base se kyu? Apne player-controlled bases ko drag-through karke chain-select karo aur ek hi baar mein massive attack launch karo!
- * Global Assault: Kisi bhi dushman ya neutral node par Double Tap karo. Tumhare saare bases se 50% troops uss target par bhej diye jaayenge—ek true Global Assault!
- * Ruthless AI: Choose karo Easy (chill expansion) ya phir Impossible (aggressive aur ruthless AI) difficulty aur dekho kitne bade strategist ho tum.
- * Real-time Collisions: Troops raste mein agar opposing troops se takraaye toh wahin khatam (die) ho jaate hain. Path planning is everything!
- * Clean Gameplay: Main Menu par saari details milengi. Game start hone ke baad, koi distraction nahi—sirf pure war.
-Ab dikhao, kaun hai naya World Conqueror!
