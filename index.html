@@ -13,12 +13,10 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
             -webkit-user-select: none;
-            /* Removed global touch-action: none to allow menu scrolling */
         }
         
         canvas {
             display: block;
-            /* Disable touch actions ONLY on the game canvas */
             touch-action: none; 
         }
         
@@ -29,20 +27,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Good for scrolling */
+            justify-content: flex-start; 
             padding: 20px 10px;
             pointer-events: auto;
             z-index: 20;
-            height: 100dvh; /* Dynamic height for mobile address bars */
-            overflow-y: auto; /* Enable vertical scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            height: 100dvh; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
         }
         
         .hidden {
             display: none !important;
         }
         
-        /* Make inputs interactive */
         select, button {
             pointer-events: auto;
         }
@@ -81,7 +78,6 @@
 
     <!-- 1. MAIN MENU SCREEN -->
     <div id="main-menu" class="screen bg-gray-900 text-white">
-        <!-- my-auto with shrink-0 helps centering but allows scroll if screen too small -->
         <div class="max-w-md w-full p-8 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl text-center relative overflow-hidden my-auto shrink-0">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500"></div>
             
@@ -91,10 +87,11 @@
             <div class="bg-gray-900 rounded-lg p-6 text-left mb-6 border border-gray-700 shadow-inner">
                 <h3 class="text-yellow-500 font-bold mb-3 text-sm uppercase tracking-wider border-b border-gray-700 pb-2">How to Conquer</h3>
                 <ul class="space-y-3 text-sm text-gray-300">
-                    <li class="flex items-start"><span class="mr-2">🔵</span> <b>Drag</b> from base to attack.</li>
-                    <li class="flex items-start"><span class="mr-2">🔗</span> <b>Drag Through</b> allies to chain attack.</li>
-                    <li class="flex items-start"><span class="mr-2">⚡</span> <b>Double Tap</b> any node to Nuke (50% from all).</li>
-                    <li class="flex items-start"><span class="mr-2">💀</span> Troops die on collision!</li>
+                    <!-- FIXED: Wrapped text in spans to ensure spacing works in flexbox -->
+                    <li class="flex items-start"><span class="mr-2">🔵</span> <span><b>Drag</b> from base to attack.</span></li>
+                    <li class="flex items-start"><span class="mr-2">🔗</span> <span><b>Drag Through</b> allies to chain attack.</span></li>
+                    <li class="flex items-start"><span class="mr-2">⚡</span> <span><b>Double Tap</b> any node to Nuke (50% from all).</span></li>
+                    <li class="flex items-start"><span class="mr-2">💀</span> <span>Troops die on collision!</span></li>
                 </ul>
             </div>
 
@@ -179,9 +176,9 @@ const NODE_RADIUS = 24;
 const AI_START_DELAY = 5;
 
 const DIFFICULTIES = {
-    easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.8 },
+    easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
     medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 1.0 },
-    hard: { aiInterval: 400, aiAggression: 0.95, growthMod: 1.2 }
+    hard: { aiInterval: 400, aiAggression: 0.8, growthMod: 1.2 }
 };
 
 // State
