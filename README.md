@@ -1,8 +1,6 @@
 # Conquerer_Ultimate
 
-<a href="https://nirgranthi.github.io/Conquerer_Ultimate/" target="_blank">
-  <img src="https://img.shields.io/badge/🚀_Live_Demo-Start_Here-3b82f6?style=for-the-badge&logo=github&logoColor=white" alt="Live Demo" height="40" />
-</a>
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Start_Here-3b82f6?style=for-the-badge&logo=github&logoColor=white)](https://nirgranthi.github.io/Conquerer_Ultimate/)
 
 ## 👑 Conquest IO: Total Domination
 Get ready to conquer the world! Conquest IO is a high-stakes, massive-scale abstract strategy game where over 10 civilizations battle for supremacy on a single map.
