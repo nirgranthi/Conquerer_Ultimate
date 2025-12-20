@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>World Conquest IO - Ultimate</title>
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 2. IN-GAME UI (Minimal) -->
+    <div id="game-ui" class="hidden">
+        <button id="pauseBtn" class="w-12 h-12 bg-gray-800 bg-opacity-60 hover:bg-opacity-90 text-white rounded-full shadow-lg backdrop-blur-sm border border-gray-600 flex items-center justify-center transition-all md:hover:scale-110 active:scale-95">
+            <span class="text-xl font-bold">⏸️</span>
+        </button>
+    </div>
+
+    <!-- 3. PAUSE MENU SCREEN -->
+    <div id="pause-menu" class="screen hidden bg-black bg-opacity-80 backdrop-blur-sm z-50 justify-center">
+        <div class="bg-gray-900 p-8 rounded-xl border border-gray-600 text-center shadow-2xl min-w-[300px]">
+            <h2 class="text-3xl font-black text-white mb-8 tracking-widest">PAUSED</h2>
+            <div class="flex flex-col gap-4">
+                <button id="resumeBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+                    Resume Game
+                </button>
+                <button id="restartInGameBtn" class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+                    Restart Map
+                </button>
+                <button id="quitBtn" class="bg-red-900 hover:bg-red-800 text-gray-300 hover:text-white font-bold py-3 px-6 rounded-lg border border-red-800 transition-transform active:scale-95">
+                    Quit to Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. GAME OVER SCREEN -->
+    <div id="game-over-screen" class="screen hidden bg-black bg-opacity-85 z-50 justify-center">
+        <div class="bg-gray-900 p-10 rounded-2xl border-2 border-yellow-500 text-center shadow-2xl transform transition-all max-w-sm w-full relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white to-transparent opacity-5 pointer-events-none"></div>
+            
+            <h2 id="winnerText" class="text-5xl font-black text-white mb-4 drop-shadow-lg">VICTORY</h2>
+            <p id="scoreText" class="text-gray-300 mb-8 text-lg">The world is yours.</p>
+            
+            <div class="flex flex-col gap-3">
+                <button id="playAgainBtn" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(234,179,8,0.4)]">
+                    PLAY AGAIN
+                </button>
+                <button id="menuBtn" class="bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Main Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script src="script.js"></script>
+<script>
+// Auto-start the game when the page loads
+window.addEventListener('load', function() {
+    startGame();
+});
+</script>
+</body>
+</html>
