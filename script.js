@@ -151,6 +151,27 @@ function startGame() {
         CANVAS.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
         CANVAS.addEventListener('dblclick', e => handleDoubleTap(e.clientX, e.clientY));
         
+        // MOBILE FIX: Bind touch listeners specifically to CANVAS so buttons remain clickable
+        CANVAS.addEventListener('touchstart', e => {
+            if (gameState !== 'PLAYING') return;
+            e.preventDefault();
+            const pos = getPos(e); const now = new Date().getTime();
+            if (now - lastTap < 300) handleDoubleTap(pos.x, pos.y); lastTap = now; handleStart(pos.x, pos.y);
+        }, {passive: false});
+
+        CANVAS.addEventListener('touchmove', e => {
+            if (gameState !== 'PLAYING') return;
+            e.preventDefault();
+            const pos = getPos(e); handleMove(pos.x, pos.y);
+        }, {passive: false});
+
+        CANVAS.addEventListener('touchend', e => {
+            if (gameState !== 'PLAYING') return;
+            const touch = e.changedTouches[0];
+            const rect = CANVAS.getBoundingClientRect();
+            handleEnd(touch.clientX - rect.left, touch.clientY - rect.top);
+        });
+        
         // Get difficulty from URL or default
         const urlParams = new URLSearchParams(window.location.search);
         currentDifficulty = urlParams.get('difficulty') || 'medium';
@@ -317,24 +338,6 @@ window.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
 window.addEventListener('mouseup', e => handleEnd(e.clientX, e.clientY));
 
 let lastTap = 0;
-// IMPORTANT: Touch scrolling fix implemented here
-window.addEventListener('touchstart', e => {
-    if (gameState !== 'PLAYING') return; // Allow default (scrolling) in menu
-    e.preventDefault(); // Prevent default ONLY in game
-    const pos = getPos(e); const now = new Date().getTime();
-    if (now - lastTap < 300) handleDoubleTap(pos.x, pos.y); lastTap = now; handleStart(pos.x, pos.y);
-}, {passive: false});
-
-window.addEventListener('touchmove', e => {
-    if (gameState !== 'PLAYING') return; // Allow default (scrolling) in menu
-    e.preventDefault(); // Prevent scrolling ONLY in game
-    const pos = getPos(e); handleMove(pos.x, pos.y);
-}, {passive: false});
-
-window.addEventListener('touchend', e => {
-    if (gameState !== 'PLAYING') return;
-    const pos = e.changedTouches[0]; handleEnd(pos.clientX, pos.clientY);
-});
 
 if (document.getElementById('startBtn')) document.getElementById('startBtn').addEventListener('click', startGame);
 if (document.getElementById('pauseBtn')) document.getElementById('pauseBtn').addEventListener('click', pauseGame);
