@@ -140,7 +140,7 @@ function goToMainMenu() {
 }
 
 function startGame() {
-    if (window.location.pathname.includes('index.html')) {
+    if (window.location.href.includes('index.html')) {
         const difficulty = document.getElementById('difficultySelect').value;
         window.location.href = 'conquer.html?difficulty=' + difficulty;
     } else {
@@ -344,7 +344,7 @@ if (document.getElementById('quitBtn')) document.getElementById('quitBtn').addEv
 if (document.getElementById('playAgainBtn')) document.getElementById('playAgainBtn').addEventListener('click', startGame);
 if (document.getElementById('menuBtn')) document.getElementById('menuBtn').addEventListener('click', goToMainMenu);
 
-if (window.location.pathname.includes('index.html') && uiMainMenu) {
+if (window.location.href.includes('index.html') && uiMainMenu) {
     showScreen(uiMainMenu);
 }
 
