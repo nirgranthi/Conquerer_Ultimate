@@ -5,140 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>World Conquest IO - Ultimate</title>
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #111827;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        
-        canvas {
-            display: block;
-            touch-action: none; 
-        }
-        
-        /* UI Layers */
-        .screen {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; 
-            padding: 20px 10px;
-            pointer-events: auto;
-            z-index: 20;
-            height: 100dvh; 
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; 
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        select, button {
-            pointer-events: auto;
-        }
-
-        /* HARDCODED STYLES (To handle issue if tailwind fails to load on time) */
-        .gradient-text {
-            background: linear-gradient(to right, #FACC15, #F97316);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: #FACC15;
-        }
-
-        .gradient-btn {
-            background: linear-gradient(to right, #2563EB, #1D4ED8);
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .gradient-btn:hover {
-            background: linear-gradient(to right, #3B82F6, #2563EB);
-            transform: scale(1.02);
-        }
-        .gradient-btn:active {
-            transform: scale(0.98);
-        }
-
-        .rainbow-strip {
-            background: linear-gradient(to right, #3B82F6, #EAB308, #EF4444);
-        }
-
-        /* From Uiverse.io by vikiWayne */ 
-        .nicebutton {
-        padding: 1em 2em;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        letter-spacing: 5px;
-        text-transform: uppercase;
-        cursor: pointer;
-        color: #2c9caf;
-        transition: all 1000ms;
-        font-size: 15px;
-        position: relative;
-        overflow: hidden;
-        outline: 2px solid #2c9caf;
-        }
-
-        .nicebutton:hover {
-        color: #ffffff;
-        transform: scale(1.1);
-        outline: 2px solid #70bdca;
-        box-shadow: 4px 5px 17px -4px #268391;
-        }
-
-        .nicebutton::before {
-        content: "";
-        position: absolute;
-        left: -50px;
-        top: 0;
-        width: 0;
-        height: 100%;
-        background-color: #2c9caf;
-        transform: skewX(45deg);
-        z-index: -1;
-        transition: width 1000ms;
-        }
-
-        .nicebutton:hover::before {
-        width: 250%;
-        }
-
-
-        /* Custom Dropdown Arrow */
-        select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            padding-right: 2.5rem;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.5); }
-            50% { box-shadow: 0 0 25px rgba(234, 179, 8, 0.8); }
-        }
-        .animate-pulse-glow {
-            animation: pulse-glow 2s infinite;
-        }
-        
-        #game-ui {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10;
-            pointer-events: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -181,7 +48,75 @@
                 ⚔️ START WAR
             </button>
         </div>
-        <p class="mt-6 text-gray-600 text-xs shrink-0 pb-8">Optimized for Mobile & Desktop</p>
+
+
+
+
+
+<div id="share-button" class="tooltip-container">
+  <div class="button-content">
+    <span class="text">Share</span>
+    <svg
+      class="share-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+    >
+      <path
+        d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92zM18 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 7.02c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"
+      ></path>
+    </svg>
+  </div>
+  <div class="tooltip-content">
+    <div class="social-icons">
+      <a href="https://twitter.com/intent/tweet?url=https://nirgranthi.github.io/Conquerer_Ultimate/" target="_blank" class="social-icon twitter">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+        >
+          <path
+            d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+          ></path>
+        </svg>
+      </a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=https://nirgranthi.github.io/Conquerer_Ultimate/" target="_blank" class="social-icon facebook">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+        >
+          <path
+            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+          ></path>
+        </svg>
+      </a>
+      <a href="https://wa.me/?text=https://nirgranthi.github.io/Conquerer_Ultimate/" target="_blank" class="social-icon whatsapp">
+        <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="24" 
+        height="24" 
+        viewBox="0 0 24 24"
+        fill="green">
+    <path 
+    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</a>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
     </div>
 
     <!-- 2. IN-GAME UI (Minimal) -->
@@ -228,340 +163,6 @@
         </div>
     </div>
 
-<script>
-/** CORE CONSTANTS */
-const CANVAS = document.getElementById('gameCanvas');
-const CTX = CANVAS.getContext('2d');
-const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#6366F1', '#14B8A6', '#4B5563'];
-const NEUTRAL_ID = 11;
-const PLAYER_ID = 0;
-
-// Config
-const NODE_COUNT = 40;
-const MIN_DISTANCE = 70;
-const MAX_POPULATION = 200;
-const BASE_GROWTH_RATE = 1.5;
-const TROOP_SPEED = 2.8;
-const TROOP_SIZE = 4;
-const NODE_RADIUS = 24;
-const AI_START_DELAY = 5;
-
-const DIFFICULTIES = {
-    easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
-    medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 1.0 },
-    hard: { aiInterval: 400, aiAggression: 0.95, growthMod: 1.2 }
-};
-
-// State
-let nodes = [];
-let troops = [];
-let particles = [];
-let dragSources = []; 
-let dragCurrent = { x: 0, y: 0 };
-let isDragging = false;
-let lastTime = 0;
-let aiTimer = 0;
-let gameTime = 0;
-let gameState = 'MENU'; // MENU, PLAYING, PAUSED, GAMEOVER
-let currentDifficulty = 'medium';
-
-/** CLASSES */
-class Node {
-    constructor(id, x, y, ownerId, pop) {
-        this.id = id; this.x = x; this.y = y; this.owner = ownerId; this.population = pop;
-        this.radius = NODE_RADIUS; this.maxPop = MAX_POPULATION; this.growthTimer = 0; this.pulse = Math.random()*Math.PI;
-    }
-    update(dt) {
-        let rate = BASE_GROWTH_RATE;
-        if (this.owner !== PLAYER_ID && this.owner !== NEUTRAL_ID) rate *= DIFFICULTIES[currentDifficulty].growthMod;
-        if (this.owner !== NEUTRAL_ID && this.population < this.maxPop) {
-            this.growthTimer += dt;
-            if (this.growthTimer > 1/rate) { this.population++; this.growthTimer = 0; }
-        }
-        this.pulse += dt * 2;
-    }
-    draw() {
-        CTX.beginPath();
-        const r = this.owner === PLAYER_ID ? this.radius + Math.sin(this.pulse)*1.5 : this.radius;
-        CTX.arc(this.x, this.y, r, 0, Math.PI * 2);
-        CTX.fillStyle = COLORS[this.owner];
-        if (this.owner === PLAYER_ID) { CTX.shadowBlur = 20; CTX.shadowColor = '#60A5FA'; }
-        else { CTX.shadowBlur = 10; CTX.shadowColor = 'rgba(0,0,0,0.3)'; }
-        CTX.fill(); CTX.shadowBlur = 0;
-        CTX.lineWidth = 3; CTX.strokeStyle = (this.owner === NEUTRAL_ID) ? '#6B7280' : '#ffffff';
-        if(this.owner === PLAYER_ID) CTX.strokeStyle = '#BFDBFE';
-        if (dragSources.includes(this)) { CTX.strokeStyle = '#FCD34D'; CTX.lineWidth = 5; }
-        CTX.stroke(); CTX.closePath();
-        CTX.fillStyle = '#fff'; CTX.font = 'bold 13px sans-serif';
-        CTX.textAlign = 'center'; CTX.textBaseline = 'middle';
-        CTX.fillText(Math.floor(this.population), this.x, this.y);
-    }
-}
-
-class Troop {
-    constructor(owner, startNode, targetNode) {
-        this.owner = owner; this.x = startNode.x; this.y = startNode.y; this.target = targetNode;
-        this.isPlayer = (owner === PLAYER_ID);
-        const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x);
-        const spread = (Math.random() - 0.5) * 0.6;
-        this.vx = Math.cos(angle + spread) * TROOP_SPEED; this.vy = Math.sin(angle + spread) * TROOP_SPEED;
-        this.dead = false; this.color = COLORS[this.owner];
-    }
-    update() {
-        this.x += this.vx; this.y += this.vy;
-        const dx = this.target.x - this.x; const dy = this.target.y - this.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist > 10) {
-            this.vx += (dx/dist * 0.15); this.vy += (dy/dist * 0.15);
-            const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
-            this.vx = (this.vx/speed)*TROOP_SPEED; this.vy = (this.vy/speed)*TROOP_SPEED;
-        }
-        if (dist < this.target.radius) { this.hitTarget(); this.dead = true; }
-    }
-    hitTarget() {
-        if (this.target.owner === this.owner) this.target.population++;
-        else {
-            this.target.population--;
-            if (this.target.population <= 0) {
-                this.target.owner = this.owner; this.target.population = 1;
-                createExplosion(this.target.x, this.target.y, COLORS[this.owner], 15);
-            }
-        }
-    }
-    draw() {
-        CTX.beginPath(); CTX.arc(this.x, this.y, TROOP_SIZE, 0, Math.PI * 2);
-        CTX.fillStyle = this.color; CTX.fill();
-        if (this.isPlayer) { CTX.lineWidth = 1.5; CTX.strokeStyle = '#ffffff'; CTX.stroke(); }
-        CTX.closePath();
-    }
-}
-
-class Particle {
-    constructor(x, y, color) {
-        this.x = x; this.y = y; this.color = color;
-        const angle = Math.random() * Math.PI * 2; const speed = Math.random() * 3;
-        this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
-        this.life = 1.0; this.decay = 0.03 + Math.random() * 0.03;
-    }
-    update() { this.x += this.vx; this.y += this.vy; this.life -= this.decay; }
-    draw() {
-        CTX.globalAlpha = Math.max(0, this.life); CTX.fillStyle = this.color;
-        CTX.beginPath(); CTX.arc(this.x, this.y, 2.5, 0, Math.PI * 2); CTX.fill(); CTX.globalAlpha = 1.0;
-    }
-}
-
-/** UI & FLOW */
-function resize() { CANVAS.width = window.innerWidth; CANVAS.height = window.innerHeight; }
-window.addEventListener('resize', resize);
-
-const uiMainMenu = document.getElementById('main-menu');
-const uiGame = document.getElementById('game-ui');
-const uiPause = document.getElementById('pause-menu');
-const uiGameOver = document.getElementById('game-over-screen');
-
-function showScreen(screen) {
-    uiMainMenu.classList.add('hidden'); uiGame.classList.add('hidden');
-    uiPause.classList.add('hidden'); uiGameOver.classList.add('hidden');
-    screen.classList.remove('hidden');
-}
-
-function goToMainMenu() {
-    gameState = 'MENU'; showScreen(uiMainMenu);
-    CTX.fillStyle = '#111827'; CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
-}
-
-function startGame() {
-    resize(); gameState = 'PLAYING';
-    currentDifficulty = document.getElementById('difficultySelect').value;
-    nodes = []; troops = []; particles = []; dragSources = []; gameTime = 0;
-    generateMap(); showScreen(uiGame);
-    lastTime = performance.now(); requestAnimationFrame(loop);
-}
-
-function pauseGame() { if (gameState === 'PLAYING') { gameState = 'PAUSED'; showScreen(uiPause); } }
-function resumeGame() { if (gameState === 'PAUSED') { gameState = 'PLAYING'; showScreen(uiGame); lastTime = performance.now(); requestAnimationFrame(loop); } }
-function gameOver(win) {
-    gameState = 'GAMEOVER'; showScreen(uiGameOver);
-    const title = document.getElementById('winnerText'); const sub = document.getElementById('scoreText');
-    if (win) { title.innerText = "VICTORY!"; title.className = "text-5xl font-black text-yellow-400 mb-4 drop-shadow-lg"; sub.innerText = "The world bows to you."; }
-    else { title.innerText = "DEFEAT"; title.className = "text-5xl font-black text-red-600 mb-4 drop-shadow-lg"; sub.innerText = "Your empire has fallen."; }
-}
-
-/** LOGIC */
-function generateMap() {
-    let attempts = 0;
-    while (nodes.length < NODE_COUNT && attempts < 2000) {
-        attempts++;
-        const margin = 60; const x = margin + Math.random()*(CANVAS.width-margin*2); const y = margin + Math.random()*(CANVAS.height-margin*2);
-        let valid = true;
-        for (let n of nodes) { if (Math.hypot(n.x - x, n.y - y) < MIN_DISTANCE) { valid = false; break; } }
-        if (valid) {
-            let owner = NEUTRAL_ID; let pop = 10 + Math.floor(Math.random() * 25);
-            if (nodes.length === 0) { owner = PLAYER_ID; pop = 60; }
-            else if (nodes.length <= 10) { owner = nodes.length; pop = 40; }
-            nodes.push(new Node(nodes.length, x, y, owner, pop));
-        }
-    }
-}
-
-function loop(timestamp) {
-    if (gameState !== 'PLAYING') return;
-    const dt = (timestamp - lastTime) / 1000; lastTime = timestamp;
-    update(dt); draw(); requestAnimationFrame(loop);
-}
-
-function update(dt) {
-    gameTime += dt;
-    nodes.forEach(n => n.update(dt));
-    troops.forEach(t => t.update()); troops = troops.filter(t => !t.dead);
-    for (let i = 0; i < troops.length; i++) {
-        let t1 = troops[i]; if (t1.dead) continue;
-        for (let j = i + 1; j < troops.length; j++) {
-            let t2 = troops[j]; if (t2.dead) continue; if (t1.owner === t2.owner) continue;
-            if ((t1.x - t2.x)**2 + (t1.y - t2.y)**2 < (TROOP_SIZE * 2)**2) {
-                t1.dead = true; t2.dead = true; createExplosion((t1.x+t2.x)/2, (t1.y+t2.y)/2, '#FFF', 2); break;
-            }
-        }
-    }
-    particles.forEach(p => p.update()); particles = particles.filter(p => p.life > 0);
-    aiTimer += dt * 1000; const diffSettings = DIFFICULTIES[currentDifficulty];
-    if (gameTime > AI_START_DELAY && aiTimer > diffSettings.aiInterval) { runSmartAI(diffSettings); aiTimer = 0; }
-    checkWinCondition();
-}
-
-function createExplosion(x, y, color, count) { for(let i=0; i<count; i++) particles.push(new Particle(x, y, color)); }
-function runSmartAI(settings) {
-    const aggression = settings.aiAggression;
-    nodes.forEach(node => {
-        if (node.owner !== NEUTRAL_ID && node.owner !== PLAYER_ID) {
-            if (node.population < 10) return;
-            let targets = [];
-            nodes.forEach(other => {
-                if (node.id === other.id) return;
-                const dist = Math.hypot(node.x - other.x, node.y - other.y);
-                if (dist > 350) return;
-                let score = 0;
-                if (other.owner === NEUTRAL_ID) score += 50 - other.population;
-                else if (other.owner !== node.owner) {
-                    let popDiff = node.population - other.population; score += popDiff * 2;
-                    if (currentDifficulty === 'hard' && other.owner === PLAYER_ID) score += 120;
-                } else { if (other.population < 10) score += 20; }
-                score -= dist * 0.1; targets.push({ node: other, score: score });
-            });
-            targets.sort((a, b) => b.score - a.score);
-            if (targets.length > 0 && (targets[0].score > 15 || Math.random() < aggression)) sendTroops(node, targets[0].node, 0.5);
-        }
-    });
-}
-
-function sendTroops(source, target, percent) {
-    if (source.population < 2) return;
-    let amount = Math.floor(source.population * percent); source.population -= amount;
-    for (let i = 0; i < amount; i++) setTimeout(() => { if (gameState === 'PLAYING') troops.push(new Troop(source.owner, source, target)); }, i * 30);
-}
-
-function sendGlobalAssault(targetNode) {
-    nodes.forEach(n => { if (n.owner === PLAYER_ID && n !== targetNode) { sendTroops(n, targetNode, 0.5); createExplosion(n.x, n.y, '#3B82F6', 5); } });
-    createExplosion(targetNode.x, targetNode.y, '#FF0000', 10);
-}
-
-function checkWinCondition() {
-    const owners = new Set(nodes.map(n => n.owner));
-    if (!owners.has(PLAYER_ID) && !troops.some(t => t.owner === PLAYER_ID)) gameOver(false);
-    else if (owners.size === 1 && owners.has(PLAYER_ID)) gameOver(true);
-    else if (owners.size === 2 && owners.has(PLAYER_ID) && owners.has(NEUTRAL_ID) && !troops.some(t => t.owner !== PLAYER_ID && t.owner !== NEUTRAL_ID)) gameOver(true);
-}
-
-function draw() {
-    CTX.fillStyle = '#111827'; CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
-    CTX.lineWidth = 1; CTX.strokeStyle = '#374151'; CTX.beginPath();
-    for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
-        const d = (nodes[i].x - nodes[j].x)**2 + (nodes[i].y - nodes[j].y)**2;
-        if (d < 40000) { CTX.moveTo(nodes[i].x, nodes[i].y); CTX.lineTo(nodes[j].x, nodes[j].y); }
-    } CTX.stroke();
-    nodes.forEach(n => n.draw());
-    if (gameTime < 3 && gameState === 'PLAYING') {
-        const p = nodes.find(n => n.owner === PLAYER_ID);
-        if (p) {
-            CTX.save(); CTX.translate(p.x, p.y - 50 - Math.sin(gameTime * 5) * 10);
-            CTX.fillStyle = '#FCD34D'; CTX.beginPath(); CTX.moveTo(-10, 0); CTX.lineTo(10, 0); CTX.lineTo(0, 20); CTX.fill();
-            CTX.font = "bold 16px sans-serif"; CTX.fillText("YOU", 0, -10); CTX.restore();
-        }
-    }
-    if (isDragging && dragSources.length > 0) {
-        CTX.beginPath(); CTX.lineWidth = 4; CTX.strokeStyle = '#FCD34D'; CTX.lineCap = 'round'; CTX.lineJoin = 'round';
-        CTX.setLineDash([10, 10]); CTX.moveTo(dragSources[0].x, dragSources[0].y);
-        for (let i = 1; i < dragSources.length; i++) CTX.lineTo(dragSources[i].x, dragSources[i].y);
-        CTX.lineTo(dragCurrent.x, dragCurrent.y); CTX.stroke(); CTX.setLineDash([]); CTX.closePath();
-    }
-    troops.forEach(t => t.draw()); particles.forEach(p => p.draw());
-}
-
-/** INPUTS */
-function getPos(e) {
-    const rect = CANVAS.getBoundingClientRect();
-    if(e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-}
-function handleStart(x, y) {
-    if (gameState !== 'PLAYING') return;
-    for (let n of nodes) if (Math.hypot(n.x - x, n.y - y) < n.radius * 1.2 && n.owner === PLAYER_ID) {
-        isDragging = true; dragSources = [n]; dragCurrent = { x, y }; return;
-    }
-}
-function handleMove(x, y) {
-    if (isDragging) {
-        dragCurrent = { x, y };
-        for (let n of nodes) if (n.owner === PLAYER_ID && !dragSources.includes(n) && Math.hypot(n.x - x, n.y - y) < n.radius * 1.2) dragSources.push(n);
-    }
-}
-function handleEnd(x, y) {
-    if (isDragging && dragSources.length > 0) {
-        let target = nodes.find(n => Math.hypot(n.x - x, n.y - y) < n.radius * 2);
-        if (target) dragSources.forEach(source => { if (source !== target) sendTroops(source, target, 0.5); });
-    }
-    isDragging = false; dragSources = [];
-}
-function handleDoubleTap(x, y) {
-    if (gameState !== 'PLAYING') return;
-    const n = nodes.find(n => Math.hypot(n.x - x, n.y - y) < n.radius * 1.5);
-    if (n) { sendGlobalAssault(n); createExplosion(x, y, '#fff', 5); }
-}
-
-CANVAS.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
-window.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
-window.addEventListener('mouseup', e => handleEnd(e.clientX, e.clientY));
-CANVAS.addEventListener('dblclick', e => handleDoubleTap(e.clientX, e.clientY));
-
-let lastTap = 0;
-// IMPORTANT: Touch scrolling fix implemented here
-window.addEventListener('touchstart', e => {
-    if (gameState !== 'PLAYING') return; // Allow default (scrolling) in menu
-    e.preventDefault(); // Prevent default ONLY in game
-    const pos = getPos(e); const now = new Date().getTime();
-    if (now - lastTap < 300) handleDoubleTap(pos.x, pos.y); lastTap = now; handleStart(pos.x, pos.y);
-}, {passive: false});
-
-window.addEventListener('touchmove', e => {
-    if (gameState !== 'PLAYING') return; // Allow default (scrolling) in menu
-    e.preventDefault(); // Prevent scrolling ONLY in game
-    const pos = getPos(e); handleMove(pos.x, pos.y);
-}, {passive: false});
-
-window.addEventListener('touchend', e => {
-    if (gameState !== 'PLAYING') return;
-    const pos = e.changedTouches[0]; handleEnd(pos.clientX, pos.clientY);
-});
-
-document.getElementById('startBtn').addEventListener('click', startGame);
-document.getElementById('pauseBtn').addEventListener('click', pauseGame);
-document.getElementById('resumeBtn').addEventListener('click', resumeGame);
-document.getElementById('restartInGameBtn').addEventListener('click', startGame);
-document.getElementById('quitBtn').addEventListener('click', goToMainMenu);
-document.getElementById('playAgainBtn').addEventListener('click', startGame);
-document.getElementById('menuBtn').addEventListener('click', goToMainMenu);
-
-goToMainMenu(); resize();
-</script>
+<script src="script.js"></script>
 </body>
 </html>
