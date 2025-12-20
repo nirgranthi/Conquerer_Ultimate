@@ -5,6 +5,15 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+    # ----------------------------------------------------------
+    # This prevents the site from deploying when you only modify
+    # these files. This saves build minutes and reduces noise.
+    # ----------------------------------------------------------
+    paths-ignore:
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - '.gitignore'
+      - 'LICENSE'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
