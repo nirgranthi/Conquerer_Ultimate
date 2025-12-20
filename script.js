@@ -1,6 +1,5 @@
 /** CORE CONSTANTS */
-const CANVAS = document.getElementById('gameCanvas');
-const CTX = CANVAS.getContext('2d');
+let CANVAS, CTX;
 const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#f40e6eff', '#14B8A6', '#4B5563'];
 const NEUTRAL_ID = 11;
 const PLAYER_ID = 0;
@@ -120,7 +119,7 @@ class Particle {
 }
 
 /** UI & FLOW */
-function resize() { CANVAS.width = window.innerWidth; CANVAS.height = window.innerHeight; }
+function resize() { if (CANVAS) { CANVAS.width = window.innerWidth; CANVAS.height = window.innerHeight; } }
 window.addEventListener('resize', resize);
 
 const uiMainMenu = document.getElementById('main-menu');
@@ -129,22 +128,38 @@ const uiPause = document.getElementById('pause-menu');
 const uiGameOver = document.getElementById('game-over-screen');
 
 function showScreen(screen) {
-    uiMainMenu.classList.add('hidden'); uiGame.classList.add('hidden');
-    uiPause.classList.add('hidden'); uiGameOver.classList.add('hidden');
-    screen.classList.remove('hidden');
+    if (uiMainMenu) uiMainMenu.classList.add('hidden');
+    if (uiGame) uiGame.classList.add('hidden');
+    if (uiPause) uiPause.classList.add('hidden');
+    if (uiGameOver) uiGameOver.classList.add('hidden');
+    if (screen) screen.classList.remove('hidden');
 }
 
 function goToMainMenu() {
-    gameState = 'MENU'; showScreen(uiMainMenu);
-    CTX.fillStyle = '#111827'; CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
+    window.location.href = 'index.html';
 }
 
 function startGame() {
-    resize(); gameState = 'PLAYING';
-    currentDifficulty = document.getElementById('difficultySelect').value;
-    nodes = []; troops = []; particles = []; dragSources = []; gameTime = 0;
-    generateMap(); showScreen(uiGame);
-    lastTime = performance.now(); requestAnimationFrame(loop);
+    if (window.location.pathname.includes('index.html')) {
+        const difficulty = document.getElementById('difficultySelect').value;
+        window.location.href = 'conquer.html?difficulty=' + difficulty;
+    } else {
+        CANVAS = document.getElementById('gameCanvas');
+        CTX = CANVAS.getContext('2d');
+        
+        // Add canvas event listeners
+        CANVAS.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
+        CANVAS.addEventListener('dblclick', e => handleDoubleTap(e.clientX, e.clientY));
+        
+        // Get difficulty from URL or default
+        const urlParams = new URLSearchParams(window.location.search);
+        currentDifficulty = urlParams.get('difficulty') || 'medium';
+        
+        resize(); gameState = 'PLAYING';
+        nodes = []; troops = []; particles = []; dragSources = []; gameTime = 0;
+        generateMap(); showScreen(uiGame);
+        lastTime = performance.now(); requestAnimationFrame(loop);
+    }
 }
 
 function pauseGame() { if (gameState === 'PLAYING') { gameState = 'PAUSED'; showScreen(uiPause); } }
@@ -268,6 +283,7 @@ function draw() {
 
 /** INPUTS */
 function getPos(e) {
+    if (!CANVAS) return { x: 0, y: 0 };
     const rect = CANVAS.getBoundingClientRect();
     if(e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -297,10 +313,8 @@ function handleDoubleTap(x, y) {
     if (n) { sendGlobalAssault(n); createExplosion(x, y, '#fff', 5); }
 }
 
-CANVAS.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
 window.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
 window.addEventListener('mouseup', e => handleEnd(e.clientX, e.clientY));
-CANVAS.addEventListener('dblclick', e => handleDoubleTap(e.clientX, e.clientY));
 
 let lastTap = 0;
 // IMPORTANT: Touch scrolling fix implemented here
@@ -322,12 +336,16 @@ window.addEventListener('touchend', e => {
     const pos = e.changedTouches[0]; handleEnd(pos.clientX, pos.clientY);
 });
 
-document.getElementById('startBtn').addEventListener('click', startGame);
-document.getElementById('pauseBtn').addEventListener('click', pauseGame);
-document.getElementById('resumeBtn').addEventListener('click', resumeGame);
-document.getElementById('restartInGameBtn').addEventListener('click', startGame);
-document.getElementById('quitBtn').addEventListener('click', goToMainMenu);
-document.getElementById('playAgainBtn').addEventListener('click', startGame);
-document.getElementById('menuBtn').addEventListener('click', goToMainMenu);
+if (document.getElementById('startBtn')) document.getElementById('startBtn').addEventListener('click', startGame);
+if (document.getElementById('pauseBtn')) document.getElementById('pauseBtn').addEventListener('click', pauseGame);
+if (document.getElementById('resumeBtn')) document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+if (document.getElementById('restartInGameBtn')) document.getElementById('restartInGameBtn').addEventListener('click', startGame);
+if (document.getElementById('quitBtn')) document.getElementById('quitBtn').addEventListener('click', goToMainMenu);
+if (document.getElementById('playAgainBtn')) document.getElementById('playAgainBtn').addEventListener('click', startGame);
+if (document.getElementById('menuBtn')) document.getElementById('menuBtn').addEventListener('click', goToMainMenu);
 
-goToMainMenu(); resize();
+if (window.location.pathname.includes('index.html') && uiMainMenu) {
+    showScreen(uiMainMenu);
+}
+
+resize();
