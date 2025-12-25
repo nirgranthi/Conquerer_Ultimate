@@ -141,7 +141,8 @@ function goToMainMenu() {
 
 function startGame() {
     if (!document.getElementById('gameCanvas')) {
-        const difficulty = document.getElementById('difficultySelect').value;
+        //const difficulty = document.getElementById('difficultySelect').value;
+        const difficulty = document.querySelector('input[name="value-radio"]:checked').value;
         window.location.href = 'conquer.html?difficulty=' + difficulty;
     } else {
         CANVAS = document.getElementById('gameCanvas');
