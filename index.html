@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>World Conquest IO - Ultimate</title>
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script src="/particles-js/particles.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
     <!-- 1. MAIN MENU SCREEN -->
     <div id="main-menu" class="screen bg-gray-900 text-white">
+        <!-- Particles Background -->
+        <div id="particles-js" class="absolute inset-0 z-0"></div>
         <div class="max-w-md w-full p-8 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl text-center relative overflow-hidden my-auto shrink-0">
             <div class="absolute top-0 left-0 w-full h-2 rainbow-strip"></div>
             
@@ -121,5 +124,6 @@
     </div>
 
 <script src="script.js"></script>
+<script src="/particles-js/particles.config.js"></script>
 </body>
 </html>
