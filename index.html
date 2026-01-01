@@ -5,7 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>World Conquest IO - Ultimate</title>
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
-    <script src="https://cdn.jsdelivr.net/gh/nirgranthi/Conquerer_Ultimate@refs/heads/main/particles-js/particles.js"></script>
+    <script>
+        async function loadScript(url) {
+            const response = await fetch(url);
+            const scriptContent = await response.text();
+            const script = document.createElement('script');
+            script.textContent = scriptContent;
+            document.body.appendChild(script); 
+        };
+        (async () => {
+            await loadScript('https://raw.githubusercontent.com/nirgranthi/Conquerer_Ultimate/refs/heads/main/particles-js/particles.js');
+            await loadScript('https://raw.githubusercontent.com/nirgranthi/Conquerer_Ultimate/refs/heads/main/particles-js/particles.config.js');
+        })();
+    </script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -124,6 +136,5 @@
     </div>
 
 <script src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/nirgranthi/Conquerer_Ultimate@refs/heads/main/particles-js/particles.config.js"></script>
 </body>
 </html>
