@@ -193,6 +193,59 @@ function gameOver(win) {
     else { title.innerText = "DEFEAT"; title.className = "text-5xl font-black text-red-600 mb-4 drop-shadow-lg"; sub.innerText = "Your empire has fallen."; }
 }
 
+/** KEYBOARD SHORTCUTS SUPPORT */
+window.addEventListener('keydown', e => {
+    // Prevent default browser actions for these keys
+    if (['Space', 'Backspace', 'Delete'].includes(e.code)) {
+        e.preventDefault();
+    }
+
+    if (gameState === 'MENU') return;
+
+    switch (e.code) {
+        case 'Space':
+            handleSpaceKey();
+            break;
+        case 'Backspace':
+            handleBackspaceKey();
+            break;
+        case 'Delete':
+            handleDeleteKey();
+            break;
+        case 'Escape':
+            if (gameState === 'PLAYING') pauseGame();
+            else if (gameState === 'PAUSED') resumeGame();
+            break;
+    }
+});
+
+// SPACE BUTTON
+function handleSpaceKey() {
+    if (gameState === 'PLAYING') {
+        pauseGame(); 
+    } else if (gameState === 'PAUSED') {
+        resumeGame();
+    } else if (gameState === 'GAMEOVER') {
+        startGame();
+    }
+}
+
+// BACKSPACE BUTTON
+function handleBackspaceKey() {
+    if (gameState === 'PAUSED') {
+        resumeGame();
+    } else if (gameState === 'PLAYING') {
+        pauseGame();
+    }
+}
+
+// DELETE BUTTON
+function handleDeleteKey() {
+    if (gameState === 'PAUSED') {
+        goToMainMenu();
+    }
+}
+
 /** LOGIC */
 function generateMap() {
     let attempts = 0;
