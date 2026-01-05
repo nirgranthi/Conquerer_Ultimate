@@ -233,7 +233,9 @@ function handleSpaceKey() {
 // BACKSPACE BUTTON
 function handleBackspaceKey() {
     if (gameState === 'PAUSED') {
-        startGame();
+        resumeGame();
+    } else if (gameState === 'PLAYING') {
+        pauseGame();
     }
 }
 
