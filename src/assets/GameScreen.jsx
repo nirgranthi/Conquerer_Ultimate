@@ -1,16 +1,20 @@
 import { useState } from "react";
 import { PauseButton } from "./Buttons";
 import { GameOverScreen } from "./GameOverScreen";
+import { PauseMenuScreen } from "./PauseMenuScreen";
 
 export function GameScreen() {
-    const [isPaused, setIspaused] = useState(false)
+    const [isPaused, setIsPaused] = useState(false)
     return (
         <>
-                <PauseButton />
-            
+            {!isPaused
+                ? <PauseButton setIsPaused={setIsPaused} />
+                : <PauseMenuScreen setIsPaused={setIsPaused} />
+            }
+
 
             {/* PAUSE MENU SCREEN */}
-            
+
 
             {/* GAME OVER SCREEN */}
             <GameOverScreen />

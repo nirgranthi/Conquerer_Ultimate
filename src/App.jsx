@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { Homepage } from "./assets/HomePage"
-import { PauseScreen } from "./assets/PauseScreen"
 import { GameScreen } from "./assets/GameScreen"
 
 function App() {
