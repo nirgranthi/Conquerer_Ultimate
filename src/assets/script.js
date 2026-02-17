@@ -139,7 +139,7 @@ function goToMainMenu() {
     window.location.href = 'index.html';
 }
 
-function startGame() {
+ function startGame() {
     if (!document.getElementById('gameCanvas')) {
         //const difficulty = document.getElementById('difficultySelect').value;
         const difficulty = document.querySelector('input[name="value-radio"]:checked').value;
@@ -406,3 +406,5 @@ if (!document.getElementById('gameCanvas') && uiMainMenu) {
 }
 
 resize();
+
+export { startGame }
