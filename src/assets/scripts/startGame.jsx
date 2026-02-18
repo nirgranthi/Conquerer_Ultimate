@@ -1,9 +1,9 @@
 import { nodeCount, growthRate, colors, difficultyConfig, neutralId, playerId, minimumDistance, nodeRadius, maxPopulation } from "../../components/configs";
 
-export function StartGame({ canvas, difficulty }) {
+export function StartGame({ canvas, difficulty, ctx }) {
 
-    const ctx = canvas.getContext('2d')
-    console.log(ctx)
+    
+    console.log(ctx.fillStyle)
 
     class Node {
         constructor(id, x, y, ownerId, pop) {
@@ -22,7 +22,7 @@ export function StartGame({ canvas, difficulty }) {
             if (this.owner !== playerId && this.owner !== neutralId) { rate *= difficultyConfig[difficulty].growthMod }
             if (this.owner !== neutralId && this.population < this.maxPop) {
                 this.growthTimer += dt
-                if (this.growthTimer > 1 / rate) {
+                if (this.growthTimer > (1 / rate)) {
                     this.population++
                     this.growthTimer = 0
                 }
@@ -91,7 +91,7 @@ export function StartGame({ canvas, difficulty }) {
                     owner = newNodes.length
                     pop = 40
                 }
-                newNodes.push(new Node(newNodes.length, x, y, owner, pop));
+                newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
             }
         }
         return newNodes

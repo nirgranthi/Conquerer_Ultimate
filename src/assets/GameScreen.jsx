@@ -12,8 +12,24 @@ export function GameScreen({ canvasRef, difficulty }) {
         const canvas = canvasRef.current
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        const node = StartGame({canvas, difficulty})
-        setNodes(node)
+        const ctx = canvas.getContext('2d')
+        const newNodes = StartGame({canvas, difficulty, ctx})
+        setNodes(newNodes)
+
+        let animationFrameId;
+
+        const render = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.fillStyle = '#111827'
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+            newNodes.forEach((node) => {
+                node.draw()
+            })
+
+            animationFrameId = requestAnimationFrame(render)
+        }
+        render()
     }, [canvasRef, difficulty])
 
     useEffect(() => {
