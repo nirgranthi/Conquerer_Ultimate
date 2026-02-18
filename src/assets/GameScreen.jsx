@@ -7,6 +7,7 @@ import { StartGame } from './scripts/startGame.jsx'
 export function GameScreen({ canvasRef, difficulty }) {
     const [isPaused, setIsPaused] = useState(false)
     const [nodes, setNodes] = useState([])
+    const fps = 40
 
     useEffect(() => {
         const canvas = canvasRef.current
@@ -24,12 +25,14 @@ export function GameScreen({ canvasRef, difficulty }) {
             ctx.fillRect(0, 0, canvas.width, canvas.height)
 
             newNodes.forEach((node) => {
+                node.update(1/fps)
                 node.draw()
             })
 
             animationFrameId = requestAnimationFrame(render)
         }
         render()
+        return () => cancelAnimationFrame(animationFrameId)
     }, [canvasRef, difficulty])
 
     useEffect(() => {
