@@ -1,20 +1,20 @@
 /** CORE CONSTANTS */
-let CANVAS, CTX;
-const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#f40e6eff', '#14B8A6', '#4B5563'];
-const NEUTRAL_ID = 11;
-const PLAYER_ID = 0;
+let CANVAS, ctx;
+const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#f40e6eff', '#14B8A6', '#4B5563'];
+const neutralId = 11;
+const playerId = 0;
 
 // Config
-const NODE_COUNT = 40;
-const MIN_DISTANCE = 70;
-const MAX_POPULATION = 200;
-const BASE_GROWTH_RATE = 1.5;
-const TROOP_SPEED = 2.8;
-const TROOP_SIZE = 4;
-const NODE_RADIUS = 24;
-const AI_START_DELAY = 5;
+const nodeCount = 40;
+const minimumDistance = 70;
+const maxPopulation = 200;
+const growthRate = 1.5;
+const troopSpeed = 2.8;
+const troopSize = 4;
+const nodeRadius = 24;
+const aiStartDelay = 5;
 
-const DIFFICULTIES = {
+const difficultyConfig = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
     medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 1.0 },
     hard: { aiInterval: 400, aiAggression: 0.95, growthMod: 1.2 }
@@ -24,7 +24,7 @@ const DIFFICULTIES = {
 let nodes = [];
 let troops = [];
 let particles = [];
-let dragSources = []; 
+let dragSources = [];
 let dragCurrent = { x: 0, y: 0 };
 let isDragging = false;
 let lastTime = 0;
@@ -36,53 +36,66 @@ let currentDifficulty = 'medium';
 /** CLASSES */
 class Node {
     constructor(id, x, y, ownerId, pop) {
-        this.id = id; this.x = x; this.y = y; this.owner = ownerId; this.population = pop;
-        this.radius = NODE_RADIUS; this.maxPop = MAX_POPULATION; this.growthTimer = 0; this.pulse = Math.random()*Math.PI;
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.owner = ownerId;
+        this.population = pop;
+        this.radius = nodeRadius;
+        this.maxPop = maxPopulation;
+        this.growthTimer = 0;
+        this.pulse = Math.random() * Math.PI;
     }
     update(dt) {
-        let rate = BASE_GROWTH_RATE;
-        if (this.owner !== PLAYER_ID && this.owner !== NEUTRAL_ID) rate *= DIFFICULTIES[currentDifficulty].growthMod;
-        if (this.owner !== NEUTRAL_ID && this.population < this.maxPop) {
+        let rate = growthRate;
+        if (this.owner !== playerId && this.owner !== neutralId)
+            rate *= difficultyConfig[currentDifficulty].growthMod;
+        if (this.owner !== neutralId && this.population < this.maxPop) {
             this.growthTimer += dt;
-            if (this.growthTimer > 1/rate) { this.population++; this.growthTimer = 0; }
+            if (this.growthTimer > 1 / rate) {
+                this.population++;
+                this.growthTimer = 0;
+            }
         }
         this.pulse += dt * 2;
     }
     draw() {
-        CTX.beginPath();
-        const r = this.owner === PLAYER_ID ? this.radius + Math.sin(this.pulse)*1.5 : this.radius;
-        CTX.arc(this.x, this.y, r, 0, Math.PI * 2);
-        CTX.fillStyle = COLORS[this.owner];
-        if (this.owner === PLAYER_ID) { CTX.shadowBlur = 20; CTX.shadowColor = '#60A5FA'; }
-        else { CTX.shadowBlur = 10; CTX.shadowColor = 'rgba(0,0,0,0.3)'; }
-        CTX.fill(); CTX.shadowBlur = 0;
-        CTX.lineWidth = 3; CTX.strokeStyle = (this.owner === NEUTRAL_ID) ? '#6B7280' : '#ffffff';
-        if(this.owner === PLAYER_ID) CTX.strokeStyle = '#BFDBFE';
-        if (dragSources.includes(this)) { CTX.strokeStyle = '#FCD34D'; CTX.lineWidth = 5; }
-        CTX.stroke(); CTX.closePath();
-        CTX.fillStyle = '#fff'; CTX.font = 'bold 13px sans-serif';
-        CTX.textAlign = 'center'; CTX.textBaseline = 'middle';
-        CTX.fillText(Math.floor(this.population), this.x, this.y);
+        ctx.beginPath();
+        const r = this.owner === playerId
+            ? this.radius + Math.sin(this.pulse) * 1.5
+            : this.radius;
+        ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = colors[this.owner];
+        if (this.owner === playerId) { ctx.shadowBlur = 20; ctx.shadowColor = '#60A5FA'; }
+        else { ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.3)'; }
+        ctx.fill(); ctx.shadowBlur = 0;
+        ctx.lineWidth = 3; ctx.strokeStyle = (this.owner === neutralId) ? '#6B7280' : '#ffffff';
+        if (this.owner === playerId) ctx.strokeStyle = '#BFDBFE';
+        if (dragSources.includes(this)) { ctx.strokeStyle = '#FCD34D'; ctx.lineWidth = 5; }
+        ctx.stroke(); ctx.closePath();
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(Math.floor(this.population), this.x, this.y);
     }
 }
 
 class Troop {
     constructor(owner, startNode, targetNode) {
         this.owner = owner; this.x = startNode.x; this.y = startNode.y; this.target = targetNode;
-        this.isPlayer = (owner === PLAYER_ID);
+        this.isPlayer = (owner === playerId);
         const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x);
         const spread = (Math.random() - 0.5) * 0.6;
-        this.vx = Math.cos(angle + spread) * TROOP_SPEED; this.vy = Math.sin(angle + spread) * TROOP_SPEED;
-        this.dead = false; this.color = COLORS[this.owner];
+        this.vx = Math.cos(angle + spread) * troopSpeed; this.vy = Math.sin(angle + spread) * troopSpeed;
+        this.dead = false; this.color = colors[this.owner];
     }
     update() {
         this.x += this.vx; this.y += this.vy;
         const dx = this.target.x - this.x; const dy = this.target.y - this.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
+        const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist > 10) {
-            this.vx += (dx/dist * 0.15); this.vy += (dy/dist * 0.15);
-            const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
-            this.vx = (this.vx/speed)*TROOP_SPEED; this.vy = (this.vy/speed)*TROOP_SPEED;
+            this.vx += (dx / dist * 0.15); this.vy += (dy / dist * 0.15);
+            const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+            this.vx = (this.vx / speed) * troopSpeed; this.vy = (this.vy / speed) * troopSpeed;
         }
         if (dist < this.target.radius) { this.hitTarget(); this.dead = true; }
     }
@@ -92,15 +105,15 @@ class Troop {
             this.target.population--;
             if (this.target.population <= 0) {
                 this.target.owner = this.owner; this.target.population = 1;
-                createExplosion(this.target.x, this.target.y, COLORS[this.owner], 15);
+                createExplosion(this.target.x, this.target.y, colors[this.owner], 15);
             }
         }
     }
     draw() {
-        CTX.beginPath(); CTX.arc(this.x, this.y, TROOP_SIZE, 0, Math.PI * 2);
-        CTX.fillStyle = this.color; CTX.fill();
-        if (this.isPlayer) { CTX.lineWidth = 1.5; CTX.strokeStyle = '#ffffff'; CTX.stroke(); }
-        CTX.closePath();
+        ctx.beginPath(); ctx.arc(this.x, this.y, troopSize, 0, Math.PI * 2);
+        ctx.fillStyle = this.color; ctx.fill();
+        if (this.isPlayer) { ctx.lineWidth = 1.5; ctx.strokeStyle = '#ffffff'; ctx.stroke(); }
+        ctx.closePath();
     }
 }
 
@@ -113,8 +126,8 @@ class Particle {
     }
     update() { this.x += this.vx; this.y += this.vy; this.life -= this.decay; }
     draw() {
-        CTX.globalAlpha = Math.max(0, this.life); CTX.fillStyle = this.color;
-        CTX.beginPath(); CTX.arc(this.x, this.y, 2.5, 0, Math.PI * 2); CTX.fill(); CTX.globalAlpha = 1.0;
+        ctx.globalAlpha = Math.max(0, this.life); ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1.0;
     }
 }
 
@@ -139,32 +152,32 @@ function goToMainMenu() {
     window.location.href = 'index.html';
 }
 
- function startGame() {
+function startGame() {
     if (!document.getElementById('gameCanvas')) {
         //const difficulty = document.getElementById('difficultySelect').value;
         const difficulty = document.querySelector('input[name="value-radio"]:checked').value;
         window.location.href = 'conquer.html?difficulty=' + difficulty;
     } else {
         CANVAS = document.getElementById('gameCanvas');
-        CTX = CANVAS.getContext('2d');
-        
+        ctx = CANVAS.getContext('2d');
+
         // Add canvas event listeners
         CANVAS.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
         CANVAS.addEventListener('dblclick', e => handleDoubleTap(e.clientX, e.clientY));
-        
+
         // MOBILE FIX: Bind touch listeners specifically to CANVAS so buttons remain clickable
         CANVAS.addEventListener('touchstart', e => {
             if (gameState !== 'PLAYING') return;
             e.preventDefault();
             const pos = getPos(e); const now = new Date().getTime();
             if (now - lastTap < 300) handleDoubleTap(pos.x, pos.y); lastTap = now; handleStart(pos.x, pos.y);
-        }, {passive: false});
+        }, { passive: false });
 
         CANVAS.addEventListener('touchmove', e => {
             if (gameState !== 'PLAYING') return;
             e.preventDefault();
             const pos = getPos(e); handleMove(pos.x, pos.y);
-        }, {passive: false});
+        }, { passive: false });
 
         CANVAS.addEventListener('touchend', e => {
             if (gameState !== 'PLAYING') return;
@@ -172,25 +185,54 @@ function goToMainMenu() {
             const rect = CANVAS.getBoundingClientRect();
             handleEnd(touch.clientX - rect.left, touch.clientY - rect.top);
         });
-        
+
         // Get difficulty from URL or default
         const urlParams = new URLSearchParams(window.location.search);
         currentDifficulty = urlParams.get('difficulty') || 'medium';
-        
-        resize(); gameState = 'PLAYING';
-        nodes = []; troops = []; particles = []; dragSources = []; gameTime = 0;
-        generateMap(); showScreen(uiGame);
-        lastTime = performance.now(); requestAnimationFrame(loop);
+
+        resize();
+        gameState = 'PLAYING';
+        nodes = [];
+        troops = [];
+        particles = [];
+        dragSources = [];
+        gameTime = 0;
+        generateMap();
+        showScreen(uiGame);
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
     }
 }
 
-function pauseGame() { if (gameState === 'PLAYING') { gameState = 'PAUSED'; showScreen(uiPause); } }
-function resumeGame() { if (gameState === 'PAUSED') { gameState = 'PLAYING'; showScreen(uiGame); lastTime = performance.now(); requestAnimationFrame(loop); } }
+function pauseGame() {
+    if (gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        showScreen(uiPause);
+    }
+}
+function resumeGame() {
+    if (gameState === 'PAUSED') {
+        gameState = 'PLAYING';
+        showScreen(uiGame);
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
+    }
+}
 function gameOver(win) {
-    gameState = 'GAMEOVER'; showScreen(uiGameOver);
-    const title = document.getElementById('winnerText'); const sub = document.getElementById('scoreText');
-    if (win) { title.innerText = "VICTORY!"; title.className = "text-5xl font-black text-yellow-400 mb-4 drop-shadow-lg"; sub.innerText = "The world bows to you."; }
-    else { title.innerText = "DEFEAT"; title.className = "text-5xl font-black text-red-600 mb-4 drop-shadow-lg"; sub.innerText = "Your empire has fallen."; }
+    gameState = 'GAMEOVER';
+    showScreen(uiGameOver);
+    const title = document.getElementById('winnerText');
+    const sub = document.getElementById('scoreText');
+    if (win) {
+        title.innerText = "VICTORY!";
+        title.className = "text-5xl font-black text-yellow-400 mb-4 drop-shadow-lg";
+        sub.innerText = "The world bows to you.";
+    }
+    else {
+        title.innerText = "DEFEAT";
+        title.className = "text-5xl font-black text-red-600 mb-4 drop-shadow-lg";
+        sub.innerText = "Your empire has fallen.";
+    }
 }
 
 /** KEYBOARD SHORTCUTS SUPPORT */
@@ -222,7 +264,7 @@ window.addEventListener('keydown', e => {
 // SPACE BUTTON
 function handleSpaceKey() {
     if (gameState === 'PLAYING') {
-        pauseGame(); 
+        pauseGame();
     } else if (gameState === 'PAUSED') {
         resumeGame();
     } else if (gameState === 'GAMEOVER') {
@@ -249,14 +291,16 @@ function handleDeleteKey() {
 /** LOGIC */
 function generateMap() {
     let attempts = 0;
-    while (nodes.length < NODE_COUNT && attempts < 2000) {
+    while (nodes.length < nodeCount && attempts < 2000) {
         attempts++;
-        const margin = 60; const x = margin + Math.random()*(CANVAS.width-margin*2); const y = margin + Math.random()*(CANVAS.height-margin*2);
+        const margin = 60
+        const x = margin + Math.random() * (CANVAS.width - margin * 2);
+        const y = margin + Math.random() * (CANVAS.height - margin * 2);
         let valid = true;
-        for (let n of nodes) { if (Math.hypot(n.x - x, n.y - y) < MIN_DISTANCE) { valid = false; break; } }
+        for (let n of nodes) { if (Math.hypot(n.x - x, n.y - y) < minimumDistance) { valid = false; break; } }
         if (valid) {
-            let owner = NEUTRAL_ID; let pop = 10 + Math.floor(Math.random() * 25);
-            if (nodes.length === 0) { owner = PLAYER_ID; pop = 60; }
+            let owner = neutralId; let pop = 10 + Math.floor(Math.random() * 25);
+            if (nodes.length === 0) { owner = playerId; pop = 60; }
             else if (nodes.length <= 10) { owner = nodes.length; pop = 40; }
             nodes.push(new Node(nodes.length, x, y, owner, pop));
         }
@@ -272,27 +316,31 @@ function loop(timestamp) {
 function update(dt) {
     gameTime += dt;
     nodes.forEach(n => n.update(dt));
-    troops.forEach(t => t.update()); troops = troops.filter(t => !t.dead);
+    troops.forEach(t => t.update());
+    troops = troops.filter(t => !t.dead);
     for (let i = 0; i < troops.length; i++) {
         let t1 = troops[i]; if (t1.dead) continue;
         for (let j = i + 1; j < troops.length; j++) {
             let t2 = troops[j]; if (t2.dead) continue; if (t1.owner === t2.owner) continue;
-            if ((t1.x - t2.x)**2 + (t1.y - t2.y)**2 < (TROOP_SIZE * 2)**2) {
-                t1.dead = true; t2.dead = true; createExplosion((t1.x+t2.x)/2, (t1.y+t2.y)/2, '#FFF', 2); break;
+            if ((t1.x - t2.x) ** 2 + (t1.y - t2.y) ** 2 < (troopSize * 2) ** 2) {
+                t1.dead = true; t2.dead = true; createExplosion((t1.x + t2.x) / 2, (t1.y + t2.y) / 2, '#FFF', 2); break;
             }
         }
     }
     particles.forEach(p => p.update()); particles = particles.filter(p => p.life > 0);
-    aiTimer += dt * 1000; const diffSettings = DIFFICULTIES[currentDifficulty];
-    if (gameTime > AI_START_DELAY && aiTimer > diffSettings.aiInterval) { runSmartAI(diffSettings); aiTimer = 0; }
+    aiTimer += dt * 1000; const diffSettings = difficultyConfig[currentDifficulty];
+    if (gameTime > aiStartDelay && aiTimer > diffSettings.aiInterval) { runSmartAI(diffSettings); aiTimer = 0; }
     checkWinCondition();
 }
 
-function createExplosion(x, y, color, count) { for(let i=0; i<count; i++) particles.push(new Particle(x, y, color)); }
+function createExplosion(x, y, color, count) {
+    for (let i = 0; i < count; i++)
+        particles.push(new Particle(x, y, color));
+}
 function runSmartAI(settings) {
     const aggression = settings.aiAggression;
     nodes.forEach(node => {
-        if (node.owner !== NEUTRAL_ID && node.owner !== PLAYER_ID) {
+        if (node.owner !== neutralId && node.owner !== playerId) {
             if (node.population < 10) return;
             let targets = [];
             nodes.forEach(other => {
@@ -300,10 +348,10 @@ function runSmartAI(settings) {
                 const dist = Math.hypot(node.x - other.x, node.y - other.y);
                 if (dist > 350) return;
                 let score = 0;
-                if (other.owner === NEUTRAL_ID) score += 50 - other.population;
+                if (other.owner === neutralId) score += 50 - other.population;
                 else if (other.owner !== node.owner) {
                     let popDiff = node.population - other.population; score += popDiff * 2;
-                    if (currentDifficulty === 'hard' && other.owner === PLAYER_ID) score += 120;
+                    if (currentDifficulty === 'hard' && other.owner === playerId) score += 120;
                 } else { if (other.population < 10) score += 20; }
                 score -= dist * 0.1; targets.push({ node: other, score: score });
             });
@@ -320,38 +368,52 @@ function sendTroops(source, target, percent) {
 }
 
 function sendGlobalAssault(targetNode) {
-    nodes.forEach(n => { if (n.owner === PLAYER_ID && n !== targetNode) { sendTroops(n, targetNode, 0.5); createExplosion(n.x, n.y, '#3B82F6', 5); } });
+    nodes.forEach(n => { if (n.owner === playerId && n !== targetNode) { sendTroops(n, targetNode, 0.5); createExplosion(n.x, n.y, '#3B82F6', 5); } });
     createExplosion(targetNode.x, targetNode.y, '#FF0000', 10);
 }
 
 function checkWinCondition() {
     const owners = new Set(nodes.map(n => n.owner));
-    if (!owners.has(PLAYER_ID) && !troops.some(t => t.owner === PLAYER_ID)) gameOver(false);
-    else if (owners.size === 1 && owners.has(PLAYER_ID)) gameOver(true);
-    else if (owners.size === 2 && owners.has(PLAYER_ID) && owners.has(NEUTRAL_ID) && !troops.some(t => t.owner !== PLAYER_ID && t.owner !== NEUTRAL_ID)) gameOver(true);
+    if (!owners.has(playerId) && !troops.some(t => t.owner === playerId)) gameOver(false);
+    else if (owners.size === 1 && owners.has(playerId)) gameOver(true);
+    else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troops.some(t => t.owner !== playerId && t.owner !== neutralId)) gameOver(true);
 }
 
 function draw() {
-    CTX.fillStyle = '#111827'; CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
-    CTX.lineWidth = 1; CTX.strokeStyle = '#374151'; CTX.beginPath();
-    for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
-        const d = (nodes[i].x - nodes[j].x)**2 + (nodes[i].y - nodes[j].y)**2;
-        if (d < 40000) { CTX.moveTo(nodes[i].x, nodes[i].y); CTX.lineTo(nodes[j].x, nodes[j].y); }
-    } CTX.stroke();
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#374151';
+    ctx.beginPath();
+    for (let i = 0; i < nodes.length; i++)
+        for (let j = i + 1; j < nodes.length; j++) {
+            const d = (nodes[i].x - nodes[j].x) ** 2 + (nodes[i].y - nodes[j].y) ** 2;
+            if (d < 40000) {
+                ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y)
+            }
+        } ctx.stroke();
     nodes.forEach(n => n.draw());
     if (gameTime < 3 && gameState === 'PLAYING') {
-        const p = nodes.find(n => n.owner === PLAYER_ID);
+        const p = nodes.find(n => n.owner === playerId);
         if (p) {
-            CTX.save(); CTX.translate(p.x, p.y - 50 - Math.sin(gameTime * 5) * 10);
-            CTX.fillStyle = '#FCD34D'; CTX.beginPath(); CTX.moveTo(-10, 0); CTX.lineTo(10, 0); CTX.lineTo(0, 20); CTX.fill();
-            CTX.font = "bold 16px sans-serif"; CTX.fillText("YOU", 0, -10); CTX.restore();
+            ctx.save();
+            ctx.translate(p.x, p.y - 50 - Math.sin(gameTime * 5) * 10);
+            ctx.fillStyle = '#FCD34D';
+            ctx.beginPath();
+            ctx.moveTo(-10, 0);
+            ctx.lineTo(10, 0);
+            ctx.lineTo(0, 20);
+            ctx.fill();
+            ctx.font = "bold 16px sans-serif";
+            ctx.fillText("YOU", 0, -10);
+            ctx.restore();
         }
     }
     if (isDragging && dragSources.length > 0) {
-        CTX.beginPath(); CTX.lineWidth = 4; CTX.strokeStyle = '#FCD34D'; CTX.lineCap = 'round'; CTX.lineJoin = 'round';
-        CTX.setLineDash([10, 10]); CTX.moveTo(dragSources[0].x, dragSources[0].y);
-        for (let i = 1; i < dragSources.length; i++) CTX.lineTo(dragSources[i].x, dragSources[i].y);
-        CTX.lineTo(dragCurrent.x, dragCurrent.y); CTX.stroke(); CTX.setLineDash([]); CTX.closePath();
+        ctx.beginPath(); ctx.lineWidth = 4; ctx.strokeStyle = '#FCD34D'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.setLineDash([10, 10]); ctx.moveTo(dragSources[0].x, dragSources[0].y);
+        for (let i = 1; i < dragSources.length; i++) ctx.lineTo(dragSources[i].x, dragSources[i].y);
+        ctx.lineTo(dragCurrent.x, dragCurrent.y); ctx.stroke(); ctx.setLineDash([]); ctx.closePath();
     }
     troops.forEach(t => t.draw()); particles.forEach(p => p.draw());
 }
@@ -360,19 +422,19 @@ function draw() {
 function getPos(e) {
     if (!CANVAS) return { x: 0, y: 0 };
     const rect = CANVAS.getBoundingClientRect();
-    if(e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    if (e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
 }
 function handleStart(x, y) {
     if (gameState !== 'PLAYING') return;
-    for (let n of nodes) if (Math.hypot(n.x - x, n.y - y) < n.radius * 1.2 && n.owner === PLAYER_ID) {
+    for (let n of nodes) if (Math.hypot(n.x - x, n.y - y) < n.radius * 1.2 && n.owner === playerId) {
         isDragging = true; dragSources = [n]; dragCurrent = { x, y }; return;
     }
 }
 function handleMove(x, y) {
     if (isDragging) {
         dragCurrent = { x, y };
-        for (let n of nodes) if (n.owner === PLAYER_ID && !dragSources.includes(n) && Math.hypot(n.x - x, n.y - y) < n.radius * 1.2) dragSources.push(n);
+        for (let n of nodes) if (n.owner === playerId && !dragSources.includes(n) && Math.hypot(n.x - x, n.y - y) < n.radius * 1.2) dragSources.push(n);
     }
 }
 function handleEnd(x, y) {

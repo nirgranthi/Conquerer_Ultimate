@@ -5,7 +5,7 @@ const playerId = 0;
 const nodeCount = 40;
 const minimumDistance = 70;
 const maxPopulation = 200;
-const playerGrowthRate = 1.5;
+const growthRate = 1.5;
 const troopSpeed = 2.8;
 const troopSize = 4;
 const nodeRadius = 24;
@@ -17,4 +17,4 @@ const difficultyConfig = {
     hard: { aiInterval: 400, aiAggression: 0.95, growthMod: 1.2 }
 };
 
-export { colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, playerGrowthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig }
+export { colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig }

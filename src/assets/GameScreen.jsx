@@ -4,7 +4,7 @@ import { GameOverScreen } from "./GameOverScreen.jsx";
 import { PauseMenuScreen } from "./PauseMenuScreen.jsx";
 import { StartGame } from './scripts/startGame.jsx'
 
-export function GameScreen({ canvasRef }) {
+export function GameScreen({ canvasRef, difficulty }) {
     const [isPaused, setIsPaused] = useState(false)
     const [nodes, setNodes] = useState([])
 
@@ -12,10 +12,9 @@ export function GameScreen({ canvasRef }) {
         const canvas = canvasRef.current
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        console.log(canvasRef.current)
-        const node = StartGame({canvas})
+        const node = StartGame({canvas, difficulty})
         setNodes(node)
-    }, [canvasRef])
+    }, [canvasRef, difficulty])
 
     useEffect(() => {
         console.log(nodes)
