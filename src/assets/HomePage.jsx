@@ -1,19 +1,13 @@
 import { ShareIcon, Twitter, Facebook, Whatsapp } from "./SVGs.jsx"
-import { startGame } from "./scripts/startGame.js"
-import { useRef } from "react"
 
 
 export function Homepage({ setDifficulty, setGameState }) {
-    const canvasRef = useRef(null)
 
     const difficultySelector = (difficulty) => {
         setDifficulty(difficulty)
     }
     const handleStart = () => {
-        if (canvasRef) {
             setGameState('playing')
-            startGame()
-        }
     }
     return (
         <div className="screen bg-gray-900 text-white">
