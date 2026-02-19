@@ -1,11 +1,10 @@
-import { useEffect } from "react";
 import { Node, nodeCount, neutralId, playerId, minimumDistance } from "../../components/configs.js";
 
-let nodes = []
+
 let previousFrameTime = 0
 let currentFrameTime = 0;
 
-export function StartGame({ canvas, difficulty, ctx, gameState }) {
+function StartGame({ canvas, difficulty, ctx, gameState, isDragging, nodesRef }) {
     const generateMap = () => {
         const newNodes = []
         let attempts = 0;
@@ -35,7 +34,7 @@ export function StartGame({ canvas, difficulty, ctx, gameState }) {
                 newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
             }
         }
-        nodes = newNodes
+        nodesRef.current = newNodes
     }
 
     const animate = () => {
@@ -43,7 +42,7 @@ export function StartGame({ canvas, difficulty, ctx, gameState }) {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         currentFrameTime = performance.now()
         const dt = (currentFrameTime - previousFrameTime) / 1000
-        nodes.forEach((node) => {
+        nodesRef.current.forEach((node) => {
             node.update(dt, difficulty)
             node.draw(ctx)
         })
@@ -57,7 +56,6 @@ export function StartGame({ canvas, difficulty, ctx, gameState }) {
         animate()
     }
     main()
-
-
-
 }
+
+export { StartGame }
