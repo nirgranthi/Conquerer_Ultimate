@@ -2,8 +2,8 @@ import { nodeCount, growthRate, colors, difficultyConfig, neutralId, playerId, m
 
 
 let nodes = []
-const fps = 60
-let animationFrameId;
+let previousFrameTime = 0
+let currentFrameTime = 0;
 
 export function StartGame({ canvas, difficulty, ctx, gameState }) {
     class Node {
@@ -66,6 +66,12 @@ export function StartGame({ canvas, difficulty, ctx, gameState }) {
         }
     }
 
+    const calculateDt = (CFTime) => {
+        const dt = (CFTime - previousFrameTime) / 1000
+        previousFrameTime = CFTime
+        return dt
+    }
+
     const generateMap = () => {
         const newNodes = []
         let attempts = 0;
@@ -98,21 +104,22 @@ export function StartGame({ canvas, difficulty, ctx, gameState }) {
         nodes = newNodes
     }
 
-    const render = () => {
+    const animate = () => {
+        if (gameState !== 'playing') return;
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.fillStyle = '#111827'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-
+        currentFrameTime = performance.now()
+        const dt = calculateDt(currentFrameTime)
         nodes.forEach((node) => {
-            node.update(1 / fps)
+            node.update(dt)
             node.draw()
         })
-        animationFrameId = requestAnimationFrame(render)
+        requestAnimationFrame(animate)
     }
 
     const main = () => {
         generateMap()
-        render()
+        previousFrameTime = performance.now()
+        animate()
     }
     main()
 
