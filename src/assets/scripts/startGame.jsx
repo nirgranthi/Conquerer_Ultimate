@@ -1,10 +1,11 @@
 import { nodeCount, growthRate, colors, difficultyConfig, neutralId, playerId, minimumDistance, nodeRadius, maxPopulation } from "../../components/configs";
 
-export function StartGame({ canvas, difficulty, ctx }) {
 
-    
-    console.log(ctx.fillStyle)
+let nodes = []
+const fps = 60
+let animationFrameId;
 
+export function StartGame({ canvas, difficulty, ctx, gameState }) {
     class Node {
         constructor(id, x, y, ownerId, pop) {
             this.id = id;
@@ -50,7 +51,7 @@ export function StartGame({ canvas, difficulty, ctx }) {
             ctx.strokeStyle = (this.owner === neutralId)
                 ? '#6B7280'
                 : '#ffffff'
-            if (this.owner === playerId) {ctx.strokeStyle = '#BFDBFE'}
+            if (this.owner === playerId) { ctx.strokeStyle = '#BFDBFE' }
             /* if (dragSources.includes(this)) {
                 ctx.strokeStyle = '#FCD34D'
                 ctx.lineWidth = 5
@@ -94,9 +95,27 @@ export function StartGame({ canvas, difficulty, ctx }) {
                 newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
             }
         }
-        return newNodes
+        nodes = newNodes
     }
 
-    return generateMap()
+    const render = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.fillStyle = '#111827'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        nodes.forEach((node) => {
+            node.update(1 / fps)
+            node.draw()
+        })
+        animationFrameId = requestAnimationFrame(render)
+    }
+
+    const main = () => {
+        generateMap()
+        render()
+    }
+    main()
+
+
 
 }
