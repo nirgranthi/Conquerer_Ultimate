@@ -1,10 +1,21 @@
-import { Node, nodeCount, neutralId, playerId, minimumDistance } from "../../components/configs.js";
+import { Node, Troop, nodeCount, neutralId, playerId, minimumDistance } from "../../components/configs.js";
 
 
 let previousFrameTime = 0
 let currentFrameTime = 0;
 
-function StartGame({ canvas, difficulty, ctx, gameState, isDragging, nodesRef }) {
+function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef }) {
+    /* isDraggingRef, dragselectedRef is not going to change, so we dont need to do .current here */
+    const isDragging = isDraggingRef.current
+
+    const sendTroops = (selectedNode, target, percent) => {
+        if (selectedNode.population < 2) return;
+        let noOfTroopsToSend = Math.floor(selectedNode.population * percent)
+        selectedNode -= noOfTroopsToSend
+        for (let i = 0; i < noOfTroopsToSend; i++) {setTimeout(() => {if (gameState === 'playing') {troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target))}}), i*30}
+    }
+    sendTroopsRef.current = sendTroops
+
     const generateMap = () => {
         const newNodes = []
         let attempts = 0;

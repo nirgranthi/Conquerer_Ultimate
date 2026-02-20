@@ -9,15 +9,17 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
     const [isPaused, setIsPaused] = useState(false)
     const isDraggingRef = useRef(false)
     const nodesRef = useRef([])
+    const troopsRef = useRef([])
     const dragSelectedRef = useRef([])
     const dragCurrentRef = useRef({ x: 0, y: 0 })
+    const sendTroopsRef = useRef(null)
 
     useEffect(() => {
         const canvas = canvasRef.current
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
-        StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef })
+        StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef })
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
@@ -25,16 +27,22 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
                 if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.2 && node.owner === playerId) {
                     isDraggingRef.current = true
                     dragSelectedRef.current = [node]
-                    dragCurrentRef.current = {x, y}
+                    dragCurrentRef.current = { x, y }
                     return
                 }
             })
         }
 
         function handleMouseUp(x, y) {
-            if (gameState !== 'playing') return;
-            isDraggingRef.current = false
-            console.log('end', x, y)
+            if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
+                let target = nodesRef.current.find(node => Math.hypot(node.x-x, node.y-y) > node.radius*1.2)
+                if (target) {dragSelectedRef.current.forEach((selectedNode) => {if (selectedNode !== target) sendTroopsRef.current(selectedNode, target, 0.5)})}
+
+
+                isDraggingRef.current = false
+                dragSelectedRef.current = []
+                console.log('end', x, y)
+            }
         }
 
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))

@@ -77,4 +77,61 @@ class Node {
     }
 }
 
-export { Node, colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig }
+class Troop {
+    constructor(owner, startNode, targetNode) {
+        this.owner = owner
+        this.x = startNode.x
+        this.y = startNode.y
+        this.target = targetNode
+        this.isPlayer = (owner === playerId)
+        const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x)
+        const spread = (Math.random() - 0.5) * 0.6
+        this.vx = Math.cos(angle + spread) * troopSpeed
+        this.vy = Math.sin(angle + spread) * troopSpeed
+        this.dead = false
+        this.color = colors[this.owner]
+    }
+    update() {
+        this.x += this.vx
+        this.y += this.vy
+        const dx = this.target.x - this.x
+        const dy = this.target.y - this.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist > 10) {
+            this.vx += (dx / dist * 0.15)
+            this.vy += (dy / dist * 0.15)
+            const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy)
+            this.vx = (this.vx / speed) * troopSpeed
+            this.vy = (this.vy / speed) * troopSpeed;
+        }
+        if (dist < this.target.radius) {
+            this.hitTarget()
+            this.dead = true
+        }
+    }
+    hitTarget(createExplosion) {
+        if (this.target.owner === this.owner) this.target.population++
+        else {
+            this.target.population--
+            if (this.target.population <= 0) {
+                this.target.owner = this.owner
+                this.target.population = 1
+                createExplosion(this.target.x, this.target.y, colors[this.owner], 15)
+            }
+        }
+    }
+    draw(ctx) {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, troopSize, 0, Math.PI * 2)
+        ctx.fillStyle = this.color
+        ctx.fill()
+        if (this.isPlayer) {
+            ctx.lineWidth = 1.5
+            ctx.strokeStyle = '#ffffff'
+            ctx.stroke()
+        }
+        ctx.closePath()
+    }
+}
+
+export { Node, Troop, colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig }
