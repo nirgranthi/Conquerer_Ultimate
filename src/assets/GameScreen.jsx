@@ -33,19 +33,33 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
             })
         }
 
+        function handleMouseMove(x, y) {
+            if (isDraggingRef.current) {
+                dragCurrentRef.current = { x, y }
+                console.log('commencing drag...')
+                nodesRef.current.forEach(node => { if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {dragSelectedRef.current.push(node)} })
+            }
+        }
+
+        /* target is from where the troop wiil be sent */
         function handleMouseUp(x, y) {
             if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
-                let target = nodesRef.current.find(node => Math.hypot(node.x-x, node.y-y) > node.radius*1.2)
-                if (target) {dragSelectedRef.current.forEach((selectedNode) => {if (selectedNode !== target) sendTroopsRef.current(selectedNode, target, 0.5)})}
-
-
+                let target = nodesRef.current.find(node => Math.hypot(node.x - x, node.y - y) > node.radius * 1.2)
+                if (target) {
+                    dragSelectedRef.current.forEach((selectedNode) => {
+                        if (selectedNode !== target) {
+                            sendTroopsRef.current(selectedNode, target, 0.5)
+                            console.log('target: ', selectedNode, target)
+                        }
+                    })
+                }
                 isDraggingRef.current = false
                 dragSelectedRef.current = []
-                console.log('end', x, y)
             }
         }
 
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
+        canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
         canvas.addEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
 
         return () => {

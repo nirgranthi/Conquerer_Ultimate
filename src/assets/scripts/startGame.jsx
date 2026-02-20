@@ -1,8 +1,9 @@
-import { Node, Troop, nodeCount, neutralId, playerId, minimumDistance } from "../../components/configs.js";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance } from "../../components/configs.js";
 
 
 let previousFrameTime = 0
-let currentFrameTime = 0;
+let currentFrameTime = 0
+let particles = 0
 
 function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef }) {
     /* isDraggingRef, dragselectedRef is not going to change, so we dont need to do .current here */
@@ -15,6 +16,13 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
         for (let i = 0; i < noOfTroopsToSend; i++) {setTimeout(() => {if (gameState === 'playing') {troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target))}}), i*30}
     }
     sendTroopsRef.current = sendTroops
+
+    /* jo cE use krre use liljo */
+    const createExplosion = (x, y, color, count) => {
+        for (let i = 0; i < count; i++) {
+            particles.push(new Particle(x, y, color))
+        }
+    }
 
     const generateMap = () => {
         const newNodes = []

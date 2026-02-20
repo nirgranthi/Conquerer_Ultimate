@@ -134,4 +134,31 @@ class Troop {
     }
 }
 
-export { Node, Troop, colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig }
+class Particle {
+    constructor(x, y, color) {
+        this.x = x
+        this.y = y
+        this.color = color
+        const angle = Math.random() * Math.PI * 2
+        const speed = Math.random() * 3
+        this.vx = Math.cos(angle) * speed
+        this.vy = Math.sin(angle) * speed
+        this.life = 1.0
+        this.decay = 0.03 + Math.random() * 0.03
+    }
+    update() {
+        this.x += this.vx
+        this.y += this.vy
+        this.life -= this.decay
+    }
+    draw(ctx) {
+        ctx.globalAlpha = Math.max(0, this.life)
+        ctx.fillStyle = this.color
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.globalAlpha = 1.0
+    }
+}
+
+export { Node, Troop, Particle, colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig }
