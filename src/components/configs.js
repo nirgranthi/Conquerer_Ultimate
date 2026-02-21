@@ -91,7 +91,7 @@ class Troop {
         this.dead = false
         this.color = colors[this.owner]
     }
-    update() {
+    update(createExplosion) {
         this.x += this.vx
         this.y += this.vy
         const dx = this.target.x - this.x
@@ -105,7 +105,7 @@ class Troop {
             this.vy = (this.vy / speed) * troopSpeed;
         }
         if (dist < this.target.radius) {
-            this.hitTarget()
+            this.hitTarget(createExplosion)
             this.dead = true
         }
     }

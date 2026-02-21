@@ -25,14 +25,12 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
-            nodesRef.current.forEach((node) => {
-                if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.2 && node.owner === playerId) {
-                    isDraggingRef.current = true
-                    dragSelectedRef.current = [node]
-                    dragCurrentRef.current = { x, y }
-                    return
-                }
-            })
+            const selectedNode = nodesRef.current.find((node) => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2 && node.owner === playerId)
+            if (selectedNode) {
+                isDraggingRef.current = true
+                dragSelectedRef.current = [selectedNode]
+                dragCurrentRef.current = { x, y }
+            }
         }
         function handleMouseMove(x, y) {
             if (isDraggingRef.current) {
@@ -40,7 +38,7 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
                 console.log('commencing drag...')
                 nodesRef.current.forEach(node => {
                     if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {
-                        dragSelectedRef.current.push(node)
+                        if (!dragSelectedRef.current.includes(node)) {dragSelectedRef.current.push(node)}
                     }
                 })
             }
@@ -48,12 +46,11 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
         /* target is from where the troop wiil be sent */
         function handleMouseUp(x, y) {
             if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
-                let target = nodesRef.current.find(node => Math.hypot(node.x - x, node.y - y) > node.radius * 1.2)
+                let target = nodesRef.current.find(node => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2)
                 if (target) {
                     dragSelectedRef.current.forEach((selectedNode) => {
                         if (selectedNode !== target) {
                             sendTroopsRef.current(selectedNode, target, 0.5)
-                            console.log('target: ', selectedNode, target)
                         }
                     })
                 }

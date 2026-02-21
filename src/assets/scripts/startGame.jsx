@@ -12,8 +12,8 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
     const sendTroops = (selectedNode, target, percent) => {
         if (selectedNode.population < 2) return;
         let noOfTroopsToSend = Math.floor(selectedNode.population * percent)
-        selectedNode -= noOfTroopsToSend
-        for (let i = 0; i < noOfTroopsToSend; i++) { setTimeout(() => { if (gameState === 'playing') { troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target)) } }), i * 30 }
+        selectedNode.population -= noOfTroopsToSend
+        for (let i = 0; i < noOfTroopsToSend; i++) { setTimeout(() => { if (gameState === 'playing') { troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target)) } }, i * 30) }
     }
     sendTroopsRef.current = sendTroops
 
@@ -26,9 +26,9 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
 
     const checkWinCondition = () => {
         const owners = new Set(nodesRef.current.map(node => node.owner))
-        if (!owners.has(playerId) && troopsRef.current.some(troop => troop.owner === playerId)) {isWonRef.current = false}
-        else if ( owners.size === 1 && owners.has(playerId)) {isWonRef.current = true}
-        else if ( owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troopsRef.current.some(troop => troop.owner !== playerId)) {isWonRef.current = true}
+        if (!owners.has(playerId) && troopsRef.current.some(troop => troop.owner === playerId)) { isWonRef.current = false }
+        else if (owners.size === 1 && owners.has(playerId)) { isWonRef.current = true }
+        else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troopsRef.current.some(troop => troop.owner !== playerId)) { isWonRef.current = true }
     }
 
     const runSmartAi = (settings) => {
@@ -38,21 +38,21 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
                 let targets = []
                 nodesRef.current.forEach(nodeB => {
                     if (nodeA.id === nodeB.id) return
-                    const dist = Math.hypot(nodeA.x-nodeB.x, nodeA.y-nodeB.y)
+                    const dist = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y)
                     if (dist > 350) return
                     let score = 0
+                    if (difficulty === 'hard' && nodeB.owner === playerId) { score += 120 }
                     if (nodeB.owner === neutralId) {
-                        score -= 50 - nodeB.population
+                        score += 50 - nodeB.population
                     } else if (nodeB.owner === nodeA.owner) {
-                        let popDiff = nodeA.population-nodeB.population
+                        let popDiff = nodeA.population - nodeB.population
                         score += popDiff * 2
-                        if (difficulty === 'hard' && nodeB.owner === playerId) {score += 120}
-                    } else { if (nodeB.population < 10) {score += 20}}
+                    } else { if (nodeB.population < 10) { score += 20 } }
                     score -= dist * 0.1
-                    targets.push({node: nodeB, score: score})
+                    targets.push({ node: nodeB, score: score })
                 })
-                targets.sort((a, b) => {b.score - a.score})
-                if (targets.length > 0 && (targets[0].score > 15 || Math.random() < settings.aiAggresion)) { sendTroops(nodeA, targets[0].node, 0.5)}
+                targets.sort((a, b) => b.score - a.score)
+                if (targets.length > 0 && (targets[0].score > 15 || Math.random() < settings.aiAggression)) { sendTroops(nodeA, targets[0].node, 0.5) }
             }
         })
     }
@@ -60,7 +60,7 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
     const update = (dt) => {
         gameTime += dt
         nodesRef.current.forEach(node => node.update(dt, difficulty))
-        troopsRef.current.forEach(troop => troop.update)
+        troopsRef.current.forEach(troop => troop.update(createExplosion))
         troopsRef.current = troopsRef.current.filter(troop => !troop.dead)
         /* troopsize */
         /* using for loop because we have to return */
@@ -73,7 +73,7 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
                         if (Math.hypot(troopA.x - troopB.x, troopA.y - troopB.y) < troopSize * 2) {
                             troopA.dead = true
                             troopB.dead = true
-                            createExplosion(troopA.x + troopB, troopA.y + troopB.y, '#FFF', 2)
+                            createExplosion(troopA.x + troopB.x, troopA.y + troopB.y, '#FFF', 2)
                             return
                         }
                     }
@@ -81,7 +81,7 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
             }
         }
         particles.forEach(particle => particle.update())
-        particles.filter(particle => particle.life > 0)
+        particles = particles.filter(particle => particle.life > 0)
         aiTimer += dt * 1000
         const difficultySettings = difficultyConfig[difficulty]
         if (gameTime > aiStartDelay && aiTimer > difficultySettings.aiInterval) {
@@ -131,11 +131,10 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
             ctx.moveTo(dragSelectedRef.current[0].x, dragSelectedRef.current[0].y)
             dragSelectedRef.current.forEach(selectedNode => {
                 ctx.lineTo(selectedNode.x, selectedNode.y)
-                ctx.lineTo(dragCurrentRef.current.x, dragCurrentRef.current.y)
-                ctx.stroke()
-                ctx.setLineDash([])
-                ctx.closePath()
             })
+            ctx.lineTo(dragCurrentRef.current.x, dragCurrentRef.current.y)
+            ctx.stroke()
+            ctx.setLineDash([])
         }
         troopsRef.current.forEach(troop => troop.draw(ctx))
         particles.forEach(particle => particle.draw(ctx))
@@ -161,7 +160,7 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
                 let pop = 10 + Math.floor(Math.random() * 25)
                 if (newNodes.length === 0) {
                     owner = playerId
-                    pop = 60
+                    pop = 600
                 }
                 else if (newNodes.length <= 10) {
                     owner = newNodes.length
