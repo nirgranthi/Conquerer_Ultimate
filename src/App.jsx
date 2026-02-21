@@ -11,7 +11,7 @@ function App() {
     <div>
       {gameState === 'menu'
       ? <Homepage setDifficulty={setDifficulty} setGameState={setGameState} canvasRef={canvasRef} />
-      : <GameScreen canvasRef={canvasRef} difficulty={difficulty} gameState={gameState} />
+      : <GameScreen canvasRef={canvasRef} difficulty={difficulty} gameState={gameState} setGameState={setGameState} />
     }
     </div>
   )

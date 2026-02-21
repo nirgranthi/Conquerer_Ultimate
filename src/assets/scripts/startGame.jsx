@@ -1,13 +1,14 @@
 import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.js";
 
 
-let previousFrameTime = 0
-let currentFrameTime = 0
-let particles = []
-let gameTime = 0
-let aiTimer = 0
+
 
 function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef }) {
+    let previousFrameTime = 0
+    let currentFrameTime = 0
+    let particles = []
+    let gameTime = 0
+    let aiTimer = 0
 
     const sendTroops = (selectedNode, target, percent) => {
         if (selectedNode.population < 2) return;

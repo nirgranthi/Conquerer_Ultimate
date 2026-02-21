@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { PauseButton } from "./Buttons";
 import { GameOverScreen } from "./GameOverScreen.jsx";
 import { PauseMenuScreen } from "./PauseMenuScreen.jsx";
@@ -6,8 +6,7 @@ import { StartGame } from './scripts/startGame.jsx'
 import { playerId } from "../components/configs.js";
 import Galaxy from "./Galaxy/Galaxy.jsx";
 
-export function GameScreen({ canvasRef, difficulty, gameState }) {
-    const [isPaused, setIsPaused] = useState(false)
+export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
     const isDraggingRef = useRef(false)
     const nodesRef = useRef([])
     const troopsRef = useRef([])
@@ -94,9 +93,9 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
                 <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
 
                 <div className="relative top-0 left-0 z-20" >
-                    {!isPaused
-                        ? <PauseButton setIsPaused={setIsPaused} />
-                        : <PauseMenuScreen setIsPaused={setIsPaused} />
+                    {gameState!=='paused'
+                        ? <PauseButton setGameState={setGameState} />
+                        : <PauseMenuScreen setGameState={setGameState} />
                     }
                 </div>
 
