@@ -1,10 +1,11 @@
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance } from "../../components/configs.js";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.js";
 
 
 let previousFrameTime = 0
 let currentFrameTime = 0
-let particles = 0
+let particles = []
 let gameTime = 0
+let aiTimer = 0
 
 function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef }) {
 
@@ -24,10 +25,37 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
     }
 
     const update = (dt) => {
-        nodesRef.current.forEach((node) => {
-            node.update(dt, difficulty)
-            node.draw(ctx, dragSelectedRef.current)
-        })
+        gameTime += dt
+        nodesRef.current.forEach(node => node.update(dt, difficulty))
+        troopsRef.current.forEach(troop => troop.update)
+        troopsRef.current = troopsRef.current.filter(troop => !troop.dead)
+        /* troopsize */
+        /* using for loop because we have to return */
+        for (let i = 0; i < troopsRef.current.length; i++) {
+            const troopA = troopsRef.current[i]
+            if (!troopA.dead) {
+                for (let j = i + 1; j < troopsRef.current.length; j++) {
+                    const troopB = troopsRef.current[j]
+                    if (!troopB.dead && troopA.owner !== troopB.owner) {
+                        if (Math.hypot(troopA.x - troopB.x, troopA.y - troopB.y) < troopSize * 2) {
+                            troopA.dead = true
+                            troopB.dead = true
+                            createExplosion(troopA.x + troopB, troopA.y + troopB.y, '#FFF', 2)
+                            return
+                        }
+                    }
+                }
+            }
+        }
+        particles.forEach(particle => particle.update())
+        particles.filter(particle => particle.life > 0)
+        aiTimer += dt * 1000
+        const difficultySettings = difficultyConfig[difficulty]
+        if (gameTime > aiStartDelay && aiTimer > difficultySettings.aiInterval) {
+            runSmartAi(difficultySettings)
+            aiTimer = 0
+        }
+        checkWinCondition()
     }
 
     const draw = () => {
@@ -36,8 +64,8 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
         ctx.strokeStyle = '#374151'
         ctx.beginPath()
         nodesRef.current.forEach((nodeA, i) => {
-            nodesRef.current.slice(i+1).forEach((nodeB) => {
-                const d = Math.hypot(nodeA.x-nodeB.x, nodeA.y-nodeB.y)
+            nodesRef.current.slice(i + 1).forEach((nodeB) => {
+                const d = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y)
                 if (d < 200) {
                     ctx.moveTo(nodeA.x, nodeA.y)
                     ctx.lineTo(nodeB.x, nodeB.y)
@@ -46,7 +74,7 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
             })
         })
         nodesRef.current.forEach(node => node.draw(ctx, dragSelectedRef.current))
-        if (gameTime < 3 && gameState==='playing'){
+        if (gameTime < 3 && gameState === 'playing') {
             const playerNode = nodesRef.current.find((node) => node.owner === playerId)
             ctx.save()
             ctx.translate(playerNode.x, playerNode.y - 50 - Math.sin(gameTime * 5) * 10)
@@ -76,8 +104,8 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
                 ctx.closePath()
             })
         }
-        troopsRef.current.forEach(troop => troop.draw())
-        particles.forEach(particle => particle.draw())
+        troopsRef.current.forEach(troop => troop.draw(ctx))
+        particles.forEach(particle => particle.draw(ctx))
     }
 
     const generateMap = () => {
