@@ -41,8 +41,8 @@ class Node {
         }
         this.pulse += dt * 2
     }
-    draw(ctx) {
-        ctx.beginPath();
+    draw(ctx, dragSelected) {
+        ctx.beginPath()
         const r = this.owner === playerId
             ? this.radius + Math.sin(this.pulse) * 1.5
             : this.radius;
@@ -63,10 +63,10 @@ class Node {
             ? '#6B7280'
             : '#ffffff'
         if (this.owner === playerId) { ctx.strokeStyle = '#BFDBFE' }
-        /* if (dragSources.includes(this)) {
+        if (dragSelected.includes(this)) {
             ctx.strokeStyle = '#FCD34D'
             ctx.lineWidth = 5
-        } */
+        }
         ctx.stroke()
         ctx.closePath()
         ctx.fillStyle = '#fff'

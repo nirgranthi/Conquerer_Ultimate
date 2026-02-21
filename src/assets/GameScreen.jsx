@@ -19,7 +19,8 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
-        StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef })
+        console.log(ctx)
+        StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef })
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
@@ -32,15 +33,17 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
                 }
             })
         }
-
         function handleMouseMove(x, y) {
             if (isDraggingRef.current) {
                 dragCurrentRef.current = { x, y }
                 console.log('commencing drag...')
-                nodesRef.current.forEach(node => { if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {dragSelectedRef.current.push(node)} })
+                nodesRef.current.forEach(node => {
+                    if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {
+                        dragSelectedRef.current.push(node)
+                    }
+                })
             }
         }
-
         /* target is from where the troop wiil be sent */
         function handleMouseUp(x, y) {
             if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
