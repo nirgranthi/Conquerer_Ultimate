@@ -7,7 +7,7 @@ let particles = []
 let gameTime = 0
 let aiTimer = 0
 
-function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef }) {
+function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef }) {
 
     const sendTroops = (selectedNode, target, percent) => {
         if (selectedNode.population < 2) return;
@@ -22,6 +22,39 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
         for (let i = 0; i < count; i++) {
             particles.push(new Particle(x, y, color))
         }
+    }
+
+    const checkWinCondition = () => {
+        const owners = new Set(nodesRef.current.map(node => node.owner))
+        if (!owners.has(playerId) && troopsRef.current.some(troop => troop.owner === playerId)) {isWonRef.current = false}
+        else if ( owners.size === 1 && owners.has(playerId)) {isWonRef.current = true}
+        else if ( owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troopsRef.current.some(troop => troop.owner !== playerId)) {isWonRef.current = true}
+    }
+
+    const runSmartAi = (settings) => {
+        nodesRef.current.forEach(nodeA => {
+            if (nodeA.owner !== playerId && nodeA.owner !== neutralId) {
+                if (nodeA.population < 10) return
+                let targets = []
+                nodesRef.current.forEach(nodeB => {
+                    if (nodeA.id === nodeB.id) return
+                    const dist = Math.hypot(nodeA.x-nodeB.x, nodeA.y-nodeB.y)
+                    if (dist > 350) return
+                    let score = 0
+                    if (nodeB.owner === neutralId) {
+                        score -= 50 - nodeB.population
+                    } else if (nodeB.owner === nodeA.owner) {
+                        let popDiff = nodeA.population-nodeB.population
+                        score += popDiff * 2
+                        if (difficulty === 'hard' && nodeB.owner === playerId) {score += 120}
+                    } else { if (nodeB.population < 10) {score += 20}}
+                    score -= dist * 0.1
+                    targets.push({node: nodeB, score: score})
+                })
+                targets.sort((a, b) => {b.score - a.score})
+                if (targets.length > 0 && (targets[0].score > 15 || Math.random() < settings.aiAggresion)) { sendTroops(nodeA, targets[0].node, 0.5)}
+            }
+        })
     }
 
     const update = (dt) => {

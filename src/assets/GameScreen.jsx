@@ -13,6 +13,7 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
     const dragSelectedRef = useRef([])
     const dragCurrentRef = useRef({ x: 0, y: 0 })
     const sendTroopsRef = useRef(null)
+    const isWonRef = useRef(null)
 
     useEffect(() => {
         const canvas = canvasRef.current
@@ -20,7 +21,7 @@ export function GameScreen({ canvasRef, difficulty, gameState }) {
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
         console.log(ctx)
-        StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef })
+        StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef })
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
