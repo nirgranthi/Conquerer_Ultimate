@@ -49,12 +49,6 @@ button {
   color: #FACC15;
 }
 
-.gradient-btn {
-  background: linear-gradient(to right, #2563EB, #1D4ED8);
-  color: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
 .rainbow-strip {
   background: linear-gradient(to right, #3B82F6, #EAB308, #EF4444);
 }
@@ -112,21 +106,6 @@ select {
   appearance: none;
 }
 
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 15px rgba(234, 179, 8, 0.5);
-  }
-
-  50% {
-    box-shadow: 0 0 25px rgba(234, 179, 8, 0.8);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s infinite;
-}
 
 #game-ui {
   position: absolute;

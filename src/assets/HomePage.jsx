@@ -19,7 +19,7 @@ export function Homepage({ setDifficulty, setGameState }) {
                 <Hyperspeed effectOptions={hyperspeedPresets.one} />
             </div>
 
-            <div className="max-w-md w-full p-8 bg-gray-800/70 rounded-2xl border border-gray-700 shadow-2xl text-center relative shrink-0">
+            <div className="max-w-md w-full overflow-hidden p-8 bg-gray-800/70 rounded-2xl border border-gray-700 shadow-2xl text-center absolute shrink-0">
                 <div className="absolute top-0 left-0 w-full h-2 rainbow-strip"></div>
 
                 <h1 className="text-5xl font-black mb-2 gradient-text tracking-tighter">CONQUEST IO</h1>
