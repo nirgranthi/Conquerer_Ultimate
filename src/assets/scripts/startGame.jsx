@@ -6,9 +6,7 @@ let currentFrameTime = 0
 let particles = 0
 let gameTime = 0
 
-function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef }) {
-    /* isDraggingRef, dragselectedRef is not going to change, so we dont need to do .current here */
-    const isDragging = isDraggingRef.current
+function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef }) {
 
     const sendTroops = (selectedNode, target, percent) => {
         if (selectedNode.population < 2) return;
@@ -62,6 +60,24 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
             ctx.fillText("YOU", 0, -10)
             ctx.restore()
         }
+        if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
+            ctx.beginPath()
+            ctx.lineWidth = 4
+            ctx.strokeStyle = '#FCD34D'
+            ctx.lineCap = 'round'
+            ctx.lineJoin = 'round'
+            ctx.setLineDash([10, 10])
+            ctx.moveTo(dragSelectedRef.current[0].x, dragSelectedRef.current[0].y)
+            dragSelectedRef.current.forEach(selectedNode => {
+                ctx.lineTo(selectedNode.x, selectedNode.y)
+                ctx.lineTo(dragCurrentRef.current.x, dragCurrentRef.current.y)
+                ctx.stroke()
+                ctx.setLineDash([])
+                ctx.closePath()
+            })
+        }
+        troopsRef.current.forEach(troop => troop.draw())
+        particles.forEach(particle => particle.draw())
     }
 
     const generateMap = () => {

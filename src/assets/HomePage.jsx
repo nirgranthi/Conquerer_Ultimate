@@ -40,6 +40,7 @@ export function Homepage({ setDifficulty, setGameState }) {
                     <div className="relative">
                         {/* <!-- From Uiverse.io by m1her --> */}
                         <div className="radio-input">
+                            {/* map the labels */}
                             <label className="label">
                                 <input value='easy' name="value-radio" id="value-1" type="radio" onClick={(e) => {difficultySelector(e.target.value)}} />
                                 <span className="text">Easy</span>
