@@ -37,7 +37,7 @@ uniform bool uTransparent;
 
 varying vec2 vUv;
 
-#define NUM_LAYER 4.0
+#define NUM_LAYER 2.0
 #define STAR_COLOR_CUTOFF 0.2
 #define MAT45 mat2(0.7071, -0.7071, 0.7071, 0.7071)
 #define PERIOD 3.0
@@ -169,9 +169,11 @@ void main() {
 }
 `;
 
+const focalConfig = [0.5, 0.5]
+const rotationConfig = [1.0, 0.0]
 export default function Galaxy({
-  focal = [0.5, 0.5],
-  rotation = [1.0, 0.0],
+  focal = focalConfig,
+  rotation = rotationConfig,
   starSpeed = 0.5,
   density = 1,
   hueShift = 140,

@@ -52,10 +52,6 @@ class Node {
             ctx.shadowBlur = 20
             ctx.shadowColor = '#60A5FA'
         }
-        else {
-            ctx.shadowBlur = 10
-            ctx.shadowColor = 'rgba(0,0,0,0.3)'
-        }
         ctx.fill()
         ctx.shadowBlur = 0
         ctx.lineWidth = 3

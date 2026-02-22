@@ -8,6 +8,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
     let gameTime = 0
     let aiTimer = 0
     let animationId
+    let connections = []
 
     const sendTroops = (selectedNode, target, percent) => {
         if (selectedNode.population < 2) return;
@@ -41,7 +42,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
     }
 
     const handleDoubleTap = (x, y) => {
-        const targetNode = nodesRef.current.find(node => Math.hypot(node.x-x, node.y-y) < node.radius*1.5)
+        const targetNode = nodesRef.current.find(node => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2)
         if (targetNode) {
             globalAssault(targetNode)
             createExplosion(x, y, '#fff', 5)
@@ -104,7 +105,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
                 for (let j = i + 1; j < troopsRef.current.length; j++) {
                     const troopB = troopsRef.current[j]
                     if (!troopB.dead && troopA.owner !== troopB.owner) {
-                        if (Math.hypot(troopA.x - troopB.x, troopA.y - troopB.y) < troopSize * 2) {
+                        if ((troopA.x - troopB.x) ** 2 + (troopA.y - troopB.y) ** 2 < (troopSize * 2) ** 2) {
                             troopA.dead = true
                             troopB.dead = true
                             createExplosion(troopA.x + troopB.x, troopA.y + troopB.y, '#FFF', 2)
@@ -130,16 +131,13 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
         ctx.lineWidth = 1
         ctx.strokeStyle = '#374151'
         ctx.beginPath()
-        nodesRef.current.forEach((nodeA, i) => {
-            nodesRef.current.slice(i + 1).forEach((nodeB) => {
-                const d = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y)
-                if (d < 200) {
-                    ctx.moveTo(nodeA.x, nodeA.y)
-                    ctx.lineTo(nodeB.x, nodeB.y)
-                }
-                ctx.stroke()
-            })
+        
+        connections.forEach(connection => {
+            ctx.moveTo(connection.nodeA.x, connection.nodeA.y)
+            ctx.lineTo(connection.nodeB.x, connection.nodeB.y)
         })
+        ctx.stroke()
+
         nodesRef.current.forEach(node => node.draw(ctx, dragSelectedRef.current))
         if (gameTime < 3 && gameStateRef.current === 'playing') {
             const playerNode = nodesRef.current.find((node) => node.owner === playerId)
@@ -177,14 +175,14 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
     const generateMap = () => {
         const newNodes = []
         let attempts = 0;
-        while (newNodes.length < nodeCount && attempts < 2000) {
+        while (newNodes.length < nodeCount && attempts < 100) {
             attempts++;
             const margin = 60
             const x = margin + Math.random() * (canvas.width - margin * 2);
             const y = margin + Math.random() * (canvas.height - margin * 2);
             let valid = true
             for (let n of newNodes) {
-                if (Math.hypot(n.x - x, n.y - y) < minimumDistance) {
+                if (((n.x - x) ** 2 + (n.y - y) ** 2) < minimumDistance ** 2) {
                     valid = false
                     break
                 }
@@ -204,6 +202,12 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
             }
         }
         nodesRef.current = newNodes
+        connections = []
+        newNodes.forEach((nodeA, i) => {
+            newNodes.slice(i + 1).forEach(nodeB => {
+                if (((nodeA.x - nodeB.x)**2 + (nodeA.y - nodeB.y)**2) < 40000) connections.push({ nodeA, nodeB })
+            })
+        })
     }
 
     const animate = () => {

@@ -37,7 +37,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
 
     function handleMouseDown(x, y) {
         if (gameState !== 'playing') return;
-        const selectedNode = nodesRef.current.find((node) => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2 && node.owner === playerId)
+        const selectedNode = nodesRef.current.find((node) => ((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.2)**2 && node.owner === playerId)
         if (selectedNode) {
             isDraggingRef.current = true
             dragSelectedRef.current = [selectedNode]
@@ -57,7 +57,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         if (isDraggingRef.current) {
             dragCurrentRef.current = { x, y }
             nodesRef.current.forEach(node => {
-                if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {
+                if (((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.5)**2 && node.owner === playerId) {
                     if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node) }
                 }
             })
@@ -67,7 +67,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
     /* target is from where the troop wiil be sent */
     function handleMouseUp(x, y) {
         if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
-            let target = nodesRef.current.find(node => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2)
+            let target = nodesRef.current.find(node => ((node.x - x)**2+ (node.y - y)**2) < (node.radius * 1.2)**2)
             if (target) {
                 dragSelectedRef.current.forEach((selectedNode) => {
                     if (selectedNode !== target) {
@@ -122,7 +122,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
             <div>
                 <div className="absolute w-full h-full z-0" >
                     <Galaxy
-                        mouseRepulsion
+                        mouseRepulsion={false}
                         mouseInteraction={false}
                         density={1}
                         glowIntensity={0.2}
