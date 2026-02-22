@@ -14,9 +14,13 @@ const QuitToMenu = ({ setGameState }) => {
     )
 }
 
-const RestartMap = ({setPlayCount}) => {
+const RestartMap = ({setGameState, setPlayCount}) => {
+    function handleRestartMap () {
+        setPlayCount(prev=> prev+1)
+        setGameState('playing')
+    }
     return (
-        <button onClick={() => setPlayCount(prev=> prev+1)} className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+        <button onClick={handleRestartMap} className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
             Restart Map
         </button>
     )

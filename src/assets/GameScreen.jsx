@@ -23,7 +23,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
         console.log('No. of times played: ', playCount)
-        StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef })
+        const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef })
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
@@ -37,7 +37,6 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         function handleMouseMove(x, y) {
             if (isDraggingRef.current) {
                 dragCurrentRef.current = { x, y }
-                console.log('commencing drag...')
                 nodesRef.current.forEach(node => {
                     if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {
                         if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node) }
@@ -66,6 +65,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         canvas.addEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
 
         return () => {
+            stopGame()
             canvas.removeEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
             canvas.removeEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
             canvas.removeEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))

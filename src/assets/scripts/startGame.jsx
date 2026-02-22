@@ -9,6 +9,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
     let particles = []
     let gameTime = 0
     let aiTimer = 0
+    let animationId
 
     const sendTroops = (selectedNode, target, percent) => {
         if (selectedNode.population < 2) return;
@@ -46,13 +47,13 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
                     const dist = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y)
                     if (dist > 350) return
                     let score = 0
-                    if (difficulty === 'hard' && nodeB.owner === playerId) { score += 120 }
+                    if (difficulty === 'hard' && nodeB.owner === playerId) { score += 90 }
                     if (nodeB.owner === neutralId) {
-                        score += 50 - nodeB.population
+                        score += 30 - nodeB.population
                     } else if (nodeB.owner === nodeA.owner) {
                         let popDiff = nodeA.population - nodeB.population
                         score += popDiff * 2
-                    } else { if (nodeB.population < 10) { score += 20 } }
+                    } else { if (nodeB.population < 10) { score += 15 } }
                     score -= dist * 0.1
                     targets.push({ node: nodeB, score: score })
                 })
@@ -178,10 +179,14 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
     }
 
     const animate = () => {
-        requestAnimationFrame(animate)
-        if (gameStateRef.current !== 'playing') return;
+        animationId = requestAnimationFrame(animate)
+        if (gameStateRef.current !== 'playing') {
+            previousFrameTime = performance.now()
+            return
+        }
         currentFrameTime = performance.now()
-        const dt = (currentFrameTime - previousFrameTime) / 1000
+        let dt = (currentFrameTime - previousFrameTime) / 1000
+        if (dt>0.1) dt=0.1
         update(dt)
         draw()
         previousFrameTime = currentFrameTime
@@ -195,6 +200,8 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
         animate()
     }
     main()
+
+    return () => cancelAnimationFrame(animationId)
 }
 
 export { StartGame }
