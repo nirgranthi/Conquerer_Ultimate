@@ -1,3 +1,8 @@
+function handleRestartMap(setGameState, setPlayCount) {
+    setPlayCount(prev => prev + 1)
+    setGameState('playing')
+}
+
 const PauseButton = ({ setGameState }) => {
     return (
         <button onClick={() => setGameState('paused')} className="w-12 h-12 bg-gray-800 bg-opacity-60 hover:bg-opacity-90 text-white rounded-full shadow-lg backdrop-blur-sm border border-gray-600 flex items-center justify-center transition-all md:hover:scale-110 active:scale-95">
@@ -14,13 +19,9 @@ const QuitToMenu = ({ setGameState }) => {
     )
 }
 
-const RestartMap = ({setGameState, setPlayCount}) => {
-    function handleRestartMap () {
-        setPlayCount(prev=> prev+1)
-        setGameState('playing')
-    }
+const RestartMap = ({ setGameState, setPlayCount }) => {
     return (
-        <button onClick={handleRestartMap} className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+        <button onClick={() => handleRestartMap(setGameState, setPlayCount)} className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
             Restart Map
         </button>
     )
@@ -34,17 +35,17 @@ const ResumeGame = ({ setGameState }) => {
     )
 }
 
-const MainMenu = () => {
+const MainMenu = ({ setGameState }) => {
     return (
-        <button className="bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white font-bold py-2 px-4 rounded-lg transition-colors">
+        <button onClick={() => setGameState('menu')} className="bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white font-bold py-2 px-4 rounded-lg transition-colors">
             Main Menu
         </button>
     )
 }
 
-const PlayAgain = () => {
+const PlayAgain = ({ setGameState, setPlayCount }) => {
     return (
-        <button className="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(234,179,8,0.4)]">
+        <button onClick={() => handleRestartMap(setGameState, setPlayCount)} className="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(234,179,8,0.4)]">
             PLAY AGAIN
         </button>
     )

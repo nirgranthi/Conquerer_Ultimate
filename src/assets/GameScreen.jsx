@@ -110,7 +110,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
                 {/* GAME OVER SCREEN */}
                 <div className="z-30">
                     {gameState === 'gameover'
-                        ? <GameOverScreen isWon={isWon} />
+                        ? <GameOverScreen isWon={isWon} setGameState={setGameState} setPlayCount={setPlayCount} />
                         : ''
                     }
                 </div>

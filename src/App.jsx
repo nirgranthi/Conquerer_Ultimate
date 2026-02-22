@@ -4,7 +4,7 @@ import { GameScreen } from "./assets/GameScreen"
 
 function App() {
   const [difficulty, setDifficulty] = useState('medium')
-  const [gameState, setGameState] = useState('menu') /* meun, playing, paused */
+  const [gameState, setGameState] = useState('menu') /* meun, playing, paused, gameover */
 
   const canvasRef = useRef(null)
   return (

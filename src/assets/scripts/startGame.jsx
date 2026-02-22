@@ -178,7 +178,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
                 let pop = 10 + Math.floor(Math.random() * 25)
                 if (newNodes.length === 0) {
                     owner = playerId
-                    pop = 600
+                    pop = 60
                 }
                 else if (newNodes.length <= 10) {
                     owner = newNodes.length

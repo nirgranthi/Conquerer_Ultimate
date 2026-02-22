@@ -1,6 +1,6 @@
 import { MainMenu, PlayAgain } from "./Buttons";
 
-export function GameOverScreen({ isWon }) {
+export function GameOverScreen({ isWon, setGameState, setPlayCount }) {
     console.log(isWon)
     return (
         <div className="screen bg-black bg-opacity-85 z-50 justify-center">
@@ -19,8 +19,8 @@ export function GameOverScreen({ isWon }) {
                 }
 
                 <div className="flex flex-col gap-3">
-                    <PlayAgain />
-                    <MainMenu />
+                    <PlayAgain setGameState={setGameState} setPlayCount={setPlayCount} />
+                    <MainMenu setGameState={setGameState} />
                 </div>
             </div>
         </div>
