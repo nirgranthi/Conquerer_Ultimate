@@ -47,7 +47,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
                     const dist = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y)
                     if (dist > 350) return
                     let score = 0
-                    if (difficulty === 'hard' && nodeB.owner === playerId) { score += 90 }
+                    if (difficulty === 'hard' && nodeB.owner === playerId) { score += 20 }
                     if (nodeB.owner === neutralId) {
                         score += 30 - nodeB.population
                     } else if (nodeB.owner === nodeA.owner) {
@@ -166,7 +166,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
                 let pop = 10 + Math.floor(Math.random() * 25)
                 if (newNodes.length === 0) {
                     owner = playerId
-                    pop = 600
+                    pop = 60
                 }
                 else if (newNodes.length <= 10) {
                     owner = newNodes.length
