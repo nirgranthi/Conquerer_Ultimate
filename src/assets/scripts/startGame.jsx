@@ -3,7 +3,7 @@ import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance,
 
 
 
-function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef }) {
+function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -14,7 +14,11 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
         if (selectedNode.population < 2) return;
         let noOfTroopsToSend = Math.floor(selectedNode.population * percent)
         selectedNode.population -= noOfTroopsToSend
-        for (let i = 0; i < noOfTroopsToSend; i++) { setTimeout(() => { if (gameState === 'playing') { troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target)) } }, i * 30) }
+        for (let i = 0; i < noOfTroopsToSend; i++) {
+            setTimeout(() => { if (gameStateRef.current === 'playing') {
+                troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target)) } }, i * 30
+            )
+        }
     }
     sendTroopsRef.current = sendTroops
 
@@ -108,7 +112,7 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
             })
         })
         nodesRef.current.forEach(node => node.draw(ctx, dragSelectedRef.current))
-        if (gameTime < 3 && gameState === 'playing') {
+        if (gameTime < 3 && gameStateRef.current === 'playing') {
             const playerNode = nodesRef.current.find((node) => node.owner === playerId)
             ctx.save()
             ctx.translate(playerNode.x, playerNode.y - 50 - Math.sin(gameTime * 5) * 10)
@@ -174,13 +178,15 @@ function StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef
     }
 
     const animate = () => {
-        if (gameState !== 'playing') return;
+        requestAnimationFrame(animate)
+        if (gameStateRef.current !== 'playing') return;
         currentFrameTime = performance.now()
         const dt = (currentFrameTime - previousFrameTime) / 1000
         update(dt)
         draw()
         previousFrameTime = currentFrameTime
-        requestAnimationFrame(animate)
+        console.log(gameStateRef.current)
+        
     }
 
     const main = () => {

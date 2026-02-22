@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PauseButton } from "./Buttons";
 import { GameOverScreen } from "./GameOverScreen.jsx";
 import { PauseMenuScreen } from "./PauseMenuScreen.jsx";
@@ -14,14 +14,16 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
     const dragCurrentRef = useRef({ x: 0, y: 0 })
     const sendTroopsRef = useRef(null)
     const isWonRef = useRef(null)
+    const [playCount, setPlayCount] = useState(0)
+    const gameStateRef = useRef(gameState)
 
     useEffect(() => {
         const canvas = canvasRef.current
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
-        console.log(ctx)
-        StartGame({ canvas, difficulty, ctx, gameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef })
+        console.log('No. of times played: ', playCount)
+        StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef })
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
@@ -68,7 +70,11 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
             canvas.removeEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
             canvas.removeEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
         }
-    }, [canvasRef, difficulty, gameState])
+    }, [canvasRef, difficulty, playCount])
+
+    useEffect(() => {
+        gameStateRef.current = gameState
+    }, [gameState])
 
     return (
         <>
@@ -95,7 +101,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
                 <div className="relative top-0 left-0 z-20" >
                     {gameState!=='paused'
                         ? <PauseButton setGameState={setGameState} />
-                        : <PauseMenuScreen setGameState={setGameState} />
+                        : <PauseMenuScreen setGameState={setGameState} setPlayCount={setPlayCount} />
                     }
                 </div>
 

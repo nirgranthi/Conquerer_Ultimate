@@ -10,9 +10,9 @@ function App() {
   return (
     <div>
       {gameState === 'menu'
-      ? <Homepage setDifficulty={setDifficulty} setGameState={setGameState} canvasRef={canvasRef} />
-      : <GameScreen canvasRef={canvasRef} difficulty={difficulty} gameState={gameState} setGameState={setGameState} />
-    }
+        ? <Homepage setDifficulty={setDifficulty} setGameState={setGameState} canvasRef={canvasRef} />
+        : <GameScreen canvasRef={canvasRef} difficulty={difficulty} gameState={gameState} setGameState={setGameState} />
+      }
     </div>
   )
 }

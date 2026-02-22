@@ -6,25 +6,25 @@ const PauseButton = ({ setGameState }) => {
     )
 }
 
-const QuitToMenu = () => {
+const QuitToMenu = ({ setGameState }) => {
     return (
-        <button className="bg-red-900 hover:bg-red-800 text-gray-300 hover:text-white font-bold py-3 px-6 rounded-lg border border-red-800 transition-transform active:scale-95">
+        <button onClick={() => setGameState('menu')} className="bg-red-900 hover:bg-red-800 text-gray-300 hover:text-white font-bold py-3 px-6 rounded-lg border border-red-800 transition-transform active:scale-95">
             Quit to Menu
         </button>
     )
 }
 
-const RestartMap = () => {
+const RestartMap = ({setPlayCount}) => {
     return (
-        <button className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+        <button onClick={() => setPlayCount(prev=> prev+1)} className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
             Restart Map
         </button>
     )
 }
 
-const ResumeGame = () => {
+const ResumeGame = ({ setGameState }) => {
     return (
-        <button  className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+        <button onClick={() => setGameState('playing')} className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
             Resume Game
         </button>
     )
