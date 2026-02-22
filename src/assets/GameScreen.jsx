@@ -13,7 +13,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
     const dragSelectedRef = useRef([])
     const dragCurrentRef = useRef({ x: 0, y: 0 })
     const sendTroopsRef = useRef(null)
-    const isWonRef = useRef(null)
+    const [isWon, setIsWon] = useState(null)
     const [playCount, setPlayCount] = useState(0)
     const gameStateRef = useRef(gameState)
 
@@ -23,7 +23,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
         console.log('No. of times played: ', playCount)
-        const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef })
+        const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon })
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
@@ -74,6 +74,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
 
     useEffect(() => {
         gameStateRef.current = gameState
+        console.log(gameState)
     }, [gameState])
 
     return (
@@ -99,7 +100,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
                 <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
 
                 <div className="relative top-0 left-0 z-20" >
-                    {gameState!=='paused'
+                    {gameState !== 'paused'
                         ? <PauseButton setGameState={setGameState} />
                         : <PauseMenuScreen setGameState={setGameState} setPlayCount={setPlayCount} />
                     }
@@ -108,7 +109,10 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
 
                 {/* GAME OVER SCREEN */}
                 <div className="z-30">
-                    <GameOverScreen />
+                    {gameState === 'gameover'
+                        ? <GameOverScreen isWon={isWon} />
+                        : ''
+                    }
                 </div>
             </div>
         </>

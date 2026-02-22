@@ -3,7 +3,7 @@ import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance,
 
 
 
-function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, isWonRef }) {
+function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -16,8 +16,11 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
         let noOfTroopsToSend = Math.floor(selectedNode.population * percent)
         selectedNode.population -= noOfTroopsToSend
         for (let i = 0; i < noOfTroopsToSend; i++) {
-            setTimeout(() => { if (gameStateRef.current === 'playing') {
-                troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target)) } }, i * 30
+            setTimeout(() => {
+                if (gameStateRef.current === 'playing') {
+                    troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target))
+                }
+            }, i * 30
             )
         }
     }
@@ -32,9 +35,18 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
 
     const checkWinCondition = () => {
         const owners = new Set(nodesRef.current.map(node => node.owner))
-        if (!owners.has(playerId) && troopsRef.current.some(troop => troop.owner === playerId)) { isWonRef.current = false }
-        else if (owners.size === 1 && owners.has(playerId)) { isWonRef.current = true }
-        else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troopsRef.current.some(troop => troop.owner !== playerId)) { isWonRef.current = true }
+        let won = null
+        if (!owners.has(playerId) && !troopsRef.current.some(troop => troop.owner === playerId)) {
+            won = false
+        } else if (owners.size === 1 && owners.has(playerId)) {
+            won = true
+        } else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troopsRef.current.some(troop => troop.owner !== playerId)) {
+            won = true
+        }
+        if (won !== null && gameStateRef.current === 'playing') {
+            setIsWon(won)
+            setGameState('gameover')
+        }
     }
 
     const runSmartAi = (settings) => {
@@ -166,7 +178,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
                 let pop = 10 + Math.floor(Math.random() * 25)
                 if (newNodes.length === 0) {
                     owner = playerId
-                    pop = 60
+                    pop = 600
                 }
                 else if (newNodes.length <= 10) {
                     owner = newNodes.length
@@ -186,12 +198,12 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, isDraggingRef, nodes
         }
         currentFrameTime = performance.now()
         let dt = (currentFrameTime - previousFrameTime) / 1000
-        if (dt>0.1) dt=0.1
+        if (dt > 0.1) dt = 0.1
         update(dt)
         draw()
         previousFrameTime = currentFrameTime
         console.log(gameStateRef.current)
-        
+
     }
 
     const main = () => {
