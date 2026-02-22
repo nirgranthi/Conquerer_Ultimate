@@ -13,6 +13,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
     const dragSelectedRef = useRef([])
     const dragCurrentRef = useRef({ x: 0, y: 0 })
     const sendTroopsRef = useRef(null)
+    const handleDoubleTapRef = useRef(null)
     const [isWon, setIsWon] = useState(null)
     const [playCount, setPlayCount] = useState(0)
     const gameStateRef = useRef(gameState)
@@ -39,7 +40,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
         console.log('No. of times played: ', playCount)
-        const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon })
+        const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef })
 
         function handleMouseDown(x, y) {
             if (gameState !== 'playing') return;
@@ -76,9 +77,14 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
             }
         }
 
+        function handleDblClick (e) {
+            handleDoubleTapRef.current(e.clientX, e.clientY)
+        }
+
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
         canvas.addEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
+        canvas.addEventListener('dblclick', handleDblClick)
 
         canvas.addEventListener('touchstart', e => handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
         canvas.addEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))

@@ -1,7 +1,7 @@
 import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.js";
 
 
-function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon }) {
+function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -30,6 +30,25 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
             particles.push(new Particle(x, y, color))
         }
     }
+
+    const globalAssault = (targetNode) => {
+        nodesRef.current.forEach(node => {
+            if (node.owner === playerId && node !== targetNode) {
+                sendTroops(node, targetNode, 0.5)
+                createExplosion(node.x, node.y, '#3B82F6', 5)
+            }
+        })
+        createExplosion(targetNode.x, targetNode.y, '#FF0000', 10)
+    }
+
+    const handleDoubleTap = (x, y) => {
+        const targetNode = nodesRef.current.find(node => Math.hypot(node.x-x, node.y-y) < node.radius*1.5)
+        if (targetNode) {
+            globalAssault(targetNode)
+            createExplosion(x, y, '#fff', 5)
+        }
+    }
+    handleDoubleTapRef.current = handleDoubleTap
 
     const checkWinCondition = () => {
         const owners = new Set(nodesRef.current.map(node => node.owner))
