@@ -53,39 +53,39 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         lastTapTime = currentTime /* idk this error will cause any problems */
     }
 
+    function handleMouseMove(x, y) {
+        if (isDraggingRef.current) {
+            dragCurrentRef.current = { x, y }
+            nodesRef.current.forEach(node => {
+                if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {
+                    if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node) }
+                }
+            })
+        }
+    }
+
+    /* target is from where the troop wiil be sent */
+    function handleMouseUp(x, y) {
+        if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
+            let target = nodesRef.current.find(node => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2)
+            if (target) {
+                dragSelectedRef.current.forEach((selectedNode) => {
+                    if (selectedNode !== target) {
+                        sendTroopsRef.current(selectedNode, target, 0.5)
+                    }
+                })
+            }
+            isDraggingRef.current = false
+            dragSelectedRef.current = []
+        }
+    }
+
     useEffect(() => {
         const canvas = canvasRef.current
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
-        console.log('No. of times played: ', playCount)
         const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef })
-
-        function handleMouseMove(x, y) {
-            if (isDraggingRef.current) {
-                dragCurrentRef.current = { x, y }
-                nodesRef.current.forEach(node => {
-                    if (Math.hypot(node.x - x, node.y - y) < node.radius * 1.5 && node.owner === playerId) {
-                        if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node) }
-                    }
-                })
-            }
-        }
-        /* target is from where the troop wiil be sent */
-        function handleMouseUp(x, y) {
-            if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
-                let target = nodesRef.current.find(node => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2)
-                if (target) {
-                    dragSelectedRef.current.forEach((selectedNode) => {
-                        if (selectedNode !== target) {
-                            sendTroopsRef.current(selectedNode, target, 0.5)
-                        }
-                    })
-                }
-                isDraggingRef.current = false
-                dragSelectedRef.current = []
-            }
-        }
 
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
@@ -146,8 +146,6 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
                     }
                 </div>
 
-
-                {/* GAME OVER SCREEN */}
                 <div className="z-30">
                     {gameState === 'gameover'
                         ? <GameOverScreen isWon={isWon} setGameState={setGameState} setPlayCount={setPlayCount} />

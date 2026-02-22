@@ -5,7 +5,9 @@ function handleRestartMap(setGameState, setPlayCount) {
 
 const PauseButton = ({ setGameState }) => {
     return (
-        <button onClick={() => setGameState('paused')} className="w-12 h-12 bg-gray-800 bg-opacity-60 hover:bg-opacity-90 text-white rounded-full shadow-lg backdrop-blur-sm border border-gray-600 flex items-center justify-center transition-all md:hover:scale-110 active:scale-95">
+        <button
+            onClick={() => setGameState('paused')}
+            className="absolute top-4 right-4 origin-top-right w-12 h-12 bg-gray-800 bg-opacity-60 hover:bg-opacity-90 text-white rounded-full shadow-lg backdrop-blur-sm border border-gray-600 flex items-center justify-center transition-all md:hover:scale-110 active:scale-95">
             <span className="text-xl font-bold">⏸️</span>
         </button>
     )
