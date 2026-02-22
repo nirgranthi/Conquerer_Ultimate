@@ -14,7 +14,6 @@ export function Homepage({ setDifficulty, setGameState }) {
     return (
         <div className="screen bg-gray-900 text-white h-full w-full">
 
-            {/* <!-- Particles Background --> */}
             <div className="absolute inset-0 z-0">
                 <Hyperspeed effectOptions={hyperspeedPresets.one} />
             </div>
