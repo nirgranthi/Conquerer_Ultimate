@@ -17,6 +17,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
     const [isWon, setIsWon] = useState(null)
     const [playCount, setPlayCount] = useState(0)
     const gameStateRef = useRef(gameState)
+    let lastTapTime = 0
 
     function handleSpaceKey() {
         if (gameStateRef.current === 'playing') { setGameState('paused') }
@@ -31,7 +32,25 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         if (e.repeat) return
         if (['Space', 'Backspace', 'Delete', 'Escape'].includes(e.code)) e.preventDefault()
         if (e.code === 'Space') { handleSpaceKey() }
-        else if (e.code === 'Escape') { handleSpaceKey()}
+        else if (e.code === 'Escape') { handleSpaceKey() }
+    }
+
+    function handleMouseDown(x, y) {
+        if (gameState !== 'playing') return;
+        const selectedNode = nodesRef.current.find((node) => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2 && node.owner === playerId)
+        if (selectedNode) {
+            isDraggingRef.current = true
+            dragSelectedRef.current = [selectedNode]
+            dragCurrentRef.current = { x, y }
+        }
+    }
+
+    function handleTouchStart(e) {
+        const currentTime = new Date().getTime()
+        const timeDiff = currentTime - lastTapTime
+        if (timeDiff < 300 && timeDiff > 0) { handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY) }
+        else handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
+        lastTapTime = currentTime /* idk this error will cause any problems */
     }
 
     useEffect(() => {
@@ -42,15 +61,6 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         console.log('No. of times played: ', playCount)
         const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef })
 
-        function handleMouseDown(x, y) {
-            if (gameState !== 'playing') return;
-            const selectedNode = nodesRef.current.find((node) => Math.hypot(node.x - x, node.y - y) < node.radius * 1.2 && node.owner === playerId)
-            if (selectedNode) {
-                isDraggingRef.current = true
-                dragSelectedRef.current = [selectedNode]
-                dragCurrentRef.current = { x, y }
-            }
-        }
         function handleMouseMove(x, y) {
             if (isDraggingRef.current) {
                 dragCurrentRef.current = { x, y }
@@ -77,16 +87,12 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
             }
         }
 
-        function handleDblClick (e) {
-            handleDoubleTapRef.current(e.clientX, e.clientY)
-        }
-
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
         canvas.addEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
-        canvas.addEventListener('dblclick', handleDblClick)
+        canvas.addEventListener('dblclick', e => handleDoubleTapRef.current(e.clientX, e.clientY))
 
-        canvas.addEventListener('touchstart', e => handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+        canvas.addEventListener('touchstart', handleTouchStart)
         canvas.addEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
         canvas.addEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
 
@@ -97,8 +103,9 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
             canvas.removeEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
             canvas.removeEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
             canvas.removeEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
+            canvas.removeEventListener('dblclick', e => handleDoubleTapRef.current(e.clientX, e.clientY))
 
-            canvas.removeEventListener('touchstart', e => handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+            canvas.removeEventListener('touchstart', handleTouchStart)
             canvas.removeEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
             canvas.removeEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
 

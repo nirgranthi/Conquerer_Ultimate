@@ -24,7 +24,6 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
     }
     sendTroopsRef.current = sendTroops
 
-    /* jo cE use krre use liljo */
     const createExplosion = (x, y, color, count) => {
         for (let i = 0; i < count; i++) {
             particles.push(new Particle(x, y, color))
