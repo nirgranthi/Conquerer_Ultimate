@@ -17,6 +17,22 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
     const [playCount, setPlayCount] = useState(0)
     const gameStateRef = useRef(gameState)
 
+    function handleSpaceKey() {
+        if (gameStateRef.current === 'playing') { setGameState('paused') }
+        else if (gameStateRef.current === 'paused') { setGameState('playing') }
+        else if (gameStateRef.current === 'gameover') {
+            setGameState('playing')
+            setPlayCount(prev => prev + 1)
+        }
+    }
+
+    function handleKeydown(e) {
+        if (e.repeat) return
+        if (['Space', 'Backspace', 'Delete', 'Escape'].includes(e.code)) e.preventDefault()
+        if (e.code === 'Space') { handleSpaceKey() }
+        else if (e.code === 'Escape') { handleSpaceKey()}
+    }
+
     useEffect(() => {
         const canvas = canvasRef.current
         canvas.width = window.innerWidth
@@ -68,7 +84,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         canvas.addEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
         canvas.addEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
 
-        window.addEventListener('keydown', e => console.log(e.code))
+        window.addEventListener('keydown', handleKeydown)
 
         return () => {
             stopGame()
@@ -79,6 +95,8 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
             canvas.removeEventListener('touchstart', e => handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
             canvas.removeEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
             canvas.removeEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+
+            window.removeEventListener('keydown', handleKeydown)
         }
     }, [canvasRef, difficulty, playCount])
 
