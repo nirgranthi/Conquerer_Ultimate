@@ -200,8 +200,6 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
         update(dt)
         draw()
         previousFrameTime = currentFrameTime
-        console.log(gameStateRef.current)
-
     }
 
     const main = () => {

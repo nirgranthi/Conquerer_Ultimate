@@ -68,6 +68,8 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         canvas.addEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
         canvas.addEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
 
+        window.addEventListener('keydown', e => console.log(e.code))
+
         return () => {
             stopGame()
             canvas.removeEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
@@ -82,7 +84,6 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
 
     useEffect(() => {
         gameStateRef.current = gameState
-        console.log(gameState)
     }, [gameState])
 
     return (
