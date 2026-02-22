@@ -64,11 +64,19 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
         canvas.addEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
 
+        canvas.addEventListener('touchstart', e => handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+        canvas.addEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+        canvas.addEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+
         return () => {
             stopGame()
             canvas.removeEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
             canvas.removeEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
             canvas.removeEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
+
+            canvas.removeEventListener('touchstart', e => handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+            canvas.removeEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
+            canvas.removeEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
         }
     }, [canvasRef, difficulty, playCount])
 
