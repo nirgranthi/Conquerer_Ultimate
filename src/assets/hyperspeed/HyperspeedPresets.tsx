@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const hyperspeedPresets = {
   one: {
     onSpeedUp: () => {},

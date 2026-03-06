@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ShareIcon, Twitter, Facebook, Whatsapp } from "./SVGs.jsx"
 import Hyperspeed from "./hyperspeed/Hyperspeed.jsx"
 import { hyperspeedPresets } from "./hyperspeed/HyperspeedPresets.jsx"

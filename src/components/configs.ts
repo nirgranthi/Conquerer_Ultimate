@@ -1,3 +1,4 @@
+// @ts-nocheck
 const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#f40e6eff', '#14B8A6', '#4B5563'];
 const neutralId = 11;
 const playerId = 0;

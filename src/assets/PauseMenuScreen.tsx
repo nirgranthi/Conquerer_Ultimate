@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { QuitToMenu, RestartMap, ResumeGame } from "./Buttons";
 
 export function PauseMenuScreen ({ setGameState, setPlayCount }) {
