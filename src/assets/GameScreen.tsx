@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef, RefObject } from "react";
 import { PauseButton } from "./Buttons";
-import { GameOverScreen } from "./GameOverScreen.jsx";
-import { PauseMenuScreen } from "./PauseMenuScreen.jsx";
-import { StartGame } from './scripts/startGame.jsx'
-import { playerId } from "../components/configs.js";
-import Galaxy from "./Galaxy/Galaxy.jsx";
-import { Difficulty, GameState } from "../App.js";
+import { GameOverScreen } from "./GameOverScreen.tsx";
+import { PauseMenuScreen } from "./PauseMenuScreen.tsx";
+import { StartGame } from './scripts/startGame.tsx'
+import { playerId } from "../components/configs.ts";
+import Galaxy from "./Galaxy/Galaxy.tsx";
+import { Difficulty, GameState } from "../App.tsx";
+import { useGameContext } from "./GameContext.tsx";
 
-export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: { canvasRef: RefObject<HTMLCanvasElement | null>; difficulty: Difficulty; gameState: GameState; setGameState: React.Dispatch<React.SetStateAction<GameState>>; }) {
+export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: { canvasRef: HTMLCanvasElement | null; difficulty: Difficulty; gameState: GameState; setGameState: React.Dispatch<React.SetStateAction<GameState>>; }) {
+    const { playCount, setPlayCount, nodesRef, gameStateRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, sendTroopsRef, isWon, troopsRef, setIsWon } = useGameContext()
     
     let lastTapTime = 0
 
@@ -33,6 +35,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: {
         if (selectedNode) {
             isDraggingRef.current = true
             dragSelectedRef.current = [selectedNode]
+            console.log(selectedNode)
             dragCurrentRef.current = { x, y }
         }
     }
@@ -48,6 +51,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: {
     function handleMouseMove(x, y) {
         if (isDraggingRef.current) {
             dragCurrentRef.current = { x, y }
+            /* console.log(dragCurrentRef.current) */
             nodesRef.current.forEach(node => {
                 if (((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.5)**2 && node.owner === playerId) {
                     if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node) }

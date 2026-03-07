@@ -1,10 +1,11 @@
-import { useState, useRef } from "react"
 import { Homepage } from "./assets/HomePage"
 import { GameScreen } from "./assets/GameScreen"
+import { useGameContext } from "./assets/GameContext"
 
 
 function App() {
-  
+  const { gameState, setDifficulty, setGameState, canvasRef, difficulty } = useGameContext()
+
   return (
     <div>
       {gameState === 'menu'

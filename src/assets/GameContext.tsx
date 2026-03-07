@@ -1,5 +1,5 @@
-import React, { createContext, RefObject, useRef, useState } from "react";
-import { Node } from "../components/configs";
+import React, { createContext, RefObject, useContext, useRef, useState } from "react";
+import { Node, Troop } from "../components/configs";
 
 export type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
 export type Difficulty = 'easy' | 'medium' | 'hard';
@@ -15,12 +15,18 @@ interface GameContextProps {
     setPlayCount: React.Dispatch<React.SetStateAction<number>>
     canvasRef: HTMLCanvasElement | null;
     isDraggingRef: RefObject<boolean>;
-    nodesRef: Node[]
+    nodesRef: Node[];
+    troopsRef: Troop[];
+    dragSelectedRef: Node;
+    dragCurrentRef: RefObject<{x: number; y: number}>;
+    sendTroopsRef: RefObject<() => void>;
+    handleDoubleTapRef: RefObject<(x: number, y: number) => void>;
+    gameStateRef: RefObject<GameState>
 }
 
 const GameContext = createContext<GameContextProps | undefined>(undefined)
 
-const gameContextProvider = ({ children }: { children: React.ReactNode }) => {
+export const GameContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [difficulty, setDifficulty] = useState<Difficulty>('medium')
     const [gameState, setGameState] = useState<GameState>('menu')
     const [isWon, setIsWon] = useState<boolean | null>(null)
@@ -29,12 +35,12 @@ const gameContextProvider = ({ children }: { children: React.ReactNode }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const isDraggingRef = useRef<boolean>(false)
     const nodesRef = useRef<Node[]>([])
-    const troopsRef = useRef([])
-    const dragSelectedRef = useRef([])
-    const dragCurrentRef = useRef({ x: 0, y: 0 })
-    const sendTroopsRef = useRef(null)
-    const handleDoubleTapRef = useRef(null)
-    const gameStateRef = useRef(gameState)
+    const troopsRef = useRef<Troop[]>([])
+    const dragSelectedRef = useRef<Node[]>([])
+    const dragCurrentRef = useRef<{"x": number; "y": number}>({x: 0, y: 0})
+    const sendTroopsRef = useRef<() => void>(null)
+    const handleDoubleTapRef = useRef<(x: number, y: number) => void>(null)
+    const gameStateRef = useRef<GameState>(gameState)
 
     return (
         <GameContext.Provider value={{
@@ -55,8 +61,14 @@ const gameContextProvider = ({ children }: { children: React.ReactNode }) => {
             sendTroopsRef,
             handleDoubleTapRef,
             gameStateRef
-        }} />
-        {children}
-        < GameContext.Provider/>
+        }}>
+            {children}
+        </ GameContext.Provider >
     )
+}
+
+export const useGameContext = () => {
+    const content = useContext(GameContext)
+    if (!content) throw new Error ("use useGameContext inside provider")
+    return content
 }

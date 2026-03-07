@@ -1,8 +1,8 @@
 import React from "react"
-import { ShareIcon, Twitter, Facebook, Whatsapp } from "./SVGs.jsx"
-import Hyperspeed from "./hyperspeed/Hyperspeed.jsx"
-import { hyperspeedPresets } from "./hyperspeed/HyperspeedPresets.jsx"
-import { Difficulty, GameState } from "../App.js"
+import { ShareIcon, Twitter, Facebook, Whatsapp } from "./SVGs.tsx"
+import Hyperspeed from "./hyperspeed/Hyperspeed.tsx"
+import { hyperspeedPresets } from "./hyperspeed/HyperspeedPresets.tsx"
+import { Difficulty, GameState } from "../App.tsx"
 
 
 export function Homepage({ setDifficulty, setGameState }: {setDifficulty: React.Dispatch<React.SetStateAction<Difficulty>>; setGameState: React.Dispatch<React.SetStateAction<GameState>>}) {

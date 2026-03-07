@@ -11,12 +11,12 @@ const growthRate = 1.5;
 const troopSpeed = 2.8;
 const troopSize = 4;
 const nodeRadius = 24;
-const aiStartDelay = 5;
+const aiStartDelay = 7;
 
 const difficultyConfig = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
-    medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 1.0 },
-    hard: { aiInterval: 400, aiAggression: 0.95, growthMod: 1.2 }
+    medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 0.6 },
+    hard: { aiInterval: 400, aiAggression: 0.9, growthMod: 0.8 }
 };
 
 class Node {
