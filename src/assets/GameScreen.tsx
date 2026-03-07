@@ -5,11 +5,10 @@ import { PauseMenuScreen } from "./PauseMenuScreen.tsx";
 import { StartGame } from './scripts/startGame.tsx'
 import { playerId } from "../components/configs.ts";
 import Galaxy from "./Galaxy/Galaxy.tsx";
-import { Difficulty, GameState } from "../App.tsx";
 import { useGameContext } from "./GameContext.tsx";
 
 export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: { canvasRef: HTMLCanvasElement | null; difficulty: Difficulty; gameState: GameState; setGameState: React.Dispatch<React.SetStateAction<GameState>>; }) {
-    const { playCount, setPlayCount, nodesRef, gameStateRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, sendTroopsRef, isWon, troopsRef, setIsWon } = useGameContext()
+    const { playCount, setPlayCount, nodesRef, gameStateRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, isWon, troopsRef, setIsWon, sendTroops } = useGameContext()
     
     let lastTapTime = 0
 
@@ -67,7 +66,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: {
             if (target) {
                 dragSelectedRef.current.forEach((selectedNode) => {
                     if (selectedNode !== target) {
-                        sendTroopsRef.current(selectedNode, target, 0.5)
+                        sendTroops(selectedNode, target, 0.5)
                     }
                 })
             }
@@ -81,7 +80,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
-        const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef })
+        const stopGame = StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef })
 
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
@@ -121,8 +120,8 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: {
                         mouseRepulsion={false}
                         mouseInteraction={false}
                         density={1}
-                        glowIntensity={0.2}
-                        saturation={0}
+                        glowIntensity={0.7}
+                        saturation={1}
                         hueShift={140}
                         twinkleIntensity={0.3}
                         rotationSpeed={0.1}

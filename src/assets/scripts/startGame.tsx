@@ -1,7 +1,7 @@
 import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.ts";
 
 
-function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, sendTroopsRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
+function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -9,21 +9,6 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
     let aiTimer = 0
     let animationId
     let connections = []
-
-    const sendTroops = (selectedNode, target, percent) => {
-        if (selectedNode.population < 2) return;
-        let noOfTroopsToSend = Math.floor(selectedNode.population * percent)
-        selectedNode.population -= noOfTroopsToSend
-        for (let i = 0; i < noOfTroopsToSend; i++) {
-            setTimeout(() => {
-                if (gameStateRef.current === 'playing') {
-                    troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target))
-                }
-            }, i * 30
-            )
-        }
-    }
-    sendTroopsRef.current = sendTroops
 
     const createExplosion = (x, y, color, count) => {
         for (let i = 0; i < count; i++) {

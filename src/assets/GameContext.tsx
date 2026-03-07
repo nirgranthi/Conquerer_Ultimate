@@ -15,13 +15,13 @@ interface GameContextProps {
     setPlayCount: React.Dispatch<React.SetStateAction<number>>
     canvasRef: HTMLCanvasElement | null;
     isDraggingRef: RefObject<boolean>;
-    nodesRef: Node[];
-    troopsRef: Troop[];
-    dragSelectedRef: Node;
+    nodesRef: RefObject<Node[]>;
+    troopsRef: RefObject<Troop[]>;
+    dragSelectedRef: RefObject<Node[]>;
     dragCurrentRef: RefObject<{x: number; y: number}>;
-    sendTroopsRef: RefObject<() => void>;
     handleDoubleTapRef: RefObject<(x: number, y: number) => void>;
-    gameStateRef: RefObject<GameState>
+    gameStateRef: RefObject<GameState>;
+    sendTroops: (selectedNode: Node, target: Node, percent: number ) => void
 }
 
 const GameContext = createContext<GameContextProps | undefined>(undefined)
@@ -38,9 +38,22 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const troopsRef = useRef<Troop[]>([])
     const dragSelectedRef = useRef<Node[]>([])
     const dragCurrentRef = useRef<{"x": number; "y": number}>({x: 0, y: 0})
-    const sendTroopsRef = useRef<() => void>(null)
     const handleDoubleTapRef = useRef<(x: number, y: number) => void>(null)
     const gameStateRef = useRef<GameState>(gameState)
+
+    const sendTroops = (selectedNode: Node, target: Node, percent: number) => {
+        if (selectedNode.population < 2) return;
+        let noOfTroopsToSend = Math.floor(selectedNode.population * percent)
+        selectedNode.population -= noOfTroopsToSend
+        for (let i = 0; i < noOfTroopsToSend; i++) {
+            setTimeout(() => {
+                if (gameStateRef.current === 'playing') {
+                    troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target))
+                }
+            }, i * 30
+            )
+        }
+    }
 
     return (
         <GameContext.Provider value={{
@@ -58,9 +71,9 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             troopsRef,
             dragSelectedRef,
             dragCurrentRef,
-            sendTroopsRef,
             handleDoubleTapRef,
-            gameStateRef
+            gameStateRef,
+            sendTroops
         }}>
             {children}
         </ GameContext.Provider >
