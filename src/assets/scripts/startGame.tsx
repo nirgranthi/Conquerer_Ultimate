@@ -1,7 +1,8 @@
 import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.ts";
+import { useGameContext } from "../GameContext.tsx";
 
 
-function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDraggingRef, nodesRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
+function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodesRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -9,6 +10,8 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
     let aiTimer = 0
     let animationId
     let connections = []
+
+    const { gameState } = useGameContext()
 
     const createExplosion = (x, y, color, count) => {
         for (let i = 0; i < count; i++) {
@@ -45,7 +48,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
         } else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troopsRef.current.some(troop => troop.owner !== playerId)) {
             won = true
         }
-        if (won !== null && gameStateRef.current === 'playing') {
+        if (won !== null && gameState === 'playing') {
             setIsWon(won)
             setGameState('gameover')
         }
@@ -124,7 +127,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
         ctx.stroke()
 
         nodesRef.current.forEach(node => node.draw(ctx, dragSelectedRef.current))
-        if (gameTime < 3 && gameStateRef.current === 'playing') {
+        if (gameTime < 3 && gameState === 'playing') {
             const playerNode = nodesRef.current.find((node) => node.owner === playerId)
             ctx.save()
             ctx.translate(playerNode.x, playerNode.y - 50 - Math.sin(gameTime * 5) * 10)
@@ -197,7 +200,7 @@ function StartGame({ canvas, difficulty, ctx, gameStateRef, setGameState, isDrag
 
     const animate = () => {
         animationId = requestAnimationFrame(animate)
-        if (gameStateRef.current !== 'playing') {
+        if (gameState !== 'playing') {
             previousFrameTime = performance.now()
             return
         }

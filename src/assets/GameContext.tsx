@@ -20,7 +20,6 @@ interface GameContextProps {
     dragSelectedRef: RefObject<Node[]>;
     dragCurrentRef: RefObject<{x: number; y: number}>;
     handleDoubleTapRef: RefObject<(x: number, y: number) => void>;
-    gameStateRef: RefObject<GameState>;
     sendTroops: (selectedNode: Node, target: Node, percent: number ) => void
 }
 
@@ -39,7 +38,6 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const dragSelectedRef = useRef<Node[]>([])
     const dragCurrentRef = useRef<{"x": number; "y": number}>({x: 0, y: 0})
     const handleDoubleTapRef = useRef<(x: number, y: number) => void>(null)
-    const gameStateRef = useRef<GameState>(gameState)
 
     const sendTroops = (selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;
@@ -47,7 +45,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
         selectedNode.population -= noOfTroopsToSend
         for (let i = 0; i < noOfTroopsToSend; i++) {
             setTimeout(() => {
-                if (gameStateRef.current === 'playing') {
+                if (gameState === 'playing') {
                     troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target))
                 }
             }, i * 30
@@ -72,7 +70,6 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             dragSelectedRef,
             dragCurrentRef,
             handleDoubleTapRef,
-            gameStateRef,
             sendTroops
         }}>
             {children}
