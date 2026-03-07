@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { MainMenu, PlayAgain } from "./Buttons";
 
 export function GameOverScreen({ isWon, setGameState, setPlayCount }) {

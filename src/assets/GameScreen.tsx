@@ -1,23 +1,14 @@
-// @ts-nocheck
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, RefObject } from "react";
 import { PauseButton } from "./Buttons";
 import { GameOverScreen } from "./GameOverScreen.jsx";
 import { PauseMenuScreen } from "./PauseMenuScreen.jsx";
 import { StartGame } from './scripts/startGame.jsx'
 import { playerId } from "../components/configs.js";
 import Galaxy from "./Galaxy/Galaxy.jsx";
+import { Difficulty, GameState } from "../App.js";
 
-export function GameScreen({ canvasRef, difficulty, gameState, setGameState }) {
-    const isDraggingRef = useRef(false)
-    const nodesRef = useRef([])
-    const troopsRef = useRef([])
-    const dragSelectedRef = useRef([])
-    const dragCurrentRef = useRef({ x: 0, y: 0 })
-    const sendTroopsRef = useRef(null)
-    const handleDoubleTapRef = useRef(null)
-    const [isWon, setIsWon] = useState(null)
-    const [playCount, setPlayCount] = useState(0)
-    const gameStateRef = useRef(gameState)
+export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: { canvasRef: RefObject<HTMLCanvasElement | null>; difficulty: Difficulty; gameState: GameState; setGameState: React.Dispatch<React.SetStateAction<GameState>>; }) {
+    
     let lastTapTime = 0
 
     function handleSpaceKey() {

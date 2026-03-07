@@ -1,4 +1,5 @@
-// @ts-nocheck
+import { Difficulty } from "../App";
+
 const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#f40e6eff', '#14B8A6', '#4B5563'];
 const neutralId = 11;
 const playerId = 0;
@@ -19,7 +20,17 @@ const difficultyConfig = {
 };
 
 class Node {
-    constructor(id, x, y, ownerId, pop) {
+    id: number;
+    x: number;
+    y: number;
+    owner: number;
+    population: number;
+    radius: number;
+    maxPop: number;
+    growthTimer: number;
+    pulse: number;
+
+    constructor(id: number, x: number, y: number, ownerId: number, pop: number) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -30,7 +41,7 @@ class Node {
         this.growthTimer = 0;
         this.pulse = Math.random() * Math.PI;
     }
-    update(dt, difficulty) {
+    update(dt: number, difficulty: Difficulty) {
         let rate = growthRate;
         if (this.owner !== playerId && this.owner !== neutralId) { rate *= difficultyConfig[difficulty].growthMod }
         if (this.owner !== neutralId && this.population < this.maxPop) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 const ShareIcon = () => {
     return (
         <svg

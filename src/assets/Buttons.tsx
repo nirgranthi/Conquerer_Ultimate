@@ -1,4 +1,3 @@
-// @ts-nocheck
 function handleRestartMap(setGameState, setPlayCount) {
     setPlayCount(prev => prev + 1)
     setGameState('playing')

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.js";
 
 
