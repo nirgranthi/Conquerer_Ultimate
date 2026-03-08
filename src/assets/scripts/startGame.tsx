@@ -2,11 +2,12 @@ import { Node, Particle, nodeCount, neutralId, playerId, minimumDistance, troopS
 import { useGameContext } from "../GameContext.tsx";
 
 
-function StartGame({ canvas, ctx }) {
+function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null}) {
+    if (!ctx) return;
     let { difficulty, setGameState, isDragging, nodes, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef } = useGameContext()
     let previousFrameTime = 0
     let currentFrameTime = 0
-    let particles = []
+    let particles: Particle[] = []
     let gameTime = 0
     let aiTimer = 0
     let animationId
@@ -14,13 +15,13 @@ function StartGame({ canvas, ctx }) {
 
     const { gameState } = useGameContext()
 
-    const createExplosion = (x, y, color, count) => {
+    const createExplosion = (x: number, y: number, color: string, count: number) => {
         for (let i = 0; i < count; i++) {
             particles.push(new Particle(x, y, color))
         }
     }
 
-    const globalAssault = (targetNode) => {
+    const globalAssault = (targetNode: Node) => {
         nodes.forEach(node => {
             if (node.owner === playerId && node !== targetNode) {
                 sendTroops(node, targetNode, 0.5)
@@ -39,9 +40,9 @@ function StartGame({ canvas, ctx }) {
     }
     handleDoubleTapRef.current = handleDoubleTap
 
-    const checkWinCondition = () => {
+    const checkWinCondition: () => void = () => {
         const owners = new Set(nodes.map(node => node.owner))
-        let won = null
+        let won: boolean | null = null
         if (!owners.has(playerId) && !troopsRef.current.some(troop => troop.owner === playerId)) {
             won = false
         } else if (owners.size === 1 && owners.has(playerId)) {
@@ -59,7 +60,7 @@ function StartGame({ canvas, ctx }) {
         nodes.forEach(nodeA => {
             if (nodeA.owner !== playerId && nodeA.owner !== neutralId) {
                 if (nodeA.population < 10) return
-                let targets = []
+                let targets: {node: Node, score: number}[] = []
                 nodes.forEach(nodeB => {
                     if (nodeA.id === nodeB.id) return
                     const dist = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y)
@@ -81,7 +82,7 @@ function StartGame({ canvas, ctx }) {
         })
     }
 
-    const update = (dt) => {
+    const update: (dt: number) => void = (dt: number) => {
         gameTime += dt
         nodes.forEach(node => node.update(dt, difficulty))
         troopsRef.current.forEach(troop => troop.update(createExplosion))
@@ -115,7 +116,7 @@ function StartGame({ canvas, ctx }) {
         checkWinCondition()
     }
 
-    const draw = () => {
+    const draw: () => void = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.lineWidth = 1
         ctx.strokeStyle = '#374151'
@@ -125,6 +126,7 @@ function StartGame({ canvas, ctx }) {
             ctx.moveTo(connection.nodeA.x, connection.nodeA.y)
             ctx.lineTo(connection.nodeB.x, connection.nodeB.y)
         })
+        console.log(connections)
         ctx.stroke()
 
         nodes.forEach(node => node.draw(ctx, dragSelected))
@@ -161,8 +163,8 @@ function StartGame({ canvas, ctx }) {
         particles.forEach(particle => particle.draw(ctx))
     }
 
-    const generateMap = () => {
-        const newNodes = []
+    const generateMap: () => void = () => {
+        const newNodes: Node[] = []
         let attempts = 0;
         while (newNodes.length < nodeCount && attempts < 100) {
             attempts++;
@@ -199,7 +201,7 @@ function StartGame({ canvas, ctx }) {
         })
     }
 
-    const animate = () => {
+    const animate: () => void = () => {
         animationId = requestAnimationFrame(animate)
         if (gameState !== 'playing') {
             previousFrameTime = performance.now()
@@ -213,7 +215,7 @@ function StartGame({ canvas, ctx }) {
         previousFrameTime = currentFrameTime
     }
 
-    const main = () => {
+    const main: () => void = () => {
         generateMap()
         previousFrameTime = performance.now()
         animate()

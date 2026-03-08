@@ -95,7 +95,7 @@ export function GameScreen() {
         window.addEventListener('keydown', handleKeydown)
 
         return () => {
-            stopGame()
+            if (stopGame) stopGame()
             canvas.removeEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
             canvas.removeEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
             canvas.removeEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
