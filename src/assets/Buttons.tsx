@@ -1,9 +1,12 @@
+import { useGameContext } from "./GameContext"
+
 function handleRestartMap(setGameState, setPlayCount) {
     setPlayCount(prev => prev + 1)
     setGameState('playing')
 }
 
-const PauseButton = ({ setGameState }) => {
+const PauseButton = () => {
+    const { setGameState } = useGameContext()
     return (
         <button
             onClick={() => setGameState('paused')}
@@ -13,7 +16,8 @@ const PauseButton = ({ setGameState }) => {
     )
 }
 
-const QuitToMenu = ({ setGameState }) => {
+const QuitToMenu = () => {
+    const { setGameState } = useGameContext()
     return (
         <button onClick={() => setGameState('menu')} className="bg-red-900 hover:bg-red-800 text-gray-300 hover:text-white font-bold py-3 px-6 rounded-lg border border-red-800 transition-transform active:scale-95">
             Quit to Menu
@@ -21,7 +25,8 @@ const QuitToMenu = ({ setGameState }) => {
     )
 }
 
-const RestartMap = ({ setGameState, setPlayCount }) => {
+const RestartMap = () => {
+    const { setGameState, setPlayCount } = useGameContext()
     return (
         <button onClick={() => handleRestartMap(setGameState, setPlayCount)} className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
             Restart Map
@@ -29,7 +34,8 @@ const RestartMap = ({ setGameState, setPlayCount }) => {
     )
 }
 
-const ResumeGame = ({ setGameState }) => {
+const ResumeGame = () => {
+    const { setGameState } = useGameContext()
     return (
         <button onClick={() => setGameState('playing')} className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
             Resume Game
@@ -37,7 +43,8 @@ const ResumeGame = ({ setGameState }) => {
     )
 }
 
-const MainMenu = ({ setGameState }) => {
+const MainMenu = () => {
+    const { setGameState } = useGameContext()
     return (
         <button onClick={() => setGameState('menu')} className="bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white font-bold py-2 px-4 rounded-lg transition-colors">
             Main Menu
@@ -45,7 +52,8 @@ const MainMenu = ({ setGameState }) => {
     )
 }
 
-const PlayAgain = ({ setGameState, setPlayCount }) => {
+const PlayAgain = () => {
+    const { setGameState, setPlayCount } = useGameContext()
     return (
         <button onClick={() => handleRestartMap(setGameState, setPlayCount)} className="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-xl text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(234,179,8,0.4)]">
             PLAY AGAIN

@@ -8,7 +8,7 @@ import Galaxy from "./Galaxy/Galaxy.tsx";
 import { useGameContext } from "./GameContext.tsx";
 
 export function GameScreen() {
-    const { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodesRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, isWon, troopsRef, setIsWon, sendTroops } = useGameContext()
+    const { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodesRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, troopsRef, setIsWon, sendTroops } = useGameContext()
     
     let lastTapTime = 0
 
@@ -133,14 +133,14 @@ export function GameScreen() {
 
                 <div className="relative top-0 left-0 z-20" >
                     {gameState !== 'paused'
-                        ? <PauseButton setGameState={setGameState} />
-                        : <PauseMenuScreen setGameState={setGameState} setPlayCount={setPlayCount} />
+                        ? <PauseButton />
+                        : <PauseMenuScreen />
                     }
                 </div>
 
                 <div className="z-30">
                     {gameState === 'gameover'
-                        ? <GameOverScreen isWon={isWon} setGameState={setGameState} setPlayCount={setPlayCount} />
+                        ? <GameOverScreen />
                         : ''
                     }
                 </div>

@@ -1,6 +1,8 @@
 import { MainMenu, PlayAgain } from "./Buttons";
+import { useGameContext } from "./GameContext";
 
-export function GameOverScreen({ isWon, setGameState, setPlayCount }) {
+export function GameOverScreen() {
+    const { isWon } = useGameContext()
     return (
         <div className="screen bg-opacity-85 backdrop-blur-md z-50 justify-center">
             <div className="bg-gray-900 p-10 rounded-2xl border-2 border-yellow-500 text-center shadow-2xl transform transition-all max-w-sm w-full relative overflow-hidden">
@@ -18,8 +20,8 @@ export function GameOverScreen({ isWon, setGameState, setPlayCount }) {
                 }
 
                 <div className="flex flex-col gap-3">
-                    <PlayAgain setGameState={setGameState} setPlayCount={setPlayCount} />
-                    <MainMenu setGameState={setGameState} />
+                    <PlayAgain />
+                    <MainMenu />
                 </div>
             </div>
         </div>
