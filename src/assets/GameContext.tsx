@@ -16,11 +16,11 @@ interface GameContextProps {
     canvasRef: RefObject<HTMLCanvasElement | null>;
     isDragging: boolean;
     nodes: Node[];
-    troopsRef: RefObject<Troop[]>;
+    troops: Troop[];
     dragSelected: Node[];
-    dragCurrentRef: RefObject<{x: number; y: number}>;
+    dragCurrentRef: RefObject<{ x: number; y: number }>;
     handleDoubleTapRef: RefObject<(x: number, y: number) => void>;
-    sendTroops: (selectedNode: Node, target: Node, percent: number ) => void
+    sendTroops: (selectedNode: Node, target: Node, percent: number) => void
 }
 
 const GameContext = createContext<GameContextProps | undefined>(undefined)
@@ -34,9 +34,9 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     let isDragging: boolean = false
     const nodes: Node[] = []
-    const troopsRef = useRef<Troop[]>([])
+    const troops: Troop[] = []
     let dragSelected: Node[] = []
-    const dragCurrentRef = useRef<{"x": number, "y": number}>({x: 0, y: 0})
+    const dragCurrentRef = useRef<{ "x": number, "y": number }>({ x: 0, y: 0 })
     const handleDoubleTapRef = useRef<(x: number, y: number) => void>(null)
 
     const sendTroops = (selectedNode: Node, target: Node, percent: number) => {
@@ -46,7 +46,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
         for (let i = 0; i < noOfTroopsToSend; i++) {
             setTimeout(() => {
                 if (gameState === 'playing') {
-                    troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target))
+                    troops.push(new Troop(selectedNode.owner, selectedNode, target))
                 }
             }, i * 30
             )
@@ -66,7 +66,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             canvasRef,
             isDragging,
             nodes,
-            troopsRef,
+            troops,
             dragSelected,
             dragCurrentRef,
             handleDoubleTapRef,
@@ -79,6 +79,6 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
 
 export const useGameContext = () => {
     const content = useContext(GameContext)
-    if (!content) throw new Error ("use useGameContext inside provider")
+    if (!content) throw new Error("use useGameContext inside provider")
     return content
 }

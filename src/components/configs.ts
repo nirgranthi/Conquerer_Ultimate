@@ -86,7 +86,17 @@ class Node {
 }
 
 class Troop {
-    constructor(owner, startNode, targetNode) {
+    owner: number;
+    x: number;
+    y: number;
+    target: Node;
+    isPlayer: boolean;
+    vx: number;
+    vy: number;
+    dead: boolean;
+    color: string
+
+    constructor(owner: number, startNode: Node, targetNode: Node) {
         this.owner = owner
         this.x = startNode.x
         this.y = startNode.y
@@ -99,7 +109,7 @@ class Troop {
         this.dead = false
         this.color = colors[this.owner]
     }
-    update(createExplosion) {
+    update(createExplosion: (x: number, y: number, color: string, count: number) => void) {
         this.x += this.vx
         this.y += this.vy
         const dx = this.target.x - this.x
@@ -117,7 +127,7 @@ class Troop {
             this.dead = true
         }
     }
-    hitTarget(createExplosion) {
+    hitTarget(createExplosion: (x: number, y: number, color: string, count: number) => void) {
         if (this.target.owner === this.owner) this.target.population++
         else {
             this.target.population--
@@ -128,7 +138,7 @@ class Troop {
             }
         }
     }
-    draw(ctx) {
+    draw(ctx: CanvasRenderingContext2D) {
         ctx.beginPath()
         ctx.arc(this.x, this.y, troopSize, 0, Math.PI * 2)
         ctx.fillStyle = this.color

@@ -4,7 +4,7 @@ import { useGameContext } from "../GameContext.tsx";
 
 function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null}) {
     if (!ctx) return;
-    let { difficulty, setGameState, isDragging, nodes, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef } = useGameContext()
+    let { difficulty, setGameState, isDragging, nodes, troops, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef } = useGameContext()
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles: Particle[] = []
@@ -43,11 +43,11 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
     const checkWinCondition: () => void = () => {
         const owners = new Set(nodes.map(node => node.owner))
         let won: boolean | null = null
-        if (!owners.has(playerId) && !troopsRef.current.some(troop => troop.owner === playerId)) {
+        if (!owners.has(playerId) && !troops.some(troop => troop.owner === playerId)) {
             won = false
         } else if (owners.size === 1 && owners.has(playerId)) {
             won = true
-        } else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troopsRef.current.some(troop => troop.owner !== playerId)) {
+        } else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troops.some(troop => troop.owner !== playerId)) {
             won = true
         }
         if (won !== null && gameState === 'playing') {
@@ -85,15 +85,15 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
     const update: (dt: number) => void = (dt: number) => {
         gameTime += dt
         nodes.forEach(node => node.update(dt, difficulty))
-        troopsRef.current.forEach(troop => troop.update(createExplosion))
-        troopsRef.current = troopsRef.current.filter(troop => !troop.dead)
+        troops.forEach(troop => troop.update(createExplosion))
+        troops = troops.filter(troop => !troop.dead)
         /* troopsize */
         /* using for loop because we have to return */
-        for (let i = 0; i < troopsRef.current.length; i++) {
-            const troopA = troopsRef.current[i]
+        for (let i = 0; i < troops.length; i++) {
+            const troopA = troops[i]
             if (!troopA.dead) {
-                for (let j = i + 1; j < troopsRef.current.length; j++) {
-                    const troopB = troopsRef.current[j]
+                for (let j = i + 1; j < troops.length; j++) {
+                    const troopB = troops[j]
                     if (!troopB.dead && troopA.owner !== troopB.owner) {
                         if ((troopA.x - troopB.x) ** 2 + (troopA.y - troopB.y) ** 2 < (troopSize * 2) ** 2) {
                             troopA.dead = true
@@ -159,7 +159,7 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
             ctx.stroke()
             ctx.setLineDash([])
         }
-        troopsRef.current.forEach(troop => troop.draw(ctx))
+        troops.forEach(troop => troop.draw(ctx))
         particles.forEach(particle => particle.draw(ctx))
     }
 
