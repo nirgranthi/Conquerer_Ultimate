@@ -31,7 +31,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const [gameState, setGameState] = useState<GameState>('menu');
     const [isWon, setIsWon] = useState<boolean | null>(null);
     const [playCount, setPlayCount] = useState<number>(0);
-    
+
     const gameStateRef = useRef<GameState>(gameState);
     const playCountRef = useRef(playCount);
 
@@ -53,16 +53,17 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
 
     const sendTroops = useCallback((selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;
-        
+
+        const originalOwner = selectedNode.owner;
         let noOfTroopsToSend = Math.floor(selectedNode.population * percent);
         selectedNode.population -= noOfTroopsToSend;
-        
+
         const sessionAtCall = playCountRef.current;
 
         for (let i = 0; i < noOfTroopsToSend; i++) {
             setTimeout(() => {
                 if (gameStateRef.current === 'playing' && playCountRef.current === sessionAtCall) {
-                    troopsRef.current.push(new Troop(selectedNode.owner, selectedNode, target));
+                    troopsRef.current.push(new Troop(originalOwner, selectedNode, target));
                 }
             }, i * 30);
         }

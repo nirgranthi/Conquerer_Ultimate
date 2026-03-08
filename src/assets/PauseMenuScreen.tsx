@@ -1,6 +1,6 @@
 import { QuitToMenu, RestartMap, ResumeGame } from "./Buttons";
 
-export function PauseMenuScreen () {
+export function PauseMenuScreen() {
     return (
         <div className="screen bg-opacity-80 backdrop-blur-md z-50 justify-center">
             <div className="bg-gray-900 p-8 rounded-xl border border-gray-600 text-center shadow-2xl min-w-75">

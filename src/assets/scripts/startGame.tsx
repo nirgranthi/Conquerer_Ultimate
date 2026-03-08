@@ -34,6 +34,7 @@ export function StartGame() {
         }
 
         function draw() {
+            if (!ctx || !canvas) return
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.lineWidth = 1;
             ctx.strokeStyle = '#374151';
@@ -46,7 +47,7 @@ export function StartGame() {
             ctx.stroke();
 
             nodes.forEach((node: Node) => node.draw(ctx, dragSelectedRef.current));
-            
+
             if (gameTime < 3 && gameStateRef.current === 'playing') {
                 const playerNode = nodes.find((node: Node) => node.owner === playerId);
                 if (playerNode) {
@@ -93,16 +94,16 @@ export function StartGame() {
 
             for (let i = 0; i < troops.length; i++) {
                 const troopA = troops[i];
-                if (!troopA.dead) {
-                    for (let j = i + 1; j < troops.length; j++) {
-                        const troopB = troops[j];
-                        if (!troopB.dead && troopA.owner !== troopB.owner) {
-                            if ((troopA.x - troopB.x) ** 2 + (troopA.y - troopB.y) ** 2 < (troopSize * 2) ** 2) {
-                                troopA.dead = true;
-                                troopB.dead = true;
-                                createExplosion(troopA.x + troopB.x, troopA.y + troopB.y, '#FFF', 2);
-                                return;
-                            }
+                if (troopA.dead) continue;
+
+                for (let j = i + 1; j < troops.length; j++) {
+                    const troopB = troops[j];
+                    if (!troopB.dead && troopA.owner !== troopB.owner) {
+                        if ((troopA.x - troopB.x) ** 2 + (troopA.y - troopB.y) ** 2 < (troopSize * 2) ** 2) {
+                            troopA.dead = true;
+                            troopB.dead = true;
+                            createExplosion((troopA.x + troopB.x) / 2, (troopA.y + troopB.y) / 2, '#FFF', 2);
+                            break;
                         }
                     }
                 }
@@ -138,14 +139,15 @@ export function StartGame() {
                         targets.push({ node: nodeB, score: score });
                     });
                     targets.sort((a, b) => b.score - a.score);
-                    if (targets.length > 0 && (targets[0].score > 15 || Math.random() < difficultyConfig[difficulty].aiAggression)) { 
-                        sendTroops(nodeA, targets[0].node, 0.5); 
+                    if (targets.length > 0 && (targets[0].score > 15 || Math.random() < difficultyConfig[difficulty].aiAggression)) {
+                        sendTroops(nodeA, targets[0].node, 0.5);
                     }
                 }
             });
         }
 
         function checkWinCondition() {
+            if (gameStateRef.current !== 'playing') return;
             const owners = new Set(nodes.map((node: Node) => node.owner));
             let won: boolean | null = null;
             if (!owners.has(playerId) && !troops.some((troop: Troop) => troop.owner === playerId)) {
@@ -155,7 +157,7 @@ export function StartGame() {
             } else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troops.some((troop: Troop) => troop.owner !== playerId)) {
                 won = true;
             }
-            if (won !== null && gameStateRef.current === 'playing') {
+            if (won !== null) {
                 setIsWon(won);
                 setGameState('gameover');
             }
@@ -167,6 +169,7 @@ export function StartGame() {
             while (newNodes.length < nodeCount && attempts < 100) {
                 attempts++;
                 const margin = 60;
+                if (!canvas) return;
                 const x = margin + Math.random() * (canvas.width - margin * 2);
                 const y = margin + Math.random() * (canvas.height - margin * 2);
                 let valid = true;

@@ -8,18 +8,18 @@ import Galaxy from "./Galaxy/Galaxy";
 import { useGameContext } from "./GameContext";
 
 export function GameScreen() {
-    const { 
-        gameState, 
-        gameStateRef, 
-        setGameState, 
-        canvasRef, 
-        setPlayCount, 
-        nodesRef, 
-        isDraggingRef, 
-        dragCurrentRef, 
-        dragSelectedRef, 
-        handleDoubleTapRef, 
-        sendTroops 
+    const {
+        gameState,
+        gameStateRef,
+        setGameState,
+        canvasRef,
+        setPlayCount,
+        nodesRef,
+        isDraggingRef,
+        dragCurrentRef,
+        dragSelectedRef,
+        handleDoubleTapRef,
+        sendTroops
     } = useGameContext();
 
     const lastTapTimeRef = useRef(0);
@@ -52,8 +52,8 @@ export function GameScreen() {
     function handleTouchStart(e: TouchEvent) {
         const currentTime = new Date().getTime();
         const timeDiff = currentTime - lastTapTimeRef.current;
-        if (timeDiff < 300 && timeDiff > 0) { 
-            handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY); 
+        if (timeDiff < 300 && timeDiff > 0) {
+            handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         } else {
             handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         }
@@ -90,7 +90,6 @@ export function GameScreen() {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        // Stable function references for removal
         const onMouseDown = (e: MouseEvent) => handleMouseDown(e.clientX, e.clientY);
         const onMouseMove = (e: MouseEvent | TouchEvent) => {
             const clientX = 'touches' in e ? e.changedTouches[0].clientX : e.clientX;
@@ -128,14 +127,12 @@ export function GameScreen() {
     return (
         <>
             <div className="absolute w-full h-full z-0">
-                <Galaxy 
-                    mouseRepulsion={false} 
-                    mouseInteraction={false} 
-                    density={1} 
-                    glowIntensity={0.7} 
-                    saturation={1} 
-                    hueShift={140} 
-                    transparent={true}
+                <Galaxy
+                    mouseRepulsion={false}
+                    mouseInteraction={false}
+                    density={1}
+                    glowIntensity={0.7}
+                    saturation={1}
                 />
             </div>
 
