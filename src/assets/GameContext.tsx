@@ -14,10 +14,10 @@ interface GameContextProps {
     playCount: number;
     setPlayCount: React.Dispatch<React.SetStateAction<number>>
     canvasRef: RefObject<HTMLCanvasElement | null>;
-    isDragging: boolean;
+    isDraggingRef: React.MutableRefObject<boolean>;
     nodes: Node[];
     troops: Troop[];
-    dragSelected: Node[];
+    dragSelectedRef: React.MutableRefObject<Node[]>;
     dragCurrentRef: RefObject<{ x: number; y: number }>;
     handleDoubleTapRef: RefObject<(x: number, y: number) => void>;
     sendTroops: (selectedNode: Node, target: Node, percent: number) => void
@@ -32,12 +32,12 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const [playCount, setPlayCount] = useState<number>(0)
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    let isDragging: boolean = false
+    const isDraggingRef = useRef<boolean>(false)
     const nodes: Node[] = []
     const troops: Troop[] = []
-    let dragSelected: Node[] = []
+    const dragSelectedRef = useRef<Node[]>([])
     const dragCurrentRef = useRef<{ "x": number, "y": number }>({ x: 0, y: 0 })
-    const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => {})
+    const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => { })
 
     const sendTroops = (selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;
@@ -64,10 +64,10 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             playCount,
             setPlayCount,
             canvasRef,
-            isDragging,
+            isDraggingRef,
             nodes,
             troops,
-            dragSelected,
+            dragSelectedRef,
             dragCurrentRef,
             handleDoubleTapRef,
             sendTroops

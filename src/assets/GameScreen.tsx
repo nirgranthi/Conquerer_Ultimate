@@ -8,8 +8,8 @@ import Galaxy from "./Galaxy/Galaxy.tsx";
 import { useGameContext } from "./GameContext.tsx";
 
 export function GameScreen() {
-    let { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodes, isDragging, dragCurrentRef, dragSelected, handleDoubleTapRef, sendTroops } = useGameContext()
-    
+    let { playCount, difficulty, gameState, setGameState, canvasRef, setPlayCount, nodes, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, sendTroops } = useGameContext()
+
     let lastTapTime = 0
 
     function handleSpaceKey() {
@@ -30,10 +30,10 @@ export function GameScreen() {
 
     function handleMouseDown(x: number, y: number) {
         if (gameState !== 'playing') return;
-        const selectedNode = nodes.find((node) => ((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.2)**2 && node.owner === playerId)
+        const selectedNode = nodes.find((node) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2 && node.owner === playerId)
         if (selectedNode) {
-            isDragging = true
-            dragSelected = [selectedNode]
+            isDraggingRef.current = true
+            dragSelectedRef.current = [selectedNode]
             console.log(selectedNode)
             dragCurrentRef.current = { x, y }
         }
@@ -48,12 +48,12 @@ export function GameScreen() {
     }
 
     function handleMouseMove(x: number, y: number) {
-        if (isDragging) {
+        if (isDraggingRef.current) {
             dragCurrentRef.current = { x, y }
             /* console.log(dragCurrentRef.current) */
             nodes.forEach(node => {
-                if (((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.5)**2 && node.owner === playerId) {
-                    if (!dragSelected.includes(node)) { dragSelected.push(node) }
+                if (((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2 && node.owner === playerId) {
+                    if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node) }
                 }
             })
         }
@@ -61,27 +61,24 @@ export function GameScreen() {
 
     /* target is from where the troop wiil be sent */
     function handleMouseUp(x: number, y: number) {
-        if (isDragging && dragSelected.length > 0) {
-            let target = nodes.find(node => ((node.x - x)**2+ (node.y - y)**2) < (node.radius * 1.2)**2)
+        if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
+            let target = nodes.find(node => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2)
             if (target) {
-                dragSelected.forEach((selectedNode) => {
+                dragSelectedRef.current.forEach((selectedNode) => {
                     if (selectedNode !== target) {
                         sendTroops(selectedNode, target, 0.5)
                     }
                 })
             }
-            isDragging = false
-            dragSelected = []
+            isDraggingRef.current = false
+            dragSelectedRef.current = []
         }
     }
-
     useEffect(() => {
-        const canvas = canvasRef.current
+        const canvas = canvasRef.current;
         if (!canvas) return;
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-        const ctx = canvas.getContext('2d')
-        const stopGame = StartGame({ canvas, ctx })
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
@@ -95,7 +92,6 @@ export function GameScreen() {
         window.addEventListener('keydown', handleKeydown)
 
         return () => {
-            if (stopGame) stopGame()
             canvas.removeEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
             canvas.removeEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
             canvas.removeEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
@@ -107,7 +103,7 @@ export function GameScreen() {
 
             window.removeEventListener('keydown', handleKeydown)
         }
-    }, [canvasRef, difficulty, playCount])
+    }, [canvasRef, difficulty, playCount, gameState])
 
     return (
         <>
@@ -130,6 +126,8 @@ export function GameScreen() {
                 </div>
 
                 <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
+
+                <StartGame />
 
                 <div className="relative top-0 left-0 z-20" >
                     {gameState !== 'paused'
