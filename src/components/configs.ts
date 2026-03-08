@@ -1,4 +1,4 @@
-import { Difficulty } from "../assets/GameContext";
+import { Difficulty, useGameContext } from "../assets/GameContext";
 
 const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#f40e6eff', '#14B8A6', '#4B5563'];
 const neutralId = 11;
@@ -53,7 +53,7 @@ class Node {
         }
         this.pulse += dt * 2
     }
-    draw(ctx, dragSelected) {
+    draw(ctx: CanvasRenderingContext2D, dragSelected: Node[]) {
         ctx.beginPath()
         const r = this.owner === playerId
             ? this.radius + Math.sin(this.pulse) * 1.5
@@ -81,7 +81,7 @@ class Node {
         ctx.font = 'bold 13px sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        ctx.fillText(Math.floor(this.population), this.x, this.y)
+        ctx.fillText(String(Math.floor(this.population)), this.x, this.y)
     }
 }
 
@@ -153,7 +153,15 @@ class Troop {
 }
 
 class Particle {
-    constructor(x, y, color) {
+    x: number;
+    y: number;
+    color: string;
+    vx: number;
+    vy: number;
+    life: number;
+    decay: number
+
+    constructor(x: number, y: number, color: string) {
         this.x = x
         this.y = y
         this.color = color
@@ -169,7 +177,7 @@ class Particle {
         this.y += this.vy
         this.life -= this.decay
     }
-    draw(ctx) {
+    draw(ctx: CanvasRenderingContext2D) {
         ctx.globalAlpha = Math.max(0, this.life)
         ctx.fillStyle = this.color
         ctx.beginPath()
