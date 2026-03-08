@@ -4,7 +4,7 @@ import { useGameContext } from "../GameContext.tsx";
 
 function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null}) {
     if (!ctx) return;
-    let { difficulty, setGameState, isDragging, nodes, troops, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef } = useGameContext()
+    let { difficulty, setGameState, isDragging, nodes, troops, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef, sendTroops } = useGameContext()
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles: Particle[] = []
@@ -56,7 +56,7 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
         }
     }
 
-    const runSmartAi = (settings) => {
+    const runSmartAi = () => {
         nodes.forEach(nodeA => {
             if (nodeA.owner !== playerId && nodeA.owner !== neutralId) {
                 if (nodeA.population < 10) return
@@ -77,7 +77,7 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
                     targets.push({ node: nodeB, score: score })
                 })
                 targets.sort((a, b) => b.score - a.score)
-                if (targets.length > 0 && (targets[0].score > 15 || Math.random() < settings.aiAggression)) { sendTroops(nodeA, targets[0].node, 0.5) }
+                if (targets.length > 0 && (targets[0].score > 15 || Math.random() < difficultyConfig[difficulty].aiAggression)) { sendTroops(nodeA, targets[0].node, 0.5) }
             }
         })
     }
@@ -108,9 +108,8 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
         particles.forEach(particle => particle.update())
         particles = particles.filter(particle => particle.life > 0)
         aiTimer += dt * 1000
-        const difficultySettings = difficultyConfig[difficulty]
-        if (gameTime > aiStartDelay && aiTimer > difficultySettings.aiInterval) {
-            runSmartAi(difficultySettings)
+        if (gameTime > aiStartDelay && aiTimer > difficultyConfig[difficulty].aiInterval) {
+            runSmartAi()
             aiTimer = 0
         }
         checkWinCondition()
@@ -132,6 +131,7 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
         nodes.forEach(node => node.draw(ctx, dragSelected))
         if (gameTime < 3 && gameState === 'playing') {
             const playerNode = nodes.find((node) => node.owner === playerId)
+            if (!playerNode) return;
             ctx.save()
             ctx.translate(playerNode.x, playerNode.y - 50 - Math.sin(gameTime * 5) * 10)
             ctx.fillStyle = '#FCD34D'
