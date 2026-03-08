@@ -13,7 +13,7 @@ interface GameContextProps {
     setIsWon: React.Dispatch<React.SetStateAction<boolean | null>>;
     playCount: number;
     setPlayCount: React.Dispatch<React.SetStateAction<number>>
-    canvasRef: HTMLCanvasElement | null;
+    canvasRef: RefObject<HTMLCanvasElement | null>;
     isDraggingRef: RefObject<boolean>;
     nodesRef: RefObject<Node[]>;
     troopsRef: RefObject<Troop[]>;
@@ -36,7 +36,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const nodesRef = useRef<Node[]>([])
     const troopsRef = useRef<Troop[]>([])
     const dragSelectedRef = useRef<Node[]>([])
-    const dragCurrentRef = useRef<{"x": number; "y": number}>({x: 0, y: 0})
+    const dragCurrentRef = useRef<{"x": number, "y": number}>({x: 0, y: 0})
     const handleDoubleTapRef = useRef<(x: number, y: number) => void>(null)
 
     const sendTroops = (selectedNode: Node, target: Node, percent: number) => {

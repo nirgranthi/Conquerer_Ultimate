@@ -29,7 +29,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodes
         createExplosion(targetNode.x, targetNode.y, '#FF0000', 10)
     }
 
-    const handleDoubleTap = (x, y) => {
+    const handleDoubleTap = (x: number, y: number) => {
         const targetNode = nodesRef.current.find(node => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2)
         if (targetNode) {
             globalAssault(targetNode)

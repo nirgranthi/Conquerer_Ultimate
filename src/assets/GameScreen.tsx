@@ -8,8 +8,8 @@ import Galaxy from "./Galaxy/Galaxy.tsx";
 import { useGameContext } from "./GameContext.tsx";
 import { Difficulty, GameState } from "./GameContext.tsx";
 
-export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: { canvasRef: HTMLCanvasElement | null; difficulty: Difficulty; gameState: GameState; setGameState: React.Dispatch<React.SetStateAction<GameState>>; }) {
-    const { playCount, setPlayCount, nodesRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, isWon, troopsRef, setIsWon, sendTroops } = useGameContext()
+export function GameScreen({ difficulty, gameState, setGameState }: { difficulty: Difficulty; gameState: GameState; setGameState: React.Dispatch<React.SetStateAction<GameState>>; }) {
+    const { playCount, canvasRef, setPlayCount, nodesRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, isWon, troopsRef, setIsWon, sendTroops } = useGameContext()
     
     let lastTapTime = 0
 
@@ -78,6 +78,7 @@ export function GameScreen({ canvasRef, difficulty, gameState, setGameState }: {
 
     useEffect(() => {
         const canvas = canvasRef.current
+        if (!canvas) return;
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')

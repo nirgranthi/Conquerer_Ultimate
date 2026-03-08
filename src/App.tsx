@@ -4,13 +4,13 @@ import { useGameContext } from "./assets/GameContext"
 
 
 function App() {
-  const { gameState, setDifficulty, setGameState, canvasRef, difficulty } = useGameContext()
+  const { gameState, setDifficulty, setGameState, difficulty } = useGameContext()
 
   return (
     <div>
       {gameState === 'menu'
         ? <Homepage setDifficulty={setDifficulty} setGameState={setGameState} />
-        : <GameScreen canvasRef={canvasRef} difficulty={difficulty} gameState={gameState} setGameState={setGameState} />
+        : <GameScreen difficulty={difficulty} gameState={gameState} setGameState={setGameState} />
       }
     </div>
   )
