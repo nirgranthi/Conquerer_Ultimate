@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, RefObject } from "react";
+import React, { useEffect } from "react";
 import { PauseButton } from "./Buttons";
 import { GameOverScreen } from "./GameOverScreen.tsx";
 import { PauseMenuScreen } from "./PauseMenuScreen.tsx";
@@ -22,14 +22,14 @@ export function GameScreen({ difficulty, gameState, setGameState }: { difficulty
         }
     }
 
-    function handleKeydown(e) {
+    function handleKeydown(e: KeyboardEvent) {
         if (e.repeat) return
         if (['Space', 'Backspace', 'Delete', 'Escape'].includes(e.code)) e.preventDefault()
         if (e.code === 'Space') { handleSpaceKey() }
         else if (e.code === 'Escape') { handleSpaceKey() }
     }
 
-    function handleMouseDown(x, y) {
+    function handleMouseDown(x: number, y: number) {
         if (gameState !== 'playing') return;
         const selectedNode = nodesRef.current.find((node) => ((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.2)**2 && node.owner === playerId)
         if (selectedNode) {
@@ -40,7 +40,7 @@ export function GameScreen({ difficulty, gameState, setGameState }: { difficulty
         }
     }
 
-    function handleTouchStart(e) {
+    function handleTouchStart(e: TouchEvent) {
         const currentTime = new Date().getTime()
         const timeDiff = currentTime - lastTapTime
         if (timeDiff < 300 && timeDiff > 0) { handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY) }
@@ -48,7 +48,7 @@ export function GameScreen({ difficulty, gameState, setGameState }: { difficulty
         lastTapTime = currentTime /* idk this error will cause any problems */
     }
 
-    function handleMouseMove(x, y) {
+    function handleMouseMove(x: number, y: number) {
         if (isDraggingRef.current) {
             dragCurrentRef.current = { x, y }
             /* console.log(dragCurrentRef.current) */
@@ -61,7 +61,7 @@ export function GameScreen({ difficulty, gameState, setGameState }: { difficulty
     }
 
     /* target is from where the troop wiil be sent */
-    function handleMouseUp(x, y) {
+    function handleMouseUp(x: number, y: number) {
         if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
             let target = nodesRef.current.find(node => ((node.x - x)**2+ (node.y - y)**2) < (node.radius * 1.2)**2)
             if (target) {
