@@ -8,7 +8,7 @@ import Galaxy from "./Galaxy/Galaxy.tsx";
 import { useGameContext } from "./GameContext.tsx";
 
 export function GameScreen() {
-    let { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodes, isDragging, dragCurrentRef, dragSelected, handleDoubleTapRef, troopsRef, setIsWon, sendTroops } = useGameContext()
+    let { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodes, isDragging, dragCurrentRef, dragSelected, handleDoubleTapRef, sendTroops } = useGameContext()
     
     let lastTapTime = 0
 
@@ -81,7 +81,7 @@ export function GameScreen() {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
-        const stopGame = StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodes, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef })
+        const stopGame = StartGame({ canvas, ctx })
 
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))

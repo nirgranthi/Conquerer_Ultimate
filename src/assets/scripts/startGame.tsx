@@ -2,7 +2,8 @@ import { Node, Particle, nodeCount, neutralId, playerId, minimumDistance, troopS
 import { useGameContext } from "../GameContext.tsx";
 
 
-function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodes, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
+function StartGame({ canvas, ctx }) {
+    let { difficulty, setGameState, isDragging, nodes, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef } = useGameContext()
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
