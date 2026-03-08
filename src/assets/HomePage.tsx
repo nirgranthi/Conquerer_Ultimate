@@ -1,13 +1,13 @@
 /* import { ShareIcon, Twitter, Facebook, Whatsapp } from "./SVGs.tsx" */
-import Hyperspeed from "./hyperspeed/Hyperspeed.tsx"
-import { hyperspeedPresets } from "./hyperspeed/HyperspeedPresets.tsx"
-import { useGameContext } from "./GameContext.tsx";
+import Hyperspeed from "./hyperspeed/Hyperspeed"
+import { hyperspeedPresets } from "./hyperspeed/HyperspeedPresets"
+import { useGameContext } from "./GameContext";
 
 
 export function Homepage() {
-    const { setDifficulty, setGameState} = useGameContext()
+    const { setDifficulty, setGameState } = useGameContext()
     const handleStart = () => {
-            setGameState('playing')
+        setGameState('playing')
     }
     return (
         <div className="screen bg-gray-900 text-white h-full w-full">
@@ -39,15 +39,15 @@ export function Homepage() {
                         <div className="radio-input">
                             {/* map the labels */}
                             <label className="label">
-                                <input name="value-radio" id="value-1" type="radio" onClick={() => {setDifficulty("easy")}} />
+                                <input name="value-radio" id="value-1" type="radio" onClick={() => { setDifficulty("easy") }} />
                                 <span className="text">Easy</span>
                             </label>
                             <label className="label">
-                                <input name="value-radio" id="value-2" type="radio" defaultChecked onClick={() => {setDifficulty("medium")}} />
+                                <input name="value-radio" id="value-2" type="radio" defaultChecked onClick={() => { setDifficulty("medium") }} />
                                 <span className="text">Medium</span>
                             </label>
                             <label className="label">
-                                <input name="value-radio" id="value-3" type="radio" onClick={() => {setDifficulty("hard")}} />
+                                <input name="value-radio" id="value-3" type="radio" onClick={() => { setDifficulty("hard") }} />
                                 <span className="text">Hard</span>
                             </label>
                         </div>

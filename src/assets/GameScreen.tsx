@@ -1,148 +1,155 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { PauseButton } from "./Buttons";
-import { GameOverScreen } from "./GameOverScreen.tsx";
-import { PauseMenuScreen } from "./PauseMenuScreen.tsx";
-import { StartGame } from './scripts/startGame.tsx'
-import { playerId } from "../components/configs.ts";
-import Galaxy from "./Galaxy/Galaxy.tsx";
-import { useGameContext } from "./GameContext.tsx";
+import { GameOverScreen } from "./GameOverScreen";
+import { PauseMenuScreen } from "./PauseMenuScreen";
+import { StartGame } from './scripts/startGame';
+import { playerId } from "../components/configs";
+import Galaxy from "./Galaxy/Galaxy";
+import { useGameContext } from "./GameContext";
 
 export function GameScreen() {
-    let { playCount, difficulty, gameState, setGameState, canvasRef, setPlayCount, nodes, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, sendTroops } = useGameContext()
+    const { 
+        gameState, 
+        gameStateRef, 
+        setGameState, 
+        canvasRef, 
+        setPlayCount, 
+        nodesRef, 
+        isDraggingRef, 
+        dragCurrentRef, 
+        dragSelectedRef, 
+        handleDoubleTapRef, 
+        sendTroops 
+    } = useGameContext();
 
-    let lastTapTime = 0
+    const lastTapTimeRef = useRef(0);
 
     function handleSpaceKey() {
-        if (gameState === 'playing') { setGameState('paused') }
-        else if (gameState === 'paused') { setGameState('playing') }
-        else if (gameState === 'gameover') {
-            setGameState('playing')
-            setPlayCount(prev => prev + 1)
+        if (gameStateRef.current === 'playing') { setGameState('paused'); }
+        else if (gameStateRef.current === 'paused') { setGameState('playing'); }
+        else if (gameStateRef.current === 'gameover') {
+            setGameState('playing');
+            setPlayCount(prev => prev + 1);
         }
     }
 
     function handleKeydown(e: KeyboardEvent) {
-        if (e.repeat) return
-        if (['Space', 'Backspace', 'Delete', 'Escape'].includes(e.code)) e.preventDefault()
-        if (e.code === 'Space') { handleSpaceKey() }
-        else if (e.code === 'Escape') { handleSpaceKey() }
+        if (e.repeat) return;
+        if (['Space', 'Backspace', 'Delete', 'Escape'].includes(e.code)) e.preventDefault();
+        if (e.code === 'Space' || e.code === 'Escape') { handleSpaceKey(); }
     }
 
     function handleMouseDown(x: number, y: number) {
-        if (gameState !== 'playing') return;
-        const selectedNode = nodes.find((node) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2 && node.owner === playerId)
+        if (gameStateRef.current !== 'playing') return;
+        const selectedNode = nodesRef.current.find((node: any) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2 && node.owner === playerId);
         if (selectedNode) {
-            isDraggingRef.current = true
-            dragSelectedRef.current = [selectedNode]
-            console.log(selectedNode)
-            dragCurrentRef.current = { x, y }
+            isDraggingRef.current = true;
+            dragSelectedRef.current = [selectedNode];
+            dragCurrentRef.current = { x, y };
         }
     }
 
     function handleTouchStart(e: TouchEvent) {
-        const currentTime = new Date().getTime()
-        const timeDiff = currentTime - lastTapTime
-        if (timeDiff < 300 && timeDiff > 0) { handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY) }
-        else handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
-        lastTapTime = currentTime /* idk this error will cause any problems */
+        const currentTime = new Date().getTime();
+        const timeDiff = currentTime - lastTapTimeRef.current;
+        if (timeDiff < 300 && timeDiff > 0) { 
+            handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY); 
+        } else {
+            handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }
+        lastTapTimeRef.current = currentTime;
     }
 
     function handleMouseMove(x: number, y: number) {
         if (isDraggingRef.current) {
-            dragCurrentRef.current = { x, y }
-            /* console.log(dragCurrentRef.current) */
-            nodes.forEach(node => {
+            dragCurrentRef.current = { x, y };
+            nodesRef.current.forEach((node: any) => {
                 if (((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2 && node.owner === playerId) {
-                    if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node) }
+                    if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node); }
                 }
-            })
+            });
         }
     }
 
-    /* target is from where the troop wiil be sent */
     function handleMouseUp(x: number, y: number) {
         if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
-            let target = nodes.find(node => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2)
+            let target = nodesRef.current.find((node: any) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2);
             if (target) {
                 dragSelectedRef.current.forEach((selectedNode) => {
                     if (selectedNode !== target) {
-                        sendTroops(selectedNode, target, 0.5)
+                        sendTroops(selectedNode, target, 0.5);
                     }
-                })
+                });
             }
-            isDraggingRef.current = false
-            dragSelectedRef.current = []
+            isDraggingRef.current = false;
+            dragSelectedRef.current = [];
         }
     }
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
 
-        canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
-        canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
-        canvas.addEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
-        canvas.addEventListener('dblclick', e => handleDoubleTapRef.current(e.clientX, e.clientY))
+        // Stable function references for removal
+        const onMouseDown = (e: MouseEvent) => handleMouseDown(e.clientX, e.clientY);
+        const onMouseMove = (e: MouseEvent | TouchEvent) => {
+            const clientX = 'touches' in e ? e.changedTouches[0].clientX : e.clientX;
+            const clientY = 'touches' in e ? e.changedTouches[0].clientY : e.clientY;
+            handleMouseMove(clientX, clientY);
+        };
+        const onMouseUp = (e: MouseEvent | TouchEvent) => {
+            const clientX = 'touches' in e ? e.changedTouches[0].clientX : e.clientX;
+            const clientY = 'touches' in e ? e.changedTouches[0].clientY : e.clientY;
+            handleMouseUp(clientX, clientY);
+        };
+        const onDoubleClick = (e: MouseEvent) => handleDoubleTapRef.current(e.clientX, e.clientY);
 
-        canvas.addEventListener('touchstart', handleTouchStart)
-        canvas.addEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
-        canvas.addEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
-
-        window.addEventListener('keydown', handleKeydown)
+        canvas.addEventListener('mousedown', onMouseDown);
+        canvas.addEventListener('mousemove', onMouseMove);
+        canvas.addEventListener('mouseup', onMouseUp);
+        canvas.addEventListener('dblclick', onDoubleClick);
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchmove', onMouseMove);
+        canvas.addEventListener('touchend', onMouseUp);
+        window.addEventListener('keydown', handleKeydown);
 
         return () => {
-            canvas.removeEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
-            canvas.removeEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
-            canvas.removeEventListener('mouseup', e => handleMouseUp(e.clientX, e.clientY))
-            canvas.removeEventListener('dblclick', e => handleDoubleTapRef.current(e.clientX, e.clientY))
-
-            canvas.removeEventListener('touchstart', handleTouchStart)
-            canvas.removeEventListener('touchmove', e => handleMouseMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
-            canvas.removeEventListener('touchend', e => handleMouseUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY))
-
-            window.removeEventListener('keydown', handleKeydown)
-        }
-    }, [canvasRef, difficulty, playCount, gameState])
+            canvas.removeEventListener('mousedown', onMouseDown);
+            canvas.removeEventListener('mousemove', onMouseMove);
+            canvas.removeEventListener('mouseup', onMouseUp);
+            canvas.removeEventListener('dblclick', onDoubleClick);
+            canvas.removeEventListener('touchstart', handleTouchStart);
+            canvas.removeEventListener('touchmove', onMouseMove);
+            canvas.removeEventListener('touchend', onMouseUp);
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, []);
 
     return (
         <>
-            <div>
-                <div className="absolute w-full h-full z-0" >
-                    <Galaxy
-                        mouseRepulsion={false}
-                        mouseInteraction={false}
-                        density={1}
-                        glowIntensity={0.7}
-                        saturation={1}
-                        hueShift={140}
-                        twinkleIntensity={0.3}
-                        rotationSpeed={0.1}
-                        repulsionStrength={2}
-                        autoCenterRepulsion={0}
-                        starSpeed={0.5}
-                        speed={1}
-                    />
-                </div>
+            <div className="absolute w-full h-full z-0">
+                <Galaxy 
+                    mouseRepulsion={false} 
+                    mouseInteraction={false} 
+                    density={1} 
+                    glowIntensity={0.7} 
+                    saturation={1} 
+                    hueShift={140} 
+                    transparent={true}
+                />
+            </div>
 
-                <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
+            <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
 
-                <StartGame />
+            <StartGame />
 
-                <div className="relative top-0 left-0 z-20" >
-                    {gameState !== 'paused'
-                        ? <PauseButton />
-                        : <PauseMenuScreen />
-                    }
-                </div>
+            <div className="relative top-0 left-0 z-20">
+                {gameState !== 'paused' ? <PauseButton /> : <PauseMenuScreen />}
+            </div>
 
-                <div className="z-30">
-                    {gameState === 'gameover'
-                        ? <GameOverScreen />
-                        : ''
-                    }
-                </div>
+            <div className="z-30">
+                {gameState === 'gameover' && <GameOverScreen />}
             </div>
         </>
-    )
+    );
 }
