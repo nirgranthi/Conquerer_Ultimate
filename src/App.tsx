@@ -10,7 +10,7 @@ function App() {
     <div>
       {gameState === 'menu'
         ? <Homepage />
-        : <GameScreen difficulty={difficulty} gameState={gameState} setGameState={setGameState} />
+        : <GameScreen />
       }
     </div>
   )

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { PauseButton } from "./Buttons";
 import { GameOverScreen } from "./GameOverScreen.tsx";
 import { PauseMenuScreen } from "./PauseMenuScreen.tsx";
@@ -6,10 +6,9 @@ import { StartGame } from './scripts/startGame.tsx'
 import { playerId } from "../components/configs.ts";
 import Galaxy from "./Galaxy/Galaxy.tsx";
 import { useGameContext } from "./GameContext.tsx";
-import { Difficulty, GameState } from "./GameContext.tsx";
 
-export function GameScreen({ difficulty, gameState, setGameState }: { difficulty: Difficulty; gameState: GameState; setGameState: React.Dispatch<React.SetStateAction<GameState>>; }) {
-    const { playCount, canvasRef, setPlayCount, nodesRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, isWon, troopsRef, setIsWon, sendTroops } = useGameContext()
+export function GameScreen() {
+    const { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodesRef, isDraggingRef, dragCurrentRef, dragSelectedRef, handleDoubleTapRef, isWon, troopsRef, setIsWon, sendTroops } = useGameContext()
     
     let lastTapTime = 0
 
