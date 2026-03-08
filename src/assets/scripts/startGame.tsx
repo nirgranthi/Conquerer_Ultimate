@@ -1,8 +1,8 @@
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.ts";
+import { Node, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs.ts";
 import { useGameContext } from "../GameContext.tsx";
 
 
-function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodesRef, troopsRef, dragSelectedRef, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
+function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodesRef, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -126,7 +126,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodes
         })
         ctx.stroke()
 
-        nodesRef.current.forEach(node => node.draw(ctx, dragSelectedRef.current))
+        nodesRef.current.forEach(node => node.draw(ctx, dragSelected))
         if (gameTime < 3 && gameState === 'playing') {
             const playerNode = nodesRef.current.find((node) => node.owner === playerId)
             ctx.save()
@@ -141,15 +141,15 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodes
             ctx.fillText("YOU", 0, -10)
             ctx.restore()
         }
-        if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
+        if (isDraggingRef.current && dragSelected.length > 0) {
             ctx.beginPath()
             ctx.lineWidth = 4
             ctx.strokeStyle = '#FCD34D'
             ctx.lineCap = 'round'
             ctx.lineJoin = 'round'
             ctx.setLineDash([10, 10])
-            ctx.moveTo(dragSelectedRef.current[0].x, dragSelectedRef.current[0].y)
-            dragSelectedRef.current.forEach(selectedNode => {
+            ctx.moveTo(dragSelected[0].x, dragSelected[0].y)
+            dragSelected.forEach(selectedNode => {
                 ctx.lineTo(selectedNode.x, selectedNode.y)
             })
             ctx.lineTo(dragCurrentRef.current.x, dragCurrentRef.current.y)
