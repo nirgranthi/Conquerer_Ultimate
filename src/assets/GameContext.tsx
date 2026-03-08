@@ -15,7 +15,7 @@ interface GameContextProps {
     setPlayCount: React.Dispatch<React.SetStateAction<number>>
     canvasRef: RefObject<HTMLCanvasElement | null>;
     isDragging: boolean;
-    nodesRef: RefObject<Node[]>;
+    nodes: Node[];
     troopsRef: RefObject<Troop[]>;
     dragSelected: Node[];
     dragCurrentRef: RefObject<{x: number; y: number}>;
@@ -33,7 +33,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     let isDragging: boolean = false
-    const nodesRef = useRef<Node[]>([])
+    const nodes: Node[] = []
     const troopsRef = useRef<Troop[]>([])
     let dragSelected: Node[] = []
     const dragCurrentRef = useRef<{"x": number, "y": number}>({x: 0, y: 0})
@@ -65,7 +65,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setPlayCount,
             canvasRef,
             isDragging,
-            nodesRef,
+            nodes,
             troopsRef,
             dragSelected,
             dragCurrentRef,

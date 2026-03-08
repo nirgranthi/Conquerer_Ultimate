@@ -2,7 +2,7 @@ import { Node, Particle, nodeCount, neutralId, playerId, minimumDistance, troopS
 import { useGameContext } from "../GameContext.tsx";
 
 
-function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
+function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodes, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -20,7 +20,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef
     }
 
     const globalAssault = (targetNode) => {
-        nodesRef.current.forEach(node => {
+        nodes.forEach(node => {
             if (node.owner === playerId && node !== targetNode) {
                 sendTroops(node, targetNode, 0.5)
                 createExplosion(node.x, node.y, '#3B82F6', 5)
@@ -30,7 +30,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef
     }
 
     const handleDoubleTap = (x: number, y: number) => {
-        const targetNode = nodesRef.current.find(node => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2)
+        const targetNode = nodes.find(node => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2)
         if (targetNode) {
             globalAssault(targetNode)
             createExplosion(x, y, '#fff', 5)
@@ -39,7 +39,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef
     handleDoubleTapRef.current = handleDoubleTap
 
     const checkWinCondition = () => {
-        const owners = new Set(nodesRef.current.map(node => node.owner))
+        const owners = new Set(nodes.map(node => node.owner))
         let won = null
         if (!owners.has(playerId) && !troopsRef.current.some(troop => troop.owner === playerId)) {
             won = false
@@ -55,11 +55,11 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef
     }
 
     const runSmartAi = (settings) => {
-        nodesRef.current.forEach(nodeA => {
+        nodes.forEach(nodeA => {
             if (nodeA.owner !== playerId && nodeA.owner !== neutralId) {
                 if (nodeA.population < 10) return
                 let targets = []
-                nodesRef.current.forEach(nodeB => {
+                nodes.forEach(nodeB => {
                     if (nodeA.id === nodeB.id) return
                     const dist = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y)
                     if (dist > 350) return
@@ -82,7 +82,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef
 
     const update = (dt) => {
         gameTime += dt
-        nodesRef.current.forEach(node => node.update(dt, difficulty))
+        nodes.forEach(node => node.update(dt, difficulty))
         troopsRef.current.forEach(troop => troop.update(createExplosion))
         troopsRef.current = troopsRef.current.filter(troop => !troop.dead)
         /* troopsize */
@@ -126,9 +126,9 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef
         })
         ctx.stroke()
 
-        nodesRef.current.forEach(node => node.draw(ctx, dragSelected))
+        nodes.forEach(node => node.draw(ctx, dragSelected))
         if (gameTime < 3 && gameState === 'playing') {
-            const playerNode = nodesRef.current.find((node) => node.owner === playerId)
+            const playerNode = nodes.find((node) => node.owner === playerId)
             ctx.save()
             ctx.translate(playerNode.x, playerNode.y - 50 - Math.sin(gameTime * 5) * 10)
             ctx.fillStyle = '#FCD34D'
@@ -189,7 +189,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef
                 newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
             }
         }
-        nodesRef.current = newNodes
+        nodes = newNodes
         connections = []
         newNodes.forEach((nodeA, i) => {
             newNodes.slice(i + 1).forEach(nodeB => {

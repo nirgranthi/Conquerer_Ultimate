@@ -8,7 +8,7 @@ import Galaxy from "./Galaxy/Galaxy.tsx";
 import { useGameContext } from "./GameContext.tsx";
 
 export function GameScreen() {
-    let { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodesRef, isDragging, dragCurrentRef, dragSelected, handleDoubleTapRef, troopsRef, setIsWon, sendTroops } = useGameContext()
+    let { playCount, difficulty,gameState, setGameState, canvasRef, setPlayCount, nodes, isDragging, dragCurrentRef, dragSelected, handleDoubleTapRef, troopsRef, setIsWon, sendTroops } = useGameContext()
     
     let lastTapTime = 0
 
@@ -30,7 +30,7 @@ export function GameScreen() {
 
     function handleMouseDown(x: number, y: number) {
         if (gameState !== 'playing') return;
-        const selectedNode = nodesRef.current.find((node) => ((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.2)**2 && node.owner === playerId)
+        const selectedNode = nodes.find((node) => ((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.2)**2 && node.owner === playerId)
         if (selectedNode) {
             isDragging = true
             dragSelected = [selectedNode]
@@ -51,7 +51,7 @@ export function GameScreen() {
         if (isDragging) {
             dragCurrentRef.current = { x, y }
             /* console.log(dragCurrentRef.current) */
-            nodesRef.current.forEach(node => {
+            nodes.forEach(node => {
                 if (((node.x - x)**2 + (node.y - y)**2) < (node.radius * 1.5)**2 && node.owner === playerId) {
                     if (!dragSelected.includes(node)) { dragSelected.push(node) }
                 }
@@ -62,7 +62,7 @@ export function GameScreen() {
     /* target is from where the troop wiil be sent */
     function handleMouseUp(x: number, y: number) {
         if (isDragging && dragSelected.length > 0) {
-            let target = nodesRef.current.find(node => ((node.x - x)**2+ (node.y - y)**2) < (node.radius * 1.2)**2)
+            let target = nodes.find(node => ((node.x - x)**2+ (node.y - y)**2) < (node.radius * 1.2)**2)
             if (target) {
                 dragSelected.forEach((selectedNode) => {
                     if (selectedNode !== target) {
@@ -81,7 +81,7 @@ export function GameScreen() {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         const ctx = canvas.getContext('2d')
-        const stopGame = StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef })
+        const stopGame = StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodes, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef })
 
         canvas.addEventListener('mousedown', e => handleMouseDown(e.clientX, e.clientY))
         canvas.addEventListener('mousemove', e => handleMouseMove(e.clientX, e.clientY))
