@@ -2,7 +2,7 @@ import { Node, Particle, nodeCount, neutralId, playerId, minimumDistance, troopS
 import { useGameContext } from "../GameContext.tsx";
 
 
-function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodesRef, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
+function StartGame({ canvas, difficulty, ctx, setGameState, isDragging, nodesRef, troopsRef, dragSelected, dragCurrentRef, setIsWon, handleDoubleTapRef }) {
     let previousFrameTime = 0
     let currentFrameTime = 0
     let particles = []
@@ -141,7 +141,7 @@ function StartGame({ canvas, difficulty, ctx, setGameState, isDraggingRef, nodes
             ctx.fillText("YOU", 0, -10)
             ctx.restore()
         }
-        if (isDraggingRef.current && dragSelected.length > 0) {
+        if (isDragging && dragSelected.length > 0) {
             ctx.beginPath()
             ctx.lineWidth = 4
             ctx.strokeStyle = '#FCD34D'
