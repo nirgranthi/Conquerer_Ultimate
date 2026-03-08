@@ -37,7 +37,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const troops: Troop[] = []
     let dragSelected: Node[] = []
     const dragCurrentRef = useRef<{ "x": number, "y": number }>({ x: 0, y: 0 })
-    const handleDoubleTapRef = useRef<(x: number, y: number) => void>(null)
+    const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => {})
 
     const sendTroops = (selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;

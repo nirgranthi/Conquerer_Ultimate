@@ -10,8 +10,8 @@ function StartGame({ canvas, ctx }: {canvas: HTMLCanvasElement, ctx: CanvasRende
     let particles: Particle[] = []
     let gameTime = 0
     let aiTimer = 0
-    let animationId
-    let connections = []
+    let animationId: number
+    let connections: {nodeA: Node, nodeB: Node}[] = []
 
     const { gameState } = useGameContext()
 
