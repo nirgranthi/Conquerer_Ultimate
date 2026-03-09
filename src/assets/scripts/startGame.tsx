@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown } from "../../components/configs";
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
@@ -142,7 +142,10 @@ export function StartGame() {
                     });
                     targets.sort((a, b) => b.score - a.score);
                     if (targets.length > 0 && (targets[0].score > 15 || Math.random() < difficultyConfig[difficulty].aiAggression)) {
-                        sendTroops(nodeA, targets[0].node, 0.5);
+                        if (gameTime - nodeA.lastTroopSentTime >= enemyCooldown) {
+                            sendTroops(nodeA, targets[0].node, 0.5);
+                            nodeA.lastTroopSentTime = gameTime;
+                        }
                     }
                 }
             });

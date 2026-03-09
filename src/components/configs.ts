@@ -12,6 +12,7 @@ const troopSpeed = 2.8;
 const troopSize = 4;
 const nodeRadius = 24;
 const aiStartDelay = 7;
+const enemyCooldown = 3;
 
 const difficultyConfig = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
@@ -29,6 +30,7 @@ class Node {
     maxPop: number;
     growthTimer: number;
     pulse: number;
+    lastTroopSentTime: number;
 
     constructor(id: number, x: number, y: number, ownerId: number, pop: number) {
         this.id = id;
@@ -40,6 +42,7 @@ class Node {
         this.maxPop = maxPopulation;
         this.growthTimer = 0;
         this.pulse = Math.random() * Math.PI;
+        this.lastTroopSentTime = 0;
     }
     update(dt: number, difficulty: Difficulty) {
         let rate = growthRate;
@@ -187,4 +190,4 @@ class Particle {
     }
 }
 
-export { Node, Troop, Particle, colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig }
+export { Node, Troop, Particle, colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig, enemyCooldown }
