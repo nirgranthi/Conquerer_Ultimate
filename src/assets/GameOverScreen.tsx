@@ -2,7 +2,7 @@ import { MainMenu, PlayAgain } from "./Buttons";
 import { useGameContext } from "./GameContext";
 
 export function GameOverScreen() {
-    const { isWon, gameTimeRef } = useGameContext()
+    const { isWon, gameTimeRef, difficulty } = useGameContext()
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -26,8 +26,9 @@ export function GameOverScreen() {
                         <p className="text-gray-300 mb-6 text-lg" >Your empire has fallen</p>
                     </>)
                 }
-                <div className="text-yellow-400 font-bold mb-8 text-xl">
-                    Survived: <span className="font-mono text-white">{timeSurvived}</span>
+                <div className="text-yellow-400 font-bold mb-8 text-xl flex flex-col gap-2">
+                    <div>Survived: <span className="font-mono text-white">{timeSurvived}</span></div>
+                    <div className="text-sm text-gray-400 tracking-widest uppercase mt-1">Difficulty: <span className="text-white">{difficulty}</span></div>
                 </div>
 
                 <div className="flex flex-col gap-3">
