@@ -8,20 +8,21 @@ interface GameContextProps {
     difficulty: Difficulty;
     setDifficulty: React.Dispatch<React.SetStateAction<Difficulty>>;
     gameState: GameState;
-    gameStateRef: React.MutableRefObject<GameState>;
+    gameStateRef: RefObject<GameState>;
     setGameState: React.Dispatch<React.SetStateAction<GameState>>;
     isWon: boolean | null;
     setIsWon: React.Dispatch<React.SetStateAction<boolean | null>>;
     playCount: number;
     setPlayCount: React.Dispatch<React.SetStateAction<number>>;
     canvasRef: RefObject<HTMLCanvasElement | null>;
-    isDraggingRef: React.MutableRefObject<boolean>;
-    nodesRef: React.MutableRefObject<Node[]>;
-    troopsRef: React.MutableRefObject<Troop[]>;
-    dragSelectedRef: React.MutableRefObject<Node[]>;
+    isDraggingRef: RefObject<boolean>;
+    nodesRef: RefObject<Node[]>;
+    troopsRef: RefObject<Troop[]>;
+    dragSelectedRef: RefObject<Node[]>;
     dragCurrentRef: RefObject<{ x: number; y: number }>;
     handleDoubleTapRef: RefObject<(x: number, y: number) => void>;
     sendTroops: (selectedNode: Node, target: Node, percent: number) => void;
+    gameTimeRef: RefObject<number>;
 }
 
 const GameContext = createContext<GameContextProps | undefined>(undefined);
@@ -50,6 +51,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const dragSelectedRef = useRef<Node[]>([]);
     const dragCurrentRef = useRef<{ "x": number, "y": number }>({ x: 0, y: 0 });
     const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => { });
+    const gameTimeRef = useRef<number>(0);
 
     const sendTroops = useCallback((selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;
@@ -87,7 +89,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             dragSelectedRef,
             dragCurrentRef,
             handleDoubleTapRef,
-            sendTroops
+            sendTroops,
+            gameTimeRef
         }}>
             {children}
         </GameContext.Provider>
@@ -96,6 +99,6 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
 
 export const useGameContext = () => {
     const content = useContext(GameContext);
-    if (!content) throw new Error("use useGameContext inside provider");
+    if (!content) throw new Error("use useGameContext inside the provider");
     return content;
 }

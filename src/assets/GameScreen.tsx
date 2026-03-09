@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { PauseButton } from "./Buttons";
+import { PauseButton, GameTimer } from "./Buttons";
 import { GameOverScreen } from "./GameOverScreen";
 import { PauseMenuScreen } from "./PauseMenuScreen";
 import { StartGame } from './scripts/startGame';
@@ -141,7 +141,12 @@ export function GameScreen() {
             <StartGame />
 
             <div className="relative top-0 left-0 z-20">
-                {gameState !== 'paused' ? <PauseButton /> : <PauseMenuScreen />}
+                {gameState !== 'paused' ? (
+                    <>
+                        <PauseButton />
+                        <GameTimer />
+                    </>
+                ) : <PauseMenuScreen />}
             </div>
 
             <div className="z-30">

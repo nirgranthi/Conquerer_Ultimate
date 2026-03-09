@@ -1,6 +1,7 @@
 import { useGameContext } from "./GameContext"
+import { useState, useEffect } from "react"
 
-const PauseButton = () => {
+export const PauseButton = () => {
     const { setGameState } = useGameContext()
     return (
         <button
@@ -11,7 +12,7 @@ const PauseButton = () => {
     )
 }
 
-const QuitToMenu = () => {
+export const QuitToMenu = () => {
     const { setGameState } = useGameContext()
     return (
         <button onClick={() => setGameState('menu')} className="bg-red-900 hover:bg-red-800 text-gray-300 hover:text-white font-bold py-3 px-6 rounded-lg border border-red-800 transition-transform active:scale-95">
@@ -20,7 +21,7 @@ const QuitToMenu = () => {
     )
 }
 
-const RestartMap = () => {
+export const RestartMap = () => {
     const { setPlayCount, setGameState } = useGameContext()
     const handleRestartMap = () => {
         setPlayCount(prev => prev + 1)
@@ -33,7 +34,7 @@ const RestartMap = () => {
     )
 }
 
-const ResumeGame = () => {
+export const ResumeGame = () => {
     const { setGameState } = useGameContext()
     return (
         <button onClick={() => setGameState('playing')} className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
@@ -42,7 +43,7 @@ const ResumeGame = () => {
     )
 }
 
-const MainMenu = () => {
+export const MainMenu = () => {
     const { setGameState } = useGameContext()
     return (
         <button onClick={() => setGameState('menu')} className="bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white font-bold py-2 px-4 rounded-lg transition-colors">
@@ -51,7 +52,7 @@ const MainMenu = () => {
     )
 }
 
-const PlayAgain = () => {
+export const PlayAgain = () => {
     const { setPlayCount, setGameState } = useGameContext()
     const handleRestartMap = () => {
         setPlayCount(prev => prev + 1)
@@ -64,4 +65,26 @@ const PlayAgain = () => {
     )
 }
 
-export { PauseButton, QuitToMenu, RestartMap, ResumeGame, MainMenu, PlayAgain }
+export const GameTimer = () => {
+    const { gameTimeRef } = useGameContext()
+    const [time, setTime] = useState(0)
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTime(Math.floor(gameTimeRef.current))
+        }, 100)
+        return () => clearInterval(interval)
+    }, [gameTimeRef])
+
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+        const s = (seconds % 60).toString().padStart(2, '0')
+        return `${m}:${s}`
+    }
+
+    return (
+        <div className="absolute top-20 right-4 w-12 text-center text-white font-mono font-bold text-sm drop-shadow-md bg-gray-800 bg-opacity-60 py-1 rounded-md shadow-lg backdrop-blur-sm border border-gray-600">
+            {formatTime(time)}
+        </div>
+    )
+}

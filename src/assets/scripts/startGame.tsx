@@ -3,7 +3,7 @@ import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance,
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
-    const { canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef } = useGameContext();
+    const { canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef } = useGameContext();
     const gameStateRef = useRef(gameState);
 
     useEffect(() => {
@@ -20,6 +20,7 @@ export function StartGame() {
         let currentFrameTime = 0;
         let particles: Particle[] = [];
         let gameTime = 0;
+        gameTimeRef.current = 0;
         let aiTimer = 0;
         let animationId: number;
         let connections: { nodeA: Node, nodeB: Node }[] = [];
@@ -86,6 +87,7 @@ export function StartGame() {
 
         function update(dt: number) {
             gameTime += dt;
+            gameTimeRef.current = gameTime;
             nodes.forEach((node: Node) => node.update(dt, difficulty));
             troops.forEach((troop: Troop) => troop.update(createExplosion));
 
