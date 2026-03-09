@@ -1,4 +1,3 @@
-/* import { ShareIcon, Twitter, Facebook, Whatsapp } from "./SVGs.tsx" */
 import Hyperspeed from "./hyperspeed/Hyperspeed"
 import { hyperspeedPresets } from "./hyperspeed/HyperspeedPresets"
 import { useGameContext } from "./GameContext";
@@ -58,19 +57,6 @@ export function Homepage() {
                     ⚔️ START WAR
                 </button>
             </div>
-            {/* <div className="tooltip-container">
-                <div className="button-content">
-                    <span className="text">Share</span>
-                    <ShareIcon />
-                </div>
-                <div className="tooltip-content">
-                    <div className="social-icons">
-                        <Twitter />
-                        <Facebook />
-                        <Whatsapp />
-                    </div>
-                </div>
-            </div> */}
         </div>
     )
 }
