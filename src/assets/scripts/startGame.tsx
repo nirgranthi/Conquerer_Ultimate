@@ -85,6 +85,16 @@ export function StartGame() {
             particles.forEach((particle: Particle) => particle.draw(ctx));
         }
 
+        const aiWorker = new Worker(new URL('./ai.worker.ts', import.meta.url));
+
+        aiWorker.onmessage = (e) => {
+            e.data.forEach((action: { fromId: number; toId: number }) => {
+                const fromNode = nodesRef.current.find(n => n.id === action.fromId);
+                const toNode = nodesRef.current.find(n => n.id === action.toId);
+                if (fromNode && toNode) sendTroops(fromNode, toNode, 0.5);
+            });
+        };
+
         function update(dt: number) {
             gameTime += dt;
             gameTimeRef.current = gameTime;
@@ -114,41 +124,18 @@ export function StartGame() {
             particles = particles.filter((particle: Particle) => particle.life > 0);
             aiTimer += dt * 1000;
             if (gameTime > aiStartDelay && aiTimer > difficultyConfig[difficulty].aiInterval) {
-                runSmartAi();
+                aiWorker.postMessage({
+                    nodes: nodes.map(n => ({ ...n })),
+                    difficulty,
+                    difficultyConfig,
+                    playerId,
+                    neutralId,
+                    gameTime,
+                    enemyCooldown
+                });
                 aiTimer = 0;
             }
             checkWinCondition();
-        }
-
-        function runSmartAi() {
-            nodes.forEach((nodeA: Node) => {
-                if (nodeA.owner !== playerId && nodeA.owner !== neutralId) {
-                    if (nodeA.population < 10) return;
-                    let targets: { node: Node, score: number }[] = [];
-                    nodes.forEach((nodeB: Node) => {
-                        if (nodeA.id === nodeB.id) return;
-                        const dist = Math.hypot(nodeA.x - nodeB.x, nodeA.y - nodeB.y);
-                        if (dist > 350) return;
-                        let score = 0;
-                        if (difficulty === 'hard' && nodeB.owner === playerId) { score += 20; }
-                        if (nodeB.owner === neutralId) {
-                            score += 30 - nodeB.population;
-                        } else if (nodeB.owner === nodeA.owner) {
-                            let popDiff = nodeA.population - nodeB.population;
-                            score += popDiff * 2;
-                        } else { if (nodeB.population < 10) { score += 15; } }
-                        score -= dist * 0.1;
-                        targets.push({ node: nodeB, score: score });
-                    });
-                    targets.sort((a, b) => b.score - a.score);
-                    if (targets.length > 0 && (targets[0].score > 15 || Math.random() < difficultyConfig[difficulty].aiAggression)) {
-                        if (gameTime - nodeA.lastTroopSentTime >= enemyCooldown) {
-                            sendTroops(nodeA, targets[0].node, 0.5);
-                            nodeA.lastTroopSentTime = gameTime;
-                        }
-                    }
-                }
-            });
         }
 
         function checkWinCondition() {
@@ -252,6 +239,7 @@ export function StartGame() {
         return () => {
             cancelAnimationFrame(animationId);
             window.removeEventListener('resize', handleResize);
+            aiWorker.terminate();
         };
     }, [playCount, difficulty]);
 
