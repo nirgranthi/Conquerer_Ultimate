@@ -190,4 +190,4 @@ class Particle {
     }
 }
 
-export { Node, Troop, Particle, colors, neutralId, playerId, nodeCount, minimumDistance, maxPopulation, growthRate, troopSpeed, troopSize, nodeRadius, aiStartDelay, difficultyConfig, enemyCooldown }
+export { Node, Troop, Particle, colors, neutralId, playerId, nodeCount, minimumDistance, troopSize, aiStartDelay, difficultyConfig, enemyCooldown }

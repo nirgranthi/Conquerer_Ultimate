@@ -2,9 +2,9 @@ import { useEffect, useRef, lazy, Suspense } from "react";
 import { PauseButton, GameTimer } from "./Buttons";
 import { StartGame } from './scripts/startGame';
 import { playerId } from "../components/configs";
+import { GameOverScreen } from "./GameOverScreen";
+import { PauseMenuScreen } from "./PauseMenuScreen";
 
-const GameOverScreen = lazy(() => import('./GameOverScreen').then(module => ({ default: module.GameOverScreen })));
-const PauseMenuScreen = lazy(() => import('./PauseMenuScreen').then(module => ({ default: module.PauseMenuScreen })));
 import Galaxy from "./Galaxy/Galaxy";
 import { useGameContext } from "./GameContext";
 import { PopulationBar } from "./PopulationBar";
@@ -130,10 +130,7 @@ export function GameScreen() {
         <>
             <div className="absolute w-full h-full z-0">
                 <Galaxy
-                    mouseRepulsion={false}
-                    mouseInteraction={false}
                     density={1}
-                    glowIntensity={0.7}
                     saturation={1}
                 />
             </div>
@@ -150,19 +147,11 @@ export function GameScreen() {
                         <PauseButton />
                         <GameTimer />
                     </>
-                ) : (
-                    <Suspense fallback={null}>
-                        <PauseMenuScreen />
-                    </Suspense>
-                )}
+                ) : (<PauseMenuScreen />)}
             </div>
 
             <div className="z-30">
-                {gameState === 'gameover' && (
-                    <Suspense fallback={null}>
-                        <GameOverScreen />
-                    </Suspense>
-                )}
+                {gameState === 'gameover' && (<GameOverScreen />)}
             </div>
         </>
     );
