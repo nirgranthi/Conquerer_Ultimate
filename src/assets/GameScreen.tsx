@@ -6,6 +6,7 @@ import { StartGame } from './scripts/startGame';
 import { playerId } from "../components/configs";
 import Galaxy from "./Galaxy/Galaxy";
 import { useGameContext } from "./GameContext";
+import { PopulationBar } from "./PopulationBar";
 
 export function GameScreen() {
     const {
@@ -139,6 +140,8 @@ export function GameScreen() {
             <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
 
             <StartGame />
+
+            <PopulationBar />
 
             <div className="relative top-0 left-0 z-20">
                 {gameState !== 'paused' ? (
