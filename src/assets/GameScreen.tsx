@@ -1,4 +1,4 @@
-import { useEffect, useRef, lazy, Suspense } from "react";
+import { useEffect, useRef } from "react";
 import { PauseButton, GameTimer } from "./Buttons";
 import { StartGame } from './scripts/startGame';
 import { playerId } from "../components/configs";
