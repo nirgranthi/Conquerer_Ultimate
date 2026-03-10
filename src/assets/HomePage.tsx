@@ -1,5 +1,7 @@
-import Hyperspeed from "./hyperspeed/Hyperspeed"
+import { lazy, Suspense } from 'react';
 import { useGameContext } from "./GameContext";
+
+const Hyperspeed = lazy(() => import('./hyperspeed/Hyperspeed'));
 
 
 export function Homepage() {
@@ -11,7 +13,9 @@ export function Homepage() {
         <div className="screen bg-gray-900 text-white h-full w-full">
 
             <div className="absolute inset-0 z-0">
-                <Hyperspeed />
+                <Suspense fallback={null}>
+                    <Hyperspeed />
+                </Suspense>
             </div>
 
             <div className="max-w-md w-full overflow-hidden p-8 bg-gray-800/70 rounded-2xl border border-gray-700 shadow-2xl text-center absolute shrink-0">

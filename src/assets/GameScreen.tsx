@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, lazy, Suspense } from "react";
 import { PauseButton, GameTimer } from "./Buttons";
-import { GameOverScreen } from "./GameOverScreen";
-import { PauseMenuScreen } from "./PauseMenuScreen";
 import { StartGame } from './scripts/startGame';
 import { playerId } from "../components/configs";
+
+const GameOverScreen = lazy(() => import('./GameOverScreen').then(module => ({ default: module.GameOverScreen })));
+const PauseMenuScreen = lazy(() => import('./PauseMenuScreen').then(module => ({ default: module.PauseMenuScreen })));
 import Galaxy from "./Galaxy/Galaxy";
 import { useGameContext } from "./GameContext";
 import { PopulationBar } from "./PopulationBar";
@@ -149,11 +150,19 @@ export function GameScreen() {
                         <PauseButton />
                         <GameTimer />
                     </>
-                ) : <PauseMenuScreen />}
+                ) : (
+                    <Suspense fallback={null}>
+                        <PauseMenuScreen />
+                    </Suspense>
+                )}
             </div>
 
             <div className="z-30">
-                {gameState === 'gameover' && <GameOverScreen />}
+                {gameState === 'gameover' && (
+                    <Suspense fallback={null}>
+                        <GameOverScreen />
+                    </Suspense>
+                )}
             </div>
         </>
     );
