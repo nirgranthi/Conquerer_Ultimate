@@ -1,7 +1,7 @@
 import React, { createContext, RefObject, useContext, useRef, useState, useEffect, useCallback } from "react";
 import { Node, Troop } from "../components/configs";
 
-export type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
+type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 interface GameContextProps {
