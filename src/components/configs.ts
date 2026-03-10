@@ -16,7 +16,7 @@ const enemyCooldown = 3;
 
 const difficultyConfig = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
-    medium: { aiInterval: 1000, aiAggression: 0.6, growthMod: 0.6 },
+    medium: { aiInterval: 1000, aiAggression: 0.7, growthMod: 0.7 },
     hard: { aiInterval: 400, aiAggression: 0.9, growthMod: 0.8 }
 };
 

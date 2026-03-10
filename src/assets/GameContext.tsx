@@ -56,6 +56,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const sendTroops = useCallback((selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;
 
+        selectedNode.lastTroopSentTime = gameTimeRef.current;
+
         const originalOwner = selectedNode.owner;
         let noOfTroopsToSend = Math.floor(selectedNode.population * percent);
         selectedNode.population -= noOfTroopsToSend;
