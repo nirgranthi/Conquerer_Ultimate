@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { useGameContext } from "./GameContext";
+import { ShareButton } from './Buttons';
 
 const Hyperspeed = lazy(() => import('./hyperspeed/Hyperspeed'));
 
@@ -20,6 +21,8 @@ export function Homepage() {
 
             <div className="max-w-md w-full overflow-hidden p-8 bg-gray-800/70 rounded-2xl border border-gray-700 shadow-2xl text-center absolute shrink-0">
                 <div className="absolute top-0 left-0 w-full h-2 rainbow-strip"></div>
+
+                <ShareButton />
 
                 <h1 className="text-5xl font-black mb-2 gradient-text tracking-tighter">CONQUEST IO</h1>
                 <p className="text-gray-400 mb-8 text-sm tracking-widest uppercase">Total Domination Simulator</p>
