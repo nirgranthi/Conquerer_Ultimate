@@ -3,7 +3,7 @@ import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance,
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
-    const { canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef } = useGameContext();
+    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef } = useGameContext();
     const gameStateRef = useRef(gameState);
 
     useEffect(() => {
@@ -12,9 +12,11 @@ export function StartGame() {
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        const bgCanvas = bgCanvasRef.current;
+        if (!canvas || !bgCanvas) return;
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        const bgCtx = bgCanvas.getContext('2d', { alpha: true });
+        if (!ctx || !bgCtx) return;
 
         let previousFrameTime = 0;
         let currentFrameTime = 0;
@@ -27,6 +29,8 @@ export function StartGame() {
 
         let nodes = nodesRef.current;
         let troops = troopsRef.current;
+        let lastNodeOwners: number[] = [];
+        let needsBgRedraw = true;
 
         function createExplosion(x: number, y: number, color: string, count: number) {
             for (let i = 0; i < count; i++) {
@@ -34,20 +38,30 @@ export function StartGame() {
             }
         }
 
-        function draw() {
-            if (!ctx || !canvas) return
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = '#374151';
-            ctx.beginPath();
+        function drawBackground() {
+            if (!bgCtx || !bgCanvas) return;
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgCtx.lineWidth = 1;
+            bgCtx.strokeStyle = '#374151';
+            bgCtx.beginPath();
 
             connections.forEach(connection => {
-                ctx.moveTo(connection.nodeA.x, connection.nodeA.y);
-                ctx.lineTo(connection.nodeB.x, connection.nodeB.y);
+                bgCtx.moveTo(connection.nodeA.x, connection.nodeA.y);
+                bgCtx.lineTo(connection.nodeB.x, connection.nodeB.y);
             });
-            ctx.stroke();
+            bgCtx.stroke();
 
-            nodes.forEach((node: Node) => node.draw(ctx, dragSelectedRef.current));
+            nodes.forEach((node: Node) => node.drawBackground(bgCtx));
+            needsBgRedraw = false;
+        }
+
+        function draw() {
+            if (!ctx || !canvas) return;
+            if (needsBgRedraw) drawBackground();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            nodes.forEach((node: Node) => node.drawForeground(ctx, dragSelectedRef.current));
 
             if (gameTime < 3 && gameStateRef.current === 'playing') {
                 const playerNode = nodes.find((node: Node) => node.owner === playerId);
@@ -100,6 +114,15 @@ export function StartGame() {
             gameTimeRef.current = gameTime;
             nodes.forEach((node: Node) => node.update(dt, difficulty));
             troops.forEach((troop: Troop) => troop.update(createExplosion));
+
+            let ownerChanged = false;
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].owner !== lastNodeOwners[i]) {
+                    ownerChanged = true;
+                    lastNodeOwners[i] = nodes[i].owner;
+                }
+            }
+            if (ownerChanged) needsBgRedraw = true;
 
             const aliveTroops = troops.filter((troop: Troop) => !troop.dead);
             troops.splice(0, troops.length, ...aliveTroops);
@@ -186,6 +209,8 @@ export function StartGame() {
                 }
             }
             nodes.splice(0, nodes.length, ...newNodes);
+            lastNodeOwners = nodes.map(n => n.owner);
+            needsBgRedraw = true;
             connections = [];
             newNodes.forEach((nodeA, i) => {
                 newNodes.slice(i + 1).forEach(nodeB => {
@@ -199,6 +224,9 @@ export function StartGame() {
             if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
+                bgCanvas.width = window.innerWidth;
+                bgCanvas.height = window.innerHeight;
+                needsBgRedraw = true;
                 draw();
             }
         };

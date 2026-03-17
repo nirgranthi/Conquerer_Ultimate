@@ -56,11 +56,9 @@ class Node {
         }
         this.pulse += dt * 2
     }
-    draw(ctx: CanvasRenderingContext2D, dragSelected: Node[]) {
+    drawBackground(ctx: CanvasRenderingContext2D) {
         ctx.beginPath()
-        const r = this.owner === playerId
-            ? this.radius + Math.sin(this.pulse) * 1.5
-            : this.radius;
+        const r = this.radius;
         ctx.arc(this.x, this.y, r, 0, Math.PI * 2)
         ctx.fillStyle = colors[this.owner]
         if (this.owner === playerId) {
@@ -74,12 +72,28 @@ class Node {
             ? '#6B7280'
             : '#ffffff'
         if (this.owner === playerId) { ctx.strokeStyle = '#BFDBFE' }
-        if (dragSelected.includes(this)) {
-            ctx.strokeStyle = '#FCD34D'
-            ctx.lineWidth = 5
-        }
         ctx.stroke()
         ctx.closePath()
+    }
+
+    drawForeground(ctx: CanvasRenderingContext2D, dragSelected: Node[]) {
+        if (this.owner === playerId) {
+            ctx.beginPath()
+            ctx.arc(this.x, this.y, this.radius + Math.sin(this.pulse) * 1.5, 0, Math.PI * 2)
+            ctx.strokeStyle = '#60A5FA'
+            ctx.lineWidth = 1.5
+            ctx.stroke()
+            ctx.closePath()
+        }
+
+        if (dragSelected.includes(this)) {
+            ctx.beginPath()
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+            ctx.strokeStyle = '#FCD34D'
+            ctx.lineWidth = 5
+            ctx.stroke()
+            ctx.closePath()
+        }
         ctx.fillStyle = '#fff'
         ctx.font = 'bold 13px sans-serif'
         ctx.textAlign = 'center'

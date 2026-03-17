@@ -14,6 +14,7 @@ interface GameContextProps {
     setIsWon: React.Dispatch<React.SetStateAction<boolean | null>>;
     playCount: number;
     setPlayCount: React.Dispatch<React.SetStateAction<number>>;
+    bgCanvasRef: RefObject<HTMLCanvasElement | null>;
     canvasRef: RefObject<HTMLCanvasElement | null>;
     isDraggingRef: RefObject<boolean>;
     nodesRef: RefObject<Node[]>;
@@ -44,6 +45,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
         playCountRef.current = playCount;
     }, [playCount]);
 
+    const bgCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const isDraggingRef = useRef<boolean>(false);
     const nodesRef = useRef<Node[]>([]);
@@ -84,6 +86,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setIsWon,
             playCount,
             setPlayCount,
+            bgCanvasRef,
             canvasRef,
             isDraggingRef,
             nodesRef,

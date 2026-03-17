@@ -14,6 +14,7 @@ export function GameScreen() {
         gameState,
         gameStateRef,
         setGameState,
+        bgCanvasRef,
         canvasRef,
         setPlayCount,
         nodesRef,
@@ -135,6 +136,7 @@ export function GameScreen() {
                 />
             </div>
 
+            <canvas ref={bgCanvasRef} className="absolute top-0 left-0 z-[5]" />
             <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
 
             <StartGame />
