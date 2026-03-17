@@ -3,7 +3,7 @@ import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance,
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
-    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef } = useGameContext();
+    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef } = useGameContext();
     const gameStateRef = useRef(gameState);
 
     useEffect(() => {
@@ -25,6 +25,7 @@ export function StartGame() {
         let gameTime = 0;
         gameTimeRef.current = 0;
         let aiTimer = 0;
+        let frameCount = 0;
         let animationId: number;
         let connections: { nodeA: Node, nodeB: Node }[] = [];
 
@@ -140,10 +141,11 @@ export function StartGame() {
         };
 
         function update(dt: number) {
+            frameCount++;
             gameTime += dt;
             gameTimeRef.current = gameTime;
-            nodes.forEach((node: Node) => node.update(dt, difficulty));
-            troops.forEach((troop: Troop) => troop.update(createExplosion));
+            nodes.forEach((node: Node) => node.update(dt, difficulty, globalPopulationRef));
+            troops.forEach((troop: Troop) => troop.update(dt, createExplosion, globalPopulationRef));
 
             let ownerChanged = false;
             for (let i = 0; i < nodes.length; i++) {
@@ -177,7 +179,7 @@ export function StartGame() {
 
             for (let i = 0; i < troops.length; i++) {
                 const troopA = troops[i];
-                if (troopA.dead) continue;
+                if (troopA.dead || (i + frameCount) % 2 !== 0) continue;
 
                 const gx = Math.floor(troopA.x / gridCellSize);
                 const gy = Math.floor(troopA.y / gridCellSize);
@@ -191,10 +193,12 @@ export function StartGame() {
 
                         for (let j = 0; j < cellTroops.length; j++) {
                             const troopB = cellTroops[j];
-                            if (!troopB.dead && troopA.owner !== troopB.owner && troopA !== troopB) {
+                            if (!troopB.dead && troopA !== troopB && (troopA.ownerMask & troopB.ownerMask) === 0) {
                                 if ((troopA.x - troopB.x) ** 2 + (troopA.y - troopB.y) ** 2 < (troopSize * 2) ** 2) {
                                     troopA.dead = true;
                                     troopB.dead = true;
+                                    globalPopulationRef.current[troopA.owner] = Math.max(0, (globalPopulationRef.current[troopA.owner] || 0) - 1);
+                                    globalPopulationRef.current[troopB.owner] = Math.max(0, (globalPopulationRef.current[troopB.owner] || 0) - 1);
                                     createExplosion((troopA.x + troopB.x) / 2, (troopA.y + troopB.y) / 2, '#FFF', 2);
                                     hit = true;
                                     break;
@@ -278,6 +282,12 @@ export function StartGame() {
                 }
             }
             nodes.splice(0, nodes.length, ...newNodes);
+            
+            globalPopulationRef.current = {};
+            newNodes.forEach((node) => {
+                globalPopulationRef.current[node.owner] = (globalPopulationRef.current[node.owner] || 0) + node.population;
+            });
+
             lastNodeOwners = nodes.map(n => n.owner);
             needsBgRedraw = true;
             connections = [];

@@ -33,6 +33,7 @@ interface GameContextProps {
     sendTroops: (selectedNode: Node, target: Node, percent: number) => void;
     gameTimeRef: RefObject<number>;
     troopPoolRef: RefObject<Troop[]>;
+    globalPopulationRef: React.MutableRefObject<Record<number, number>>;
 }
 
 const GameContext = createContext<GameContextProps | undefined>(undefined);
@@ -83,6 +84,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => { });
     const gameTimeRef = useRef<number>(0);
     const troopPoolRef = useRef<Troop[]>([]);
+    const globalPopulationRef = useRef<Record<number, number>>({});
 
     const sendTroops = useCallback((selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;
@@ -136,7 +138,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             handleDoubleTapRef,
             sendTroops,
             gameTimeRef,
-            troopPoolRef
+            troopPoolRef,
+            globalPopulationRef
         }}>
             {children}
         </GameContext.Provider>

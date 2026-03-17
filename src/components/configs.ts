@@ -57,13 +57,14 @@ class Node {
         this.pulse = Math.random() * Math.PI;
         this.lastTroopSentTime = 0;
     }
-    update(dt: number, difficulty: Difficulty) {
+    update(dt: number, difficulty: Difficulty, globalPopRef: React.RefObject<Record<number, number>>) {
         let rate = growthRate;
         if (this.owner !== playerId && this.owner !== neutralId) { rate *= difficultyConfig[difficulty].growthMod }
         if (this.owner !== neutralId && this.population < this.maxPop) {
             this.growthTimer += dt
             if (this.growthTimer > (1 / rate)) {
                 this.population++
+                globalPopRef.current[this.owner] = (globalPopRef.current[this.owner] || 0) + 1;
                 this.growthTimer = 0
             }
         }
@@ -127,6 +128,8 @@ class Troop {
     color: string = '';
     targetRadiusSq: number = 0;
     steeringTimer: number = 0;
+    lifeTime: number = 0;
+    ownerMask: number = 0;
 
     constructor() {}
 
@@ -144,41 +147,53 @@ class Troop {
         this.color = colors[this.owner];
         this.targetRadiusSq = targetNode.radius * targetNode.radius;
         this.steeringTimer = Math.floor(Math.random() * 5);
+        this.lifeTime = 0;
+        this.ownerMask = 1 << owner;
     }
-    update(createExplosion: (x: number, y: number, color: string, count: number) => void) {
+    update(dt: number, createExplosion: (x: number, y: number, color: string, count: number) => void, globalPopRef: React.RefObject<Record<number, number>>) {
+        this.lifeTime += dt * 1000;
         this.x += this.vx
         this.y += this.vy
         const dx = this.target.x - this.x
         const dy = this.target.y - this.y
         const distSq = dx * dx + dy * dy
         
-        if (distSq > 100) {
+        if (distSq > 100 && this.lifeTime > 500) {
             this.steeringTimer++;
             if (this.steeringTimer % 3 === 0) {
-                const dist = Math.sqrt(distSq);
-                this.vx += (dx / dist * 0.15)
-                this.vy += (dy / dist * 0.15)
+                const absDx = Math.abs(dx);
+                const absDy = Math.abs(dy);
+                const approxDist = Math.max(absDx, absDy) + 0.4 * Math.min(absDx, absDy);
+                if (approxDist > 0) {
+                    this.vx += (dx / approxDist * 0.15)
+                    this.vy += (dy / approxDist * 0.15)
+                }
                 const speedSq = this.vx * this.vx + this.vy * this.vy
-                if (speedSq > 0) {
-                    const speed = Math.sqrt(speedSq)
-                    this.vx = (this.vx / speed) * troopSpeed
-                    this.vy = (this.vy / speed) * troopSpeed;
+                const maxSpeedSq = troopSpeed * troopSpeed;
+                if (speedSq > maxSpeedSq) {
+                    const speedRatio = troopSpeed / Math.sqrt(speedSq)
+                    this.vx *= speedRatio;
+                    this.vy *= speedRatio;
                 }
             }
         }
         if (distSq < this.targetRadiusSq) {
-            this.hitTarget(createExplosion)
+            this.hitTarget(createExplosion, globalPopRef)
             this.dead = true
         }
     }
-    hitTarget(createExplosion: (x: number, y: number, color: string, count: number) => void) {
-        if (this.target.owner === this.owner) this.target.population++
-        else {
+    hitTarget(createExplosion: (x: number, y: number, color: string, count: number) => void, globalPopRef: React.MutableRefObject<Record<number, number>>) {
+        if (this.target.owner === this.owner) {
+            this.target.population++
+        } else {
             this.target.population--
+            globalPopRef.current[this.target.owner] = Math.max(0, (globalPopRef.current[this.target.owner] || 0) - 1);
             if (this.target.population <= 0) {
                 this.target.owner = this.owner
                 this.target.population = 1
                 createExplosion(this.target.x, this.target.y, colors[this.owner], 15)
+            } else {
+                globalPopRef.current[this.owner] = Math.max(0, (globalPopRef.current[this.owner] || 0) - 1);
             }
         }
     }

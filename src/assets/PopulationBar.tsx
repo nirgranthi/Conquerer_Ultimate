@@ -3,26 +3,31 @@ import { useGameContext } from "./GameContext";
 import { colors } from "../components/configs";
 
 export const PopulationBar = () => {
-    const { nodesRef, gameState } = useGameContext();
+    const { gameState, globalPopulationRef } = useGameContext();
     const [stats, setStats] = useState<{ owner: number; width: number }[]>([]);
 
     useEffect(() => {
         if (gameState !== 'playing') return;
 
         const calculateStats = () => {
-            const nodes = nodesRef.current;
-            if (!nodes || nodes.length === 0) return;
+            const popTotals = globalPopulationRef.current;
+            if (!popTotals) return;
 
-            const popTotals: Record<number, number> = {};
             let totalTotal = 0;
+            const validOwners: Record<number, number> = {};
 
-            nodes.forEach((node) => {
-                if (node.owner === 11) return;
-                popTotals[node.owner] = (popTotals[node.owner] || 0) + node.population;
-                totalTotal += node.population;
+            Object.entries(popTotals).forEach(([ownerStr, pop]) => {
+                const owner = parseInt(ownerStr);
+                if (owner === 11) return; // Ignore neutral
+                if (pop > 0) {
+                    validOwners[owner] = pop;
+                    totalTotal += pop;
+                }
             });
 
-            const newStats = Object.entries(popTotals)
+            if (totalTotal === 0) return;
+
+            const newStats = Object.entries(validOwners)
                 .map(([owner, pop]) => ({
                     owner: parseInt(owner),
                     width: (pop / totalTotal) * 100,
@@ -34,7 +39,7 @@ export const PopulationBar = () => {
 
         const intervalId = setInterval(calculateStats, 150);
         return () => clearInterval(intervalId);
-    }, [gameState, nodesRef]);
+    }, [gameState, globalPopulationRef]);
 
     if (gameState === 'menu') return null;
 
