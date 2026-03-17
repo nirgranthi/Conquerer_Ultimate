@@ -136,7 +136,7 @@ class Troop {
     lifeTime: number = 0;
     ownerMask: number = 0;
 
-    constructor() {}
+    constructor() { }
 
     init(owner: number, startNode: Node, targetNode: Node) {
         this.owner = owner;
@@ -145,7 +145,7 @@ class Troop {
         this.target = targetNode;
         this.isPlayer = (owner === playerId);
         const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x);
-        const spread = (Math.random() - 0.5) * (chaosMode ? 0.6 : 0.3);
+        const spread = (Math.random() - 0.5) * (chaosMode ? 0.6 : 0.18);
         this.vx = Math.cos(angle + spread) * troopSpeed;
         this.vy = Math.sin(angle + spread) * troopSpeed;
         this.dead = false;
@@ -162,7 +162,7 @@ class Troop {
         const dx = this.target.x - this.x
         const dy = this.target.y - this.y
         const distSq = dx * dx + dy * dy
-        
+
         if (!chaosMode && distSq < 400) {
             this.steeringTimer = 1;
             const dist = Math.sqrt(distSq) || 1;
@@ -230,7 +230,7 @@ class Particle {
     life: number = 0;
     decay: number = 0;
 
-    constructor() {}
+    constructor() { }
 
     init(x: number, y: number, color: string) {
         this.x = x

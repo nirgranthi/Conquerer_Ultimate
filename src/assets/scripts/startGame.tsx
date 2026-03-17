@@ -31,8 +31,6 @@ export function StartGame() {
 
         let nodes = nodesRef.current;
         let troops = troopsRef.current;
-        let lastNodeOwners: number[] = [];
-        let needsBgRedraw = true;
 
         function createExplosion(x: number, y: number, color: string, count: number) {
             for (let i = 0; i < count; i++) {
@@ -55,18 +53,17 @@ export function StartGame() {
                 bgCtx.lineTo(connection.nodeB.x, connection.nodeB.y);
             });
             bgCtx.stroke();
-
-            nodes.forEach((node: Node) => node.drawBackground(bgCtx));
-            needsBgRedraw = false;
         }
 
         function draw() {
             if (!ctx || !canvas) return;
-            if (needsBgRedraw) drawBackground();
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            nodes.forEach((node: Node) => node.drawForeground(ctx, dragSelectedRef.current));
+            nodes.forEach((node: Node) => {
+                node.drawBackground(ctx);
+                node.drawForeground(ctx, dragSelectedRef.current);
+            });
 
             if (gameTime < 3 && gameStateRef.current === 'playing') {
                 const playerNode = nodes.find((node: Node) => node.owner === playerId);
@@ -146,15 +143,6 @@ export function StartGame() {
             gameTimeRef.current = gameTime;
             nodes.forEach((node: Node) => node.update(dt, difficulty, globalPopulationRef));
             troops.forEach((troop: Troop) => troop.update(dt, createExplosion, globalPopulationRef));
-
-            let ownerChanged = false;
-            for (let i = 0; i < nodes.length; i++) {
-                if (nodes[i].owner !== lastNodeOwners[i]) {
-                    ownerChanged = true;
-                    lastNodeOwners[i] = nodes[i].owner;
-                }
-            }
-            if (ownerChanged) needsBgRedraw = true;
 
             const aliveTroops: Troop[] = [];
             troops.forEach(t => {
@@ -288,8 +276,6 @@ export function StartGame() {
                 globalPopulationRef.current[node.owner] = (globalPopulationRef.current[node.owner] || 0) + node.population;
             });
 
-            lastNodeOwners = nodes.map(n => n.owner);
-            needsBgRedraw = true;
             connections = [];
             newNodes.forEach((nodeA, i) => {
                 newNodes.slice(i + 1).forEach(nodeB => {
@@ -297,6 +283,7 @@ export function StartGame() {
                 });
             });
             troops.splice(0, troops.length);
+            drawBackground();
         }
 
         const handleResize = () => {
@@ -305,7 +292,7 @@ export function StartGame() {
                 canvas.height = window.innerHeight;
                 bgCanvas.width = window.innerWidth;
                 bgCanvas.height = window.innerHeight;
-                needsBgRedraw = true;
+                drawBackground();
                 draw();
             }
         };
