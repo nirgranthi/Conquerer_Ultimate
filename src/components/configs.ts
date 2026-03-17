@@ -19,6 +19,10 @@ export let playerShadowColor = '#60A5FA';
 export let playerStrokeColor = '#BFDBFE';
 
 export function setPlayerColorVar(base: string, shadow: string, stroke: string) {
+    const existingIndex = colors.indexOf(base);
+    if (existingIndex !== -1 && existingIndex !== playerId) {
+        colors[existingIndex] = colors[playerId];
+    }
     colors[playerId] = base;
     playerShadowColor = shadow;
     playerStrokeColor = stroke;
