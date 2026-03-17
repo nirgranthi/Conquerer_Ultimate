@@ -1,5 +1,5 @@
 import React, { createContext, RefObject, useContext, useRef, useState, useEffect, useCallback } from "react";
-import { Node, Troop, setPlayerColorVar, setTroopSpeedVar } from "../components/configs";
+import { Node, Troop, setPlayerColorVar, setTroopSpeedVar, setChaosModeVar } from "../components/configs";
 
 type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
 export type Difficulty = 'easy' | 'medium' | 'hard';
@@ -15,6 +15,8 @@ interface GameContextProps {
     setPlayerColor: React.Dispatch<React.SetStateAction<PlayerColorOption>>;
     troopSpeedSetting: number;
     setTroopSpeedSetting: React.Dispatch<React.SetStateAction<number>>;
+    chaosModeEnabled: boolean;
+    setChaosModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     gameState: GameState;
     gameStateRef: RefObject<GameState>;
     setGameState: React.Dispatch<React.SetStateAction<GameState>>;
@@ -43,6 +45,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const [galaxyBgEnabled, setGalaxyBgEnabled] = useState<boolean>(true);
     const [playerColor, setPlayerColor] = useState<PlayerColorOption>('blue');
     const [troopSpeedSetting, setTroopSpeedSetting] = useState<number>(2.8);
+    const [chaosModeEnabled, setChaosModeEnabled] = useState<boolean>(false);
     const [gameState, setGameState] = useState<GameState>('menu');
     const [isWon, setIsWon] = useState<boolean | null>(null);
     const [playCount, setPlayCount] = useState<number>(0);
@@ -65,6 +68,10 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     useEffect(() => {
         setTroopSpeedVar(troopSpeedSetting);
     }, [troopSpeedSetting]);
+
+    useEffect(() => {
+        setChaosModeVar(chaosModeEnabled);
+    }, [chaosModeEnabled]);
 
     useEffect(() => {
         gameStateRef.current = gameState;
@@ -121,6 +128,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setPlayerColor,
             troopSpeedSetting,
             setTroopSpeedSetting,
+            chaosModeEnabled,
+            setChaosModeEnabled,
             gameState,
             gameStateRef,
             setGameState,

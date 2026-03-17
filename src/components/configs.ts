@@ -9,6 +9,7 @@ const minimumDistance = 70;
 const maxPopulation = 200;
 const growthRate = 1.5;
 export let troopSpeed = 2.8;
+export let chaosMode = false;
 const troopSize = 4;
 const nodeRadius = 24;
 const aiStartDelay = 7;
@@ -25,6 +26,10 @@ export function setPlayerColorVar(base: string, shadow: string, stroke: string) 
 
 export function setTroopSpeedVar(speed: number) {
     troopSpeed = speed;
+}
+
+export function setChaosModeVar(val: boolean) {
+    chaosMode = val;
 }
 
 const difficultyConfig = {
@@ -140,7 +145,7 @@ class Troop {
         this.target = targetNode;
         this.isPlayer = (owner === playerId);
         const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x);
-        const spread = (Math.random() - 0.5) * 0.6;
+        const spread = (Math.random() - 0.5) * (chaosMode ? 0.6 : 0.3);
         this.vx = Math.cos(angle + spread) * troopSpeed;
         this.vy = Math.sin(angle + spread) * troopSpeed;
         this.dead = false;
@@ -158,7 +163,12 @@ class Troop {
         const dy = this.target.y - this.y
         const distSq = dx * dx + dy * dy
         
-        if (distSq > 100 && this.lifeTime > 500) {
+        if (!chaosMode && distSq < 400) {
+            this.steeringTimer = 1;
+            const dist = Math.sqrt(distSq) || 1;
+            this.vx = (dx / dist) * troopSpeed;
+            this.vy = (dy / dist) * troopSpeed;
+        } else if (distSq > 100 && this.lifeTime > 500) {
             this.steeringTimer++;
             if (this.steeringTimer % 3 === 0) {
                 const absDx = Math.abs(dx);

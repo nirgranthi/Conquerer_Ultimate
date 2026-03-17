@@ -8,7 +8,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     const { 
         galaxyBgEnabled, setGalaxyBgEnabled,
         playerColor, setPlayerColor,
-        troopSpeedSetting, setTroopSpeedSetting
+        troopSpeedSetting, setTroopSpeedSetting,
+        chaosModeEnabled, setChaosModeEnabled
     } = useGameContext();
 
     return (
@@ -68,6 +69,18 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${galaxyBgEnabled ? 'bg-blue-600' : 'bg-gray-600'}`}
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${galaxyBgEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+
+                    {/* Chaos Mode */}
+                    <div className="flex items-center justify-between">
+                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Chaos Mode</label>
+                        <button 
+                            onClick={() => setChaosModeEnabled(!chaosModeEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${chaosModeEnabled ? 'bg-red-600' : 'bg-gray-600'}`}
+                            title="Disable Hard Homing"
+                        >
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${chaosModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
                     </div>
                 </div>
