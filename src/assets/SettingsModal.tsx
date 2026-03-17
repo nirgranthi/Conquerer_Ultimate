@@ -1,0 +1,83 @@
+import { useGameContext, PlayerColorOption } from "./GameContext";
+
+interface SettingsModalProps {
+    onClose: () => void;
+}
+
+export function SettingsModal({ onClose }: SettingsModalProps) {
+    const { 
+        galaxyBgEnabled, setGalaxyBgEnabled,
+        playerColor, setPlayerColor,
+        troopSpeedSetting, setTroopSpeedSetting
+    } = useGameContext();
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 max-w-sm w-full shadow-2xl relative">
+                <button 
+                    onClick={onClose} 
+                    className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                >
+                    ✕
+                </button>
+                <h2 className="text-2xl font-black mb-6 text-white text-center">SETTINGS</h2>
+                
+                <div className="space-y-6">
+                    {/* Player Color */}
+                    <div>
+                        <label className="block text-gray-400 text-xs font-bold mb-3 uppercase tracking-wide">Player Color</label>
+                        <div className="flex justify-between">
+                            {(['blue', 'red', 'green', 'yellow', 'purple'] as PlayerColorOption[]).map(color => (
+                                <button
+                                    key={color}
+                                    onClick={() => setPlayerColor(color)}
+                                    className={`w-10 h-10 rounded-full border-2 transition-transform ${playerColor === color ? 'scale-110 border-white' : 'border-transparent hover:scale-105'}`}
+                                    style={{
+                                        backgroundColor: 
+                                            color === 'blue' ? '#3B82F6' : 
+                                            color === 'red' ? '#EF4444' : 
+                                            color === 'green' ? '#10B981' : 
+                                            color === 'yellow' ? '#F59E0B' : '#8B5CF6'
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Troop Speed */}
+                    <div>
+                        <label className="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">
+                            Troop Speed ({troopSpeedSetting.toFixed(1)}x)
+                        </label>
+                        <input 
+                            type="range" 
+                            min="1.0" 
+                            max="5.0" 
+                            step="0.1" 
+                            value={troopSpeedSetting}
+                            onChange={(e) => setTroopSpeedSetting(parseFloat(e.target.value))}
+                            className="w-full accent-blue-500"
+                        />
+                    </div>
+
+                    {/* Galaxy Background */}
+                    <div className="flex items-center justify-between">
+                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Galaxy Background</label>
+                        <button 
+                            onClick={() => setGalaxyBgEnabled(!galaxyBgEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${galaxyBgEnabled ? 'bg-blue-600' : 'bg-gray-600'}`}
+                        >
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${galaxyBgEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="mt-8">
+                    <button onClick={onClose} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors cursor-pointer">
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}

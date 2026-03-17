@@ -22,7 +22,8 @@ export function GameScreen() {
         dragCurrentRef,
         dragSelectedRef,
         handleDoubleTapRef,
-        sendTroops
+        sendTroops,
+        galaxyBgEnabled
     } = useGameContext();
 
     const lastTapTimeRef = useRef(0);
@@ -130,10 +131,12 @@ export function GameScreen() {
     return (
         <>
             <div className="absolute w-full h-full z-0">
-                <Galaxy
-                    density={1}
-                    saturation={1}
-                />
+                {galaxyBgEnabled && (
+                    <Galaxy
+                        density={1}
+                        saturation={1}
+                    />
+                )}
             </div>
 
             <canvas ref={bgCanvasRef} className="absolute top-0 left-0 z-[5]" />

@@ -1,12 +1,13 @@
-import { lazy, Suspense } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useGameContext } from "./GameContext";
 import { ShareButton } from './Buttons';
+import { SettingsModal } from './SettingsModal';
 
 const Hyperspeed = lazy(() => import('./hyperspeed/Hyperspeed'));
 
-
 export function Homepage() {
-    const { setDifficulty, setGameState } = useGameContext()
+    const { setDifficulty, setGameState } = useGameContext();
+    const [showSettings, setShowSettings] = useState(false);
     const handleStart = () => {
         setGameState('playing')
     }
@@ -23,8 +24,15 @@ export function Homepage() {
                 <div className="absolute top-0 left-0 w-full h-2 rainbow-strip"></div>
 
                 <ShareButton />
+                <button 
+                    onClick={() => setShowSettings(true)}
+                    className="absolute top-4 left-4 p-2 bg-gray-800/80 hover:bg-gray-700/80 rounded-full border border-gray-600 transition-colors shadow-lg z-10"
+                    title="Settings"
+                >
+                    ⚙️
+                </button>
 
-                <h1 className="text-5xl font-black mb-2 gradient-text tracking-tighter">CONQUEST IO</h1>
+                <h1 className="text-5xl font-black mb-2 gradient-text tracking-tighter mt-4">CONQUEST IO</h1>
                 <p className="text-gray-400 mb-8 text-sm tracking-widest uppercase">Total Domination Simulator</p>
 
                 <div className="bg-gray-900/80 rounded-lg p-6 text-left mb-6 border border-gray-700 shadow-inner">
@@ -42,7 +50,6 @@ export function Homepage() {
                     <div className="relative">
                         {/* <!-- From Uiverse.io by m1her --> */}
                         <div className="radio-input">
-                            {/* map the labels */}
                             <label className="label">
                                 <input name="value-radio" id="value-1" type="radio" onClick={() => { setDifficulty("easy") }} />
                                 <span className="text">Easy</span>
@@ -63,6 +70,10 @@ export function Homepage() {
                     ⚔️ START WAR
                 </button>
             </div>
+            
+            {showSettings && (
+                <SettingsModal onClose={() => setShowSettings(false)} />
+            )}
         </div>
     )
 }

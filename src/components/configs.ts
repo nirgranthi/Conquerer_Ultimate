@@ -8,11 +8,24 @@ const nodeCount = 40;
 const minimumDistance = 70;
 const maxPopulation = 200;
 const growthRate = 1.5;
-const troopSpeed = 2.8;
+export let troopSpeed = 2.8;
 const troopSize = 4;
 const nodeRadius = 24;
 const aiStartDelay = 7;
 const enemyCooldown = 3;
+
+export let playerShadowColor = '#60A5FA';
+export let playerStrokeColor = '#BFDBFE';
+
+export function setPlayerColorVar(base: string, shadow: string, stroke: string) {
+    colors[playerId] = base;
+    playerShadowColor = shadow;
+    playerStrokeColor = stroke;
+}
+
+export function setTroopSpeedVar(speed: number) {
+    troopSpeed = speed;
+}
 
 const difficultyConfig = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
@@ -63,7 +76,7 @@ class Node {
         ctx.fillStyle = colors[this.owner]
         if (this.owner === playerId) {
             ctx.shadowBlur = 20
-            ctx.shadowColor = '#60A5FA'
+            ctx.shadowColor = playerShadowColor
         }
         ctx.fill()
         ctx.shadowBlur = 0
@@ -71,7 +84,7 @@ class Node {
         ctx.strokeStyle = (this.owner === neutralId)
             ? '#6B7280'
             : '#ffffff'
-        if (this.owner === playerId) { ctx.strokeStyle = '#BFDBFE' }
+        if (this.owner === playerId) { ctx.strokeStyle = playerStrokeColor }
         ctx.stroke()
         ctx.closePath()
     }
@@ -80,7 +93,7 @@ class Node {
         if (this.owner === playerId) {
             ctx.beginPath()
             ctx.arc(this.x, this.y, this.radius + Math.sin(this.pulse) * 1.5, 0, Math.PI * 2)
-            ctx.strokeStyle = '#60A5FA'
+            ctx.strokeStyle = playerShadowColor
             ctx.lineWidth = 1.5
             ctx.stroke()
             ctx.closePath()
