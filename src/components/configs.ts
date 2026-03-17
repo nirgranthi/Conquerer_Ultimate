@@ -10,6 +10,7 @@ const maxPopulation = 200;
 const growthRate = 1.5;
 export let troopSpeed = 2.8;
 export let chaosMode = false;
+export let imposterMode = false;
 const troopSize = 4;
 const nodeRadius = 24;
 const aiStartDelay = 7;
@@ -34,6 +35,10 @@ export function setTroopSpeedVar(speed: number) {
 
 export function setChaosModeVar(val: boolean) {
     chaosMode = val;
+}
+
+export function setImposterModeVar(val: boolean) {
+    imposterMode = val;
 }
 
 const difficultyConfig = {
@@ -83,24 +88,28 @@ class Node {
         ctx.beginPath()
         const r = this.radius;
         ctx.arc(this.x, this.y, r, 0, Math.PI * 2)
-        ctx.fillStyle = colors[this.owner]
-        if (this.owner === playerId) {
+        const isEnemy = this.owner !== playerId && this.owner !== neutralId;
+        const apparentOwner = (isEnemy && imposterMode) ? playerId : this.owner;
+        ctx.fillStyle = colors[apparentOwner]
+        if (apparentOwner === playerId) {
             ctx.shadowBlur = 20
             ctx.shadowColor = playerShadowColor
         }
         ctx.fill()
         ctx.shadowBlur = 0
         ctx.lineWidth = 3
-        ctx.strokeStyle = (this.owner === neutralId)
+        ctx.strokeStyle = (apparentOwner === neutralId)
             ? '#6B7280'
             : '#ffffff'
-        if (this.owner === playerId) { ctx.strokeStyle = playerStrokeColor }
+        if (apparentOwner === playerId) { ctx.strokeStyle = playerStrokeColor }
         ctx.stroke()
         ctx.closePath()
     }
 
     drawForeground(ctx: CanvasRenderingContext2D, dragSelected: Node[]) {
-        if (this.owner === playerId) {
+        const isEnemy = this.owner !== playerId && this.owner !== neutralId;
+        const apparentOwner = (isEnemy && imposterMode) ? playerId : this.owner;
+        if (apparentOwner === playerId) {
             ctx.beginPath()
             ctx.arc(this.x, this.y, this.radius + Math.sin(this.pulse) * 1.5, 0, Math.PI * 2)
             ctx.strokeStyle = playerShadowColor
@@ -153,7 +162,9 @@ class Troop {
         this.vx = Math.cos(angle + spread) * troopSpeed;
         this.vy = Math.sin(angle + spread) * troopSpeed;
         this.dead = false;
-        this.color = colors[this.owner];
+        const isEnemy = this.owner !== playerId && this.owner !== neutralId;
+        const apparentOwner = (isEnemy && imposterMode) ? playerId : this.owner;
+        this.color = colors[apparentOwner];
         this.targetRadiusSq = targetNode.radius * targetNode.radius;
         this.steeringTimer = Math.floor(Math.random() * 5);
         this.lifeTime = 0;
@@ -216,7 +227,9 @@ class Troop {
         ctx.arc(this.x, this.y, troopSize, 0, Math.PI * 2)
         ctx.fillStyle = this.color
         ctx.fill()
-        if (this.isPlayer) {
+        const isEnemy = this.owner !== playerId && this.owner !== neutralId;
+        const apparentOwner = (isEnemy && imposterMode) ? playerId : this.owner;
+        if (apparentOwner === playerId) {
             ctx.lineWidth = 1.5
             ctx.strokeStyle = '#ffffff'
             ctx.stroke()

@@ -9,7 +9,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         galaxyBgEnabled, setGalaxyBgEnabled,
         playerColor, setPlayerColor,
         troopSpeedSetting, setTroopSpeedSetting,
-        chaosModeEnabled, setChaosModeEnabled
+        chaosModeEnabled, setChaosModeEnabled,
+        imposterModeEnabled, setImposterModeEnabled
     } = useGameContext();
 
     return (
@@ -81,6 +82,18 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             title="Disable Hard Homing"
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${chaosModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+
+                    {/* Imposter Mode */}
+                    <div className="flex items-center justify-between">
+                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Imposter Mode</label>
+                        <button 
+                            onClick={() => setImposterModeEnabled(!imposterModeEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${imposterModeEnabled ? 'bg-purple-600' : 'bg-gray-600'}`}
+                            title="Disguise enemies as player"
+                        >
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${imposterModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
                     </div>
                 </div>
