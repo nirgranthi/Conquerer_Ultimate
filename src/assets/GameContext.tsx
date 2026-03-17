@@ -32,6 +32,7 @@ interface GameContextProps {
     handleDoubleTapRef: RefObject<(x: number, y: number) => void>;
     sendTroops: (selectedNode: Node, target: Node, percent: number) => void;
     gameTimeRef: RefObject<number>;
+    troopPoolRef: RefObject<Troop[]>;
 }
 
 const GameContext = createContext<GameContextProps | undefined>(undefined);
@@ -81,6 +82,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const dragCurrentRef = useRef<{ "x": number, "y": number }>({ x: 0, y: 0 });
     const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => { });
     const gameTimeRef = useRef<number>(0);
+    const troopPoolRef = useRef<Troop[]>([]);
 
     const sendTroops = useCallback((selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;
@@ -96,7 +98,12 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
         for (let i = 0; i < noOfTroopsToSend; i++) {
             setTimeout(() => {
                 if (gameStateRef.current === 'playing' && playCountRef.current === sessionAtCall) {
-                    troopsRef.current.push(new Troop(originalOwner, selectedNode, target));
+                    let troop = troopPoolRef.current.pop();
+                    if (!troop) {
+                        troop = new Troop();
+                    }
+                    troop.init(originalOwner, selectedNode, target);
+                    troopsRef.current.push(troop);
                 }
             }, i * 30);
         }
@@ -128,7 +135,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             dragCurrentRef,
             handleDoubleTapRef,
             sendTroops,
-            gameTimeRef
+            gameTimeRef,
+            troopPoolRef
         }}>
             {children}
         </GameContext.Provider>

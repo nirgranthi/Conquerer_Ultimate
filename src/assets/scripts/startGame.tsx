@@ -3,7 +3,7 @@ import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance,
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
-    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef } = useGameContext();
+    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef } = useGameContext();
     const gameStateRef = useRef(gameState);
 
     useEffect(() => {
@@ -21,6 +21,7 @@ export function StartGame() {
         let previousFrameTime = 0;
         let currentFrameTime = 0;
         let particles: Particle[] = [];
+        let particlePool: Particle[] = [];
         let gameTime = 0;
         gameTimeRef.current = 0;
         let aiTimer = 0;
@@ -34,7 +35,10 @@ export function StartGame() {
 
         function createExplosion(x: number, y: number, color: string, count: number) {
             for (let i = 0; i < count; i++) {
-                particles.push(new Particle(x, y, color));
+                let p = particlePool.pop();
+                if (!p) p = new Particle();
+                p.init(x, y, color);
+                particles.push(p);
             }
         }
 
@@ -95,7 +99,33 @@ export function StartGame() {
                 ctx.stroke();
                 ctx.setLineDash([]);
             }
-            troops.forEach((troop: Troop) => troop.draw(ctx));
+            const troopsByOwner: { [key: number]: Troop[] } = {};
+            troops.forEach(troop => {
+                if (!troopsByOwner[troop.owner]) troopsByOwner[troop.owner] = [];
+                troopsByOwner[troop.owner].push(troop);
+            });
+
+            Object.keys(troopsByOwner).forEach(ownerIdStr => {
+                const ownerId = parseInt(ownerIdStr);
+                const ownerTroops = troopsByOwner[ownerId];
+                if (ownerTroops.length === 0) return;
+
+                ctx.beginPath();
+                ctx.fillStyle = ownerTroops[0].color;
+                ownerTroops.forEach(troop => {
+                    ctx.moveTo(troop.x + troopSize, troop.y);
+                    ctx.arc(troop.x, troop.y, troopSize, 0, Math.PI * 2);
+                });
+                ctx.fill();
+
+                if (ownerId === playerId) {
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+                }
+                ctx.closePath();
+            });
+
             particles.forEach((particle: Particle) => particle.draw(ctx));
         }
 
@@ -124,27 +154,66 @@ export function StartGame() {
             }
             if (ownerChanged) needsBgRedraw = true;
 
-            const aliveTroops = troops.filter((troop: Troop) => !troop.dead);
+            const aliveTroops: Troop[] = [];
+            troops.forEach(t => {
+                if (t.dead) {
+                    troopPoolRef.current?.push(t);
+                } else {
+                    aliveTroops.push(t);
+                }
+            });
             troops.splice(0, troops.length, ...aliveTroops);
+
+            const gridCellSize = 50;
+            const grid: { [key: string]: Troop[] } = {};
+            troops.forEach(troop => {
+                if (troop.dead) return;
+                const gx = Math.floor(troop.x / gridCellSize);
+                const gy = Math.floor(troop.y / gridCellSize);
+                const key = `${gx},${gy}`;
+                if (!grid[key]) grid[key] = [];
+                grid[key].push(troop);
+            });
 
             for (let i = 0; i < troops.length; i++) {
                 const troopA = troops[i];
                 if (troopA.dead) continue;
 
-                for (let j = i + 1; j < troops.length; j++) {
-                    const troopB = troops[j];
-                    if (!troopB.dead && troopA.owner !== troopB.owner) {
-                        if ((troopA.x - troopB.x) ** 2 + (troopA.y - troopB.y) ** 2 < (troopSize * 2) ** 2) {
-                            troopA.dead = true;
-                            troopB.dead = true;
-                            createExplosion((troopA.x + troopB.x) / 2, (troopA.y + troopB.y) / 2, '#FFF', 2);
-                            break;
+                const gx = Math.floor(troopA.x / gridCellSize);
+                const gy = Math.floor(troopA.y / gridCellSize);
+                let hit = false;
+
+                for (let ox = -1; ox <= 1; ox++) {
+                    for (let oy = -1; oy <= 1; oy++) {
+                        const key = `${gx + ox},${gy + oy}`;
+                        const cellTroops = grid[key];
+                        if (!cellTroops) continue;
+
+                        for (let j = 0; j < cellTroops.length; j++) {
+                            const troopB = cellTroops[j];
+                            if (!troopB.dead && troopA.owner !== troopB.owner && troopA !== troopB) {
+                                if ((troopA.x - troopB.x) ** 2 + (troopA.y - troopB.y) ** 2 < (troopSize * 2) ** 2) {
+                                    troopA.dead = true;
+                                    troopB.dead = true;
+                                    createExplosion((troopA.x + troopB.x) / 2, (troopA.y + troopB.y) / 2, '#FFF', 2);
+                                    hit = true;
+                                    break;
+                                }
+                            }
                         }
+                        if (hit) break;
                     }
+                    if (hit) break;
                 }
             }
-            particles.forEach((particle: Particle) => particle.update());
-            particles = particles.filter((particle: Particle) => particle.life > 0);
+            
+            const aliveParticles: Particle[] = [];
+            particles.forEach(p => {
+                p.update();
+                if (p.life > 0) aliveParticles.push(p);
+                else particlePool.push(p);
+            });
+            particles = aliveParticles;
             aiTimer += dt * 1000;
             if (gameTime > aiStartDelay && aiTimer > difficultyConfig[difficulty].aiInterval) {
                 aiWorker.postMessage({

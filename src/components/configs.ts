@@ -116,43 +116,57 @@ class Node {
 }
 
 class Troop {
-    owner: number;
-    x: number;
-    y: number;
-    target: Node;
-    isPlayer: boolean;
-    vx: number;
-    vy: number;
-    dead: boolean;
-    color: string
+    owner: number = 0;
+    x: number = 0;
+    y: number = 0;
+    target!: Node;
+    isPlayer: boolean = false;
+    vx: number = 0;
+    vy: number = 0;
+    dead: boolean = true;
+    color: string = '';
+    targetRadiusSq: number = 0;
+    steeringTimer: number = 0;
 
-    constructor(owner: number, startNode: Node, targetNode: Node) {
-        this.owner = owner
-        this.x = startNode.x
-        this.y = startNode.y
-        this.target = targetNode
-        this.isPlayer = (owner === playerId)
-        const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x)
-        const spread = (Math.random() - 0.5) * 0.6
-        this.vx = Math.cos(angle + spread) * troopSpeed
-        this.vy = Math.sin(angle + spread) * troopSpeed
-        this.dead = false
-        this.color = colors[this.owner]
+    constructor() {}
+
+    init(owner: number, startNode: Node, targetNode: Node) {
+        this.owner = owner;
+        this.x = startNode.x;
+        this.y = startNode.y;
+        this.target = targetNode;
+        this.isPlayer = (owner === playerId);
+        const angle = Math.atan2(targetNode.y - startNode.y, targetNode.x - startNode.x);
+        const spread = (Math.random() - 0.5) * 0.6;
+        this.vx = Math.cos(angle + spread) * troopSpeed;
+        this.vy = Math.sin(angle + spread) * troopSpeed;
+        this.dead = false;
+        this.color = colors[this.owner];
+        this.targetRadiusSq = targetNode.radius * targetNode.radius;
+        this.steeringTimer = Math.floor(Math.random() * 5);
     }
     update(createExplosion: (x: number, y: number, color: string, count: number) => void) {
         this.x += this.vx
         this.y += this.vy
         const dx = this.target.x - this.x
         const dy = this.target.y - this.y
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist > 10) {
-            this.vx += (dx / dist * 0.15)
-            this.vy += (dy / dist * 0.15)
-            const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy)
-            this.vx = (this.vx / speed) * troopSpeed
-            this.vy = (this.vy / speed) * troopSpeed;
+        const distSq = dx * dx + dy * dy
+        
+        if (distSq > 100) {
+            this.steeringTimer++;
+            if (this.steeringTimer % 3 === 0) {
+                const dist = Math.sqrt(distSq);
+                this.vx += (dx / dist * 0.15)
+                this.vy += (dy / dist * 0.15)
+                const speedSq = this.vx * this.vx + this.vy * this.vy
+                if (speedSq > 0) {
+                    const speed = Math.sqrt(speedSq)
+                    this.vx = (this.vx / speed) * troopSpeed
+                    this.vy = (this.vy / speed) * troopSpeed;
+                }
+            }
         }
-        if (dist < this.target.radius) {
+        if (distSq < this.targetRadiusSq) {
             this.hitTarget(createExplosion)
             this.dead = true
         }
@@ -183,15 +197,17 @@ class Troop {
 }
 
 class Particle {
-    x: number;
-    y: number;
-    color: string;
-    vx: number;
-    vy: number;
-    life: number;
-    decay: number
+    x: number = 0;
+    y: number = 0;
+    color: string = '';
+    vx: number = 0;
+    vy: number = 0;
+    life: number = 0;
+    decay: number = 0;
 
-    constructor(x: number, y: number, color: string) {
+    constructor() {}
+
+    init(x: number, y: number, color: string) {
         this.x = x
         this.y = y
         this.color = color
