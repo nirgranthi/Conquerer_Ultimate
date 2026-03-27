@@ -1,5 +1,5 @@
 import React, { createContext, RefObject, useContext, useRef, useState, useEffect, useCallback } from "react";
-import { Node, Troop, setPlayerColorVar, setTroopSpeedVar, setChaosModeVar } from "../components/configs";
+import { Node, Troop, setPlayerColorVar, setTroopSpeedVar, setChaosModeVar, maxTroopPoolSize } from "../components/configs";
 import { setImposterModeVar } from "../components/configs";
 
 type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
@@ -56,6 +56,17 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
 
     const gameStateRef = useRef<GameState>(gameState);
     const playCountRef = useRef(playCount);
+    const bgCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const isDraggingRef = useRef<boolean>(false);
+    const nodesRef = useRef<Node[]>([]);
+    const troopsRef = useRef<Troop[]>([]);
+    const dragSelectedRef = useRef<Node[]>([]);
+    const dragCurrentRef = useRef<{ "x": number, "y": number }>({ x: 0, y: 0 });
+    const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => { });
+    const gameTimeRef = useRef<number>(0);
+    const troopPoolRef = useRef<Troop[]>([]);
+    const globalPopulationRef = useRef<Record<number, number>>({});
 
     useEffect(() => {
         const colorMap = {
@@ -88,18 +99,18 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     useEffect(() => {
         playCountRef.current = playCount;
     }, [playCount]);
+  
+    const populateTroopPool = useCallback(() => {
+        if (troopPoolRef.current.length >= maxTroopPoolSize) return;
+        const remaining = maxTroopPoolSize - troopPoolRef.current.length;
+        for (let i = 0; i < remaining; i++) {
+            troopPoolRef.current.push(new Troop());
+        }
+    }, []);
 
-    const bgCanvasRef = useRef<HTMLCanvasElement | null>(null);
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const isDraggingRef = useRef<boolean>(false);
-    const nodesRef = useRef<Node[]>([]);
-    const troopsRef = useRef<Troop[]>([]);
-    const dragSelectedRef = useRef<Node[]>([]);
-    const dragCurrentRef = useRef<{ "x": number, "y": number }>({ x: 0, y: 0 });
-    const handleDoubleTapRef = useRef<(x: number, y: number) => void>(() => { });
-    const gameTimeRef = useRef<number>(0);
-    const troopPoolRef = useRef<Troop[]>([]);
-    const globalPopulationRef = useRef<Record<number, number>>({});
+    useEffect(() => {
+        populateTroopPool();
+    }, [populateTroopPool]);
 
     const sendTroops = useCallback((selectedNode: Node, target: Node, percent: number) => {
         if (selectedNode.population < 2) return;

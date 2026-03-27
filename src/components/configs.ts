@@ -15,6 +15,7 @@ const troopSize = 4;
 const nodeRadius = 24;
 const aiStartDelay = 7;
 const enemyCooldown = 3;
+const maxTroopPoolSize = 2500;
 
 export let playerShadowColor = '#60A5FA';
 export let playerStrokeColor = '#BFDBFE';
@@ -275,4 +276,4 @@ class Particle {
     }
 }
 
-export { Node, Troop, Particle, colors, neutralId, playerId, nodeCount, minimumDistance, troopSize, aiStartDelay, difficultyConfig, enemyCooldown }
+export { Node, Troop, Particle, colors, neutralId, playerId, nodeCount, minimumDistance, troopSize, aiStartDelay, difficultyConfig, enemyCooldown, maxTroopPoolSize }
