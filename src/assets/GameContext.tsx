@@ -1,6 +1,6 @@
 import React, { createContext, RefObject, useContext, useRef, useState, useEffect, useCallback } from "react";
 import { Node, Troop, setPlayerColorVar, setTroopSpeedVar, setChaosModeVar, maxTroopPoolSize } from "../components/configs";
-import { setImposterModeVar } from "../components/configs";
+import { setImposterModeVar, setMonopolyModeVar } from "../components/configs";
 
 type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
 export type Difficulty = 'easy' | 'medium' | 'hard';
@@ -20,6 +20,8 @@ interface GameContextProps {
     setChaosModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     imposterModeEnabled: boolean;
     setImposterModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+    monopolyModeEnabled: boolean;
+    setMonopolyModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     gameState: GameState;
     gameStateRef: RefObject<GameState>;
     setGameState: React.Dispatch<React.SetStateAction<GameState>>;
@@ -50,6 +52,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const [troopSpeedSetting, setTroopSpeedSetting] = useState<number>(2.8);
     const [chaosModeEnabled, setChaosModeEnabled] = useState<boolean>(false);
     const [imposterModeEnabled, setImposterModeEnabled] = useState<boolean>(false);
+    const [monopolyModeEnabled, setMonopolyModeEnabled] = useState<boolean>(false);
     const [gameState, setGameState] = useState<GameState>('menu');
     const [isWon, setIsWon] = useState<boolean | null>(null);
     const [playCount, setPlayCount] = useState<number>(0);
@@ -91,6 +94,10 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     useEffect(() => {
         setImposterModeVar(imposterModeEnabled);
     }, [imposterModeEnabled]);
+
+    useEffect(() => {
+        setMonopolyModeVar(monopolyModeEnabled);
+    }, [monopolyModeEnabled]);
 
     useEffect(() => {
         gameStateRef.current = gameState;
@@ -151,6 +158,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setChaosModeEnabled,
             imposterModeEnabled,
             setImposterModeEnabled,
+            monopolyModeEnabled,
+            setMonopolyModeEnabled,
             gameState,
             gameStateRef,
             setGameState,

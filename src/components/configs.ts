@@ -11,6 +11,7 @@ const growthRate = 1.5;
 export let troopSpeed = 2.8;
 export let chaosMode = false;
 export let imposterMode = false;
+export let monopolyMode = false;
 const troopSize = 4;
 const nodeRadius = 24;
 const aiStartDelay = 7;
@@ -40,6 +41,10 @@ export function setChaosModeVar(val: boolean) {
 
 export function setImposterModeVar(val: boolean) {
     imposterMode = val;
+}
+
+export function setMonopolyModeVar(val: boolean) {
+    monopolyMode = val;
 }
 
 const difficultyConfig = {

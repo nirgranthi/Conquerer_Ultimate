@@ -10,7 +10,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         playerColor, setPlayerColor,
         troopSpeedSetting, setTroopSpeedSetting,
         chaosModeEnabled, setChaosModeEnabled,
-        imposterModeEnabled, setImposterModeEnabled
+        imposterModeEnabled, setImposterModeEnabled,
+        monopolyModeEnabled, setMonopolyModeEnabled
     } = useGameContext();
 
     return (
@@ -94,6 +95,18 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             title="Disguise enemies as player"
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${imposterModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+
+                    {/* Monopoly Mode */}
+                    <div className="flex items-center justify-between">
+                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Monopoly Mode</label>
+                        <button 
+                            onClick={() => setMonopolyModeEnabled(!monopolyModeEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${monopolyModeEnabled ? 'bg-amber-600' : 'bg-gray-600'}`}
+                            title="Random enemy starts with 250 troops"
+                        >
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${monopolyModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode } from "../../components/configs";
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
@@ -198,7 +198,7 @@ export function StartGame() {
                     if (hit) break;
                 }
             }
-            
+
             const aliveParticles: Particle[] = [];
             particles.forEach(p => {
                 p.update();
@@ -269,8 +269,17 @@ export function StartGame() {
                     newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
                 }
             }
+
+            if (monopolyMode) {
+                const enemyNodes = newNodes.filter(n => n.owner !== playerId && n.owner !== neutralId);
+                if (enemyNodes.length > 0) {
+                    const luckyEnemy = enemyNodes[Math.floor(Math.random() * enemyNodes.length)];
+                    luckyEnemy.population = 600;
+                }
+            }
+
             nodes.splice(0, nodes.length, ...newNodes);
-            
+
             globalPopulationRef.current = {};
             newNodes.forEach((node) => {
                 globalPopulationRef.current[node.owner] = (globalPopulationRef.current[node.owner] || 0) + node.population;
