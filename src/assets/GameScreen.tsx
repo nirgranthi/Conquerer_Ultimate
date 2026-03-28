@@ -8,6 +8,8 @@ import { PauseMenuScreen } from "./PauseMenuScreen";
 import Galaxy from "./Galaxy/Galaxy";
 import { useGameContext } from "./GameContext";
 import { PopulationBar } from "./PopulationBar";
+import { StatsOverlay } from "./StatsOverlay";
+import { useState } from "react";
 
 export function GameScreen() {
     const {
@@ -26,6 +28,10 @@ export function GameScreen() {
         galaxyBgEnabled
     } = useGameContext();
 
+    const [showStats, setShowStats] = useState(false);
+    const showStatsRef = useRef(false);
+    const wasPlayingBeforeStats = useRef(false);
+
     const lastTapTimeRef = useRef(0);
 
     function handleSpaceKey() {
@@ -39,8 +45,28 @@ export function GameScreen() {
 
     function handleKeydown(e: KeyboardEvent) {
         if (e.repeat) return;
-        if (['Space', 'Backspace', 'Delete', 'Escape'].includes(e.code)) e.preventDefault();
-        if (e.code === 'Space' || e.code === 'Escape') { handleSpaceKey(); }
+        if (['Space', 'Backspace', 'Delete', 'Escape', 'KeyS'].includes(e.code)) e.preventDefault();
+        
+        if (e.code === 'Space' || e.code === 'Escape') { 
+            if (showStatsRef.current) { 
+                showStatsRef.current = false;
+                setShowStats(false); 
+                if (wasPlayingBeforeStats.current) setGameState('playing');
+            }
+            else { handleSpaceKey(); }
+        }
+        
+        if (e.code === 'KeyS') { 
+            const newShowStats = !showStatsRef.current;
+            showStatsRef.current = newShowStats;
+            if (newShowStats) {
+                wasPlayingBeforeStats.current = gameStateRef.current === 'playing';
+                setGameState('paused');
+            } else if (wasPlayingBeforeStats.current) {
+                setGameState('playing');
+            }
+            setShowStats(newShowStats);
+        }
     }
 
     function handleMouseDown(x: number, y: number) {
@@ -152,8 +178,26 @@ export function GameScreen() {
                         <PauseButton />
                         <GameTimer />
                     </>
-                ) : (<PauseMenuScreen />)}
+                ) : (
+                    <PauseMenuScreen 
+                        onShowStats={() => {
+                            wasPlayingBeforeStats.current = false;
+                            showStatsRef.current = true;
+                            setShowStats(true);
+                        }} 
+                    />
+                )}
             </div>
+
+            {showStats && (
+                <StatsOverlay 
+                    onClose={() => {
+                        showStatsRef.current = false;
+                        setShowStats(false);
+                        if (wasPlayingBeforeStats.current) setGameState('playing');
+                    }} 
+                />
+            )}
 
             <div className="z-30">
                 {gameState === 'gameover' && (<GameOverScreen />)}
