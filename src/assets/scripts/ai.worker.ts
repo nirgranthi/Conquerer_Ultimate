@@ -1,16 +1,19 @@
+import { Node } from "../../components/configs";
+
 onmessage = (e: MessageEvent) => {
-  const { nodes, difficulty, difficultyConfig, playerId, neutralId, gameTime, enemyCooldown } = e.data;
+  const { nodes, difficulty, difficultyConfig, playerId, neutralId, gameTime, enemyCooldown, equalityMode } = e.data;
+
 
   const actions: { fromId: number; toId: number }[] = [];
 
-  nodes.forEach((nodeA: any) => {
+  nodes.forEach((nodeA: Node) => {
     if (nodeA.owner !== playerId && nodeA.owner !== neutralId) {
       if (nodeA.population < 10) return;
 
       let bestTargetId = -1;
       let maxScore = -Infinity;
 
-      nodes.forEach((nodeB: any) => {
+      nodes.forEach((nodeB: Node) => {
         if (nodeA.id === nodeB.id) return;
 
         const dx = nodeA.x - nodeB.x;
@@ -21,18 +24,28 @@ onmessage = (e: MessageEvent) => {
 
         let score = 0;
 
-        if (difficulty === 'hard' && nodeB.owner === playerId) {
+        if (!equalityMode && difficulty === 'hard' && nodeB.owner === playerId) {
           score += 20;
         }
 
         if (nodeB.owner === neutralId) {
-          score += 30 - nodeB.population;
+          score += (30 - nodeB.population) * Math.max(0.1, 1 - gameTime / 180);
         } else if (nodeB.owner === nodeA.owner) {
           const popDiff = nodeA.population - nodeB.population;
-          score += popDiff;
+          let allyScore = 0;
+          if (nodeB.population < 100) {
+            allyScore = popDiff;
+          } else if (nodeB.population < 150) {
+            allyScore = popDiff * 0.75;
+          } else if (nodeB.population < 200) {
+            allyScore = popDiff * 0.4;
+          }
+          score += Math.min(allyScore, 30);
         } else {
+          score += 40;
+          score += (nodeA.population - nodeB.population) * 0.5;
           if (nodeB.population < 10) {
-            score += 15;
+            score += 20;
           }
         }
 

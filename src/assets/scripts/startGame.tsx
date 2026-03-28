@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation } from "../../components/configs";
 
 import { useGameContext } from "../GameContext";
 
@@ -128,7 +128,7 @@ export function StartGame() {
             particles.forEach((particle: Particle) => particle.draw(ctx));
         }
 
-        const aiWorker = new Worker(new URL('./ai.worker.ts', import.meta.url));
+        const aiWorker = new Worker(new URL('./ai.worker.ts', import.meta.url), { type: 'module' });
 
         aiWorker.onmessage = (e) => {
             e.data.forEach((action: { fromId: number; toId: number }) => {
@@ -277,7 +277,7 @@ export function StartGame() {
                 const enemyNodes = newNodes.filter(n => n.owner !== playerId && n.owner !== neutralId);
                 if (enemyNodes.length > 0) {
                     const luckyEnemy = enemyNodes[Math.floor(Math.random() * enemyNodes.length)];
-                    luckyEnemy.population = 600;
+                    luckyEnemy.population = monopolyLuckyNodePopulation;
                 }
             }
 
