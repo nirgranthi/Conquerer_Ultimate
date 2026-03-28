@@ -11,7 +11,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         troopSpeedSetting, setTroopSpeedSetting,
         chaosModeEnabled, setChaosModeEnabled,
         imposterModeEnabled, setImposterModeEnabled,
-        monopolyModeEnabled, setMonopolyModeEnabled
+        monopolyModeEnabled, setMonopolyModeEnabled,
+        equalityModeEnabled, setEqualityModeEnabled
     } = useGameContext();
 
     return (
@@ -107,6 +108,18 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             title="Random enemy starts with 250 troops"
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${monopolyModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+
+                    {/* Equality Mode */}
+                    <div className="flex items-center justify-between">
+                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Equality Mode</label>
+                        <button 
+                            onClick={() => setEqualityModeEnabled(!equalityModeEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${equalityModeEnabled ? 'bg-indigo-600' : 'bg-gray-600'}`}
+                            title="AI treats all nodes equally"
+                        >
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${equalityModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
                     </div>
                 </div>

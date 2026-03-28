@@ -12,6 +12,8 @@ export let troopSpeed = 2.8;
 export let chaosMode = false;
 export let imposterMode = false;
 export let monopolyMode = false;
+export let equalityMode = false;
+
 const troopSize = 4;
 const nodeRadius = 24;
 const aiStartDelay = 7;
@@ -46,6 +48,11 @@ export function setImposterModeVar(val: boolean) {
 export function setMonopolyModeVar(val: boolean) {
     monopolyMode = val;
 }
+
+export function setEqualityModeVar(val: boolean) {
+    equalityMode = val;
+}
+
 
 const difficultyConfig = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },

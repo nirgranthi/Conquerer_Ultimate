@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode } from "../../components/configs";
+
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
@@ -215,7 +216,9 @@ export function StartGame() {
                     playerId,
                     neutralId,
                     gameTime,
-                    enemyCooldown
+                    enemyCooldown,
+                    equalityMode
+
                 });
                 aiTimer = 0;
             }
