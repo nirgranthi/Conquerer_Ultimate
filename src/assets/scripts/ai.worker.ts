@@ -29,7 +29,7 @@ onmessage = (e: MessageEvent) => {
           score += 30 - nodeB.population;
         } else if (nodeB.owner === nodeA.owner) {
           const popDiff = nodeA.population - nodeB.population;
-          score += popDiff * 2;
+          score += popDiff;
         } else {
           if (nodeB.population < 10) {
             score += 15;
