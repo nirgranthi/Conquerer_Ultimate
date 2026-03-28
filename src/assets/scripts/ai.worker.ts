@@ -28,9 +28,7 @@ onmessage = (e: MessageEvent) => {
           score += 20;
         }
 
-        if (nodeB.owner === neutralId) {
-          score += (30 - nodeB.population) * Math.max(0.1, 1 - gameTime / 180);
-        } else if (nodeB.owner === nodeA.owner) {
+        if (nodeB.owner !== playerId) {
           const popDiff = nodeA.population - nodeB.population;
           let allyScore = 0;
           if (nodeB.population < 100) {
@@ -42,8 +40,7 @@ onmessage = (e: MessageEvent) => {
           }
           score += Math.min(allyScore, 30);
         } else {
-          score += 40;
-          score += (nodeA.population - nodeB.population) * 0.5;
+          score += 10 + (nodeA.population - nodeB.population) * 0.5;
           if (nodeB.population < 10) {
             score += 20;
           }
