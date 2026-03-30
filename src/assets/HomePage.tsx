@@ -6,7 +6,7 @@ import { SettingsModal } from './SettingsModal';
 const Hyperspeed = lazy(() => import('./hyperspeed/Hyperspeed'));
 
 export function Homepage() {
-    const { setDifficulty, setGameState } = useGameContext();
+    const { setDifficulty, setGameState, doubleTapPercent } = useGameContext();
     const [showSettings, setShowSettings] = useState(false);
     const handleStart = () => {
         setGameState('playing')
@@ -40,7 +40,7 @@ export function Homepage() {
                     <ul className="space-y-3 text-sm text-gray-300">
                         <li className="flex items-start"><span className="mr-2">🔵</span> <span><b>Drag</b> from base to attack.</span></li>
                         <li className="flex items-start"><span className="mr-2">🔗</span> <span><b>Drag Through</b> allies to chain attack.</span></li>
-                        <li className="flex items-start"><span className="mr-2">⚡</span> <span><b>Double Tap</b> any node to Nuke (50% from all).</span></li>
+                        <li className="flex items-start"><span className="mr-2">⚡</span> <span><b>Double Tap</b> any node to Nuke ({Math.round(doubleTapPercent * 100)}% from all).</span></li>
                         <li className="flex items-start"><span className="mr-2">💀</span> <span>Troops die on collision!</span></li>
                     </ul>
                 </div>

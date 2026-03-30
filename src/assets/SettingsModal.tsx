@@ -9,6 +9,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         galaxyBgEnabled, setGalaxyBgEnabled,
         playerColor, setPlayerColor,
         troopSpeedSetting, setTroopSpeedSetting,
+        doubleTapPercent, setDoubleTapPercent,
         chaosModeEnabled, setChaosModeEnabled,
         imposterModeEnabled, setImposterModeEnabled,
         monopolyModeEnabled, setMonopolyModeEnabled,
@@ -62,6 +63,26 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             onChange={(e) => setTroopSpeedSetting(parseFloat(e.target.value))}
                             className="w-full accent-blue-500"
                         />
+                    </div>
+
+                    {/* Double Tap Send % */}
+                    <div>
+                        <label className="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">
+                            Double Tap: Send {Math.round(doubleTapPercent * 100)}% of troops
+                        </label>
+                        <input 
+                            type="range" 
+                            min="10" 
+                            max="100" 
+                            step="5" 
+                            value={Math.round(doubleTapPercent * 100)}
+                            onChange={(e) => setDoubleTapPercent(parseInt(e.target.value) / 100)}
+                            className="w-full accent-yellow-500"
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>10%</span>
+                            <span>100%</span>
+                        </div>
                     </div>
 
                     {/* Galaxy Background */}

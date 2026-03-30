@@ -4,7 +4,9 @@ import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance,
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
-    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef } = useGameContext();
+    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef, doubleTapPercent } = useGameContext();
+    const doubleTapPercentRef = useRef(doubleTapPercent);
+    doubleTapPercentRef.current = doubleTapPercent;
     const gameStateRef = useRef(gameState);
 
     useEffect(() => {
@@ -317,7 +319,7 @@ export function StartGame() {
             if (targetNode) {
                 nodes.forEach(node => {
                     if (node.owner === playerId && node !== targetNode) {
-                        sendTroops(node, targetNode, 0.5);
+                        sendTroops(node, targetNode, doubleTapPercentRef.current);
                     }
                 });
                 createExplosion(targetNode.x, targetNode.y, '#FF0000', 10);

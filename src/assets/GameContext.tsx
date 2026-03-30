@@ -25,6 +25,8 @@ interface GameContextProps {
     setMonopolyModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     equalityModeEnabled: boolean;
     setEqualityModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+    doubleTapPercent: number;
+    setDoubleTapPercent: React.Dispatch<React.SetStateAction<number>>;
 
     gameState: GameState;
     gameStateRef: RefObject<GameState>;
@@ -58,6 +60,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const [imposterModeEnabled, setImposterModeEnabled] = useState<boolean>(false);
     const [monopolyModeEnabled, setMonopolyModeEnabled] = useState<boolean>(false);
     const [equalityModeEnabled, setEqualityModeEnabled] = useState<boolean>(false);
+    const [doubleTapPercent, setDoubleTapPercent] = useState<number>(0.5);
 
     const [gameState, setGameState] = useState<GameState>('menu');
     const [isWon, setIsWon] = useState<boolean | null>(null);
@@ -173,6 +176,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setMonopolyModeEnabled,
             equalityModeEnabled,
             setEqualityModeEnabled,
+            doubleTapPercent,
+            setDoubleTapPercent,
 
             gameState,
             gameStateRef,
