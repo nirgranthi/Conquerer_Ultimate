@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { PauseButton, GameTimer } from "./Buttons";
-import { StartGame } from './scripts/startGame';
+import { StartGame } from './scripts/engine';
 import { playerId } from "../components/configs";
 import { GameOverScreen } from "./GameOverScreen";
 import { PauseMenuScreen } from "./PauseMenuScreen";
@@ -46,17 +46,17 @@ export function GameScreen() {
     function handleKeydown(e: KeyboardEvent) {
         if (e.repeat) return;
         if (['Space', 'Backspace', 'Delete', 'Escape', 'KeyS'].includes(e.code)) e.preventDefault();
-        
-        if (e.code === 'Space' || e.code === 'Escape') { 
-            if (showStatsRef.current) { 
+
+        if (e.code === 'Space' || e.code === 'Escape') {
+            if (showStatsRef.current) {
                 showStatsRef.current = false;
-                setShowStats(false); 
+                setShowStats(false);
                 if (wasPlayingBeforeStats.current) setGameState('playing');
             }
             else { handleSpaceKey(); }
         }
-        
-        if (e.code === 'KeyS') { 
+
+        if (e.code === 'KeyS') {
             const newShowStats = !showStatsRef.current;
             showStatsRef.current = newShowStats;
             if (newShowStats) {
@@ -179,23 +179,23 @@ export function GameScreen() {
                         <GameTimer />
                     </>
                 ) : (
-                    <PauseMenuScreen 
+                    <PauseMenuScreen
                         onShowStats={() => {
                             wasPlayingBeforeStats.current = false;
                             showStatsRef.current = true;
                             setShowStats(true);
-                        }} 
+                        }}
                     />
                 )}
             </div>
 
             {showStats && (
-                <StatsOverlay 
+                <StatsOverlay
                     onClose={() => {
                         showStatsRef.current = false;
                         setShowStats(false);
                         if (wasPlayingBeforeStats.current) setGameState('playing');
-                    }} 
+                    }}
                 />
             )}
 
