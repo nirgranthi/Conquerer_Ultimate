@@ -12,7 +12,7 @@ export let troopSpeed = 2.8;
 export let chaosMode = false;
 export let imposterMode = false;
 export let monopolyMode = false;
-export const monopolyLuckyNodePopulation = 350
+export const monopolyLuckyNodePopulation = 250
 export let equalityMode = false;
 
 const troopSize = 4;
