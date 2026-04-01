@@ -244,6 +244,10 @@ export function StartGame() {
             }
         }
 
+        function randomTroopSize() {
+            return Math.ceil(Math.random() * 20) + 20;
+        }
+
         function generateMap() {
             const newNodes: Node[] = [];
             let attempts = 0;
@@ -269,7 +273,7 @@ export function StartGame() {
                     }
                     else if (newNodes.length <= 10) {
                         owner = newNodes.length;
-                        pop = 40;
+                        pop = randomTroopSize();
                     }
                     newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
                 }
