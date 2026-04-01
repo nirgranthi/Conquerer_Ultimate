@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode } from "../../components/configs";
 
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
-    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef, doubleTapPercent } = useGameContext();
+    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef, doubleTapPercent, setSpyOwnerId } = useGameContext();
     const doubleTapPercentRef = useRef(doubleTapPercent);
     doubleTapPercentRef.current = doubleTapPercent;
     const gameStateRef = useRef(gameState);
@@ -284,7 +284,26 @@ export function StartGame() {
                 if (enemyNodes.length > 0) {
                     const luckyEnemy = enemyNodes[Math.floor(Math.random() * enemyNodes.length)];
                     luckyEnemy.population = monopolyLuckyNodePopulation;
+
+                    if (spyMode) {
+                        const enemyOwners = [...new Set(enemyNodes.map(n => n.owner))].filter(id => id !== luckyEnemy.owner);
+                        if (enemyOwners.length > 0) {
+                            setSpyOwnerId(enemyOwners[Math.floor(Math.random() * enemyOwners.length)]);
+                        } else {
+                            setSpyOwnerId(-1);
+                        }
+                    }
                 }
+            } else if (spyMode) {
+                const enemyNodes = newNodes.filter(n => n.owner !== playerId && n.owner !== neutralId);
+                const enemyOwners = [...new Set(enemyNodes.map(n => n.owner))];
+                if (enemyOwners.length > 0) {
+                    setSpyOwnerId(enemyOwners[Math.floor(Math.random() * enemyOwners.length)]);
+                } else {
+                    setSpyOwnerId(-1);
+                }
+            } else {
+                setSpyOwnerId(-1);
             }
 
             nodes.splice(0, nodes.length, ...newNodes);

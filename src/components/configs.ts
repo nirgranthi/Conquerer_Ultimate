@@ -8,12 +8,15 @@ const nodeCount = 40;
 const minimumDistance = 70;
 const maxPopulation = 200;
 const growthRate = 1.5;
+const spyGrowthRate = 1.5;
 export let troopSpeed = 2.8;
 export let chaosMode = false;
 export let imposterMode = false;
 export let monopolyMode = false;
 export const monopolyLuckyNodePopulation = 250
 export let equalityMode = false;
+export let spyMode = false;
+export let spyOwnerId: number = -1;
 
 const troopSize = 4;
 const nodeRadius = 24;
@@ -54,6 +57,15 @@ export function setEqualityModeVar(val: boolean) {
     equalityMode = val;
 }
 
+export function setSpyModeVar(val: boolean) {
+    spyMode = val;
+    if (!val) spyOwnerId = -1;
+}
+
+export function setSpyOwnerIdVar(id: number) {
+    spyOwnerId = id;
+}
+
 
 const difficultyConfig = {
     easy: { aiInterval: 2000, aiAggression: 0.3, growthMod: 0.4 },
@@ -88,6 +100,9 @@ class Node {
     update(dt: number, difficulty: Difficulty, globalPopRef: React.RefObject<Record<number, number>>) {
         let rate = growthRate;
         if (this.owner !== playerId && this.owner !== neutralId) { rate *= difficultyConfig[difficulty].growthMod }
+        if (spyMode && spyOwnerId === this.owner && this.owner !== playerId && this.owner !== neutralId) {
+            rate *= spyGrowthRate;
+        }
         if (this.owner !== neutralId && this.population < this.maxPop) {
             this.growthTimer += dt
             if (this.growthTimer > (1 / rate)) {
