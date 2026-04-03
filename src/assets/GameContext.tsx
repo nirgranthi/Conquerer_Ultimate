@@ -154,19 +154,21 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
 
         const originalOwner = selectedNode.owner;
         let noOfTroopsToSend = Math.floor(selectedNode.population * percent);
-        selectedNode.population -= noOfTroopsToSend;
-
         const sessionAtCall = playCountRef.current;
 
         for (let i = 0; i < noOfTroopsToSend; i++) {
             setTimeout(() => {
-                if (gameStateRef.current === 'playing' && playCountRef.current === sessionAtCall) {
-                    let troop = troopPoolRef.current.pop();
-                    if (!troop) {
-                        troop = new Troop();
+                if (playCountRef.current === sessionAtCall) {
+                    // Only dispatch if still owned by the sender and pop hasn't drained
+                    if (selectedNode.owner === originalOwner && selectedNode.population > 1) {
+                        selectedNode.population -= 1;
+                        let troop = troopPoolRef.current.pop();
+                        if (!troop) {
+                            troop = new Troop();
+                        }
+                        troop.init(originalOwner, selectedNode, target);
+                        troopsRef.current.push(troop);
                     }
-                    troop.init(originalOwner, selectedNode, target);
-                    troopsRef.current.push(troop);
                 }
             }, i * 30);
         }
