@@ -1,3 +1,4 @@
+import { monopolyLuckyNodePopulation, spyGrowthRate } from "../components/configs";
 import { useGameContext, PlayerColorOption } from "./GameContext";
 
 interface SettingsModalProps {
@@ -127,7 +128,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                         <button
                             onClick={() => setMonopolyModeEnabled(!monopolyModeEnabled)}
                             className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${monopolyModeEnabled ? 'bg-amber-600' : 'bg-gray-600'}`}
-                            title="Random enemy starts with 250 troops"
+                            title={`Random enemy starts with ${monopolyLuckyNodePopulation} troops`}
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${monopolyModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
@@ -139,7 +140,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                         <button
                             onClick={() => setSpyModeEnabled(!spyModeEnabled)}
                             className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${spyModeEnabled ? 'bg-teal-600' : 'bg-gray-600'}`}
-                            title="A random enemy node grows troops 3× faster"
+                            title={`A random enemy node grows troops ${spyGrowthRate}× faster`}
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${spyModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
