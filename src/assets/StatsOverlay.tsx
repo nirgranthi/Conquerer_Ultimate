@@ -14,7 +14,10 @@ export function StatsOverlay({ onClose }: StatsOverlayProps) {
             const ownedNodes = nodesRef.current.filter(n => n.owner === i);
             const nodeCount = ownedNodes.length;
             const nodePopulation = ownedNodes.reduce((sum, n) => sum + Math.floor(n.population), 0);
-            const totalTroops = globalPopulationRef.current[i] || 0;
+            
+            // Re-sync with actual values to eliminate any potential float drift from the engine
+            const exactAirborne = Math.floor(globalPopulationRef.current[i] || 0) - nodePopulation;
+            const totalTroops = nodePopulation + Math.max(0, exactAirborne);
             
             if (nodeCount > 0 || totalTroops > 0) {
                 // Calculation inspired by ai logic: emphasizing node count and population
@@ -25,8 +28,8 @@ export function StatsOverlay({ onClose }: StatsOverlayProps) {
                     color: colors[i],
                     name: i === playerId ? "YOU" : `Enemy ${i}`,
                     nodes: nodeCount,
-                    score: strategicScore,
-                    troops: totalTroops
+                    score: Math.floor(strategicScore),
+                    troops: Math.floor(totalTroops)
                 });
             }
         }

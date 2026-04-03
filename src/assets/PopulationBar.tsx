@@ -18,10 +18,11 @@ export const PopulationBar = () => {
 
             Object.entries(popTotals).forEach(([ownerStr, pop]) => {
                 const owner = parseInt(ownerStr);
+                const truePop = Math.max(0, Math.floor(pop));
                 if (owner === 11) return; // Ignore neutral
-                if (pop > 0) {
-                    validOwners[owner] = pop;
-                    totalTotal += pop;
+                if (truePop > 0) {
+                    validOwners[owner] = truePop;
+                    totalTotal += truePop;
                 }
             });
 
