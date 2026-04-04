@@ -12,8 +12,6 @@ export type PlayerColorOption = 'blue' | 'red' | 'green' | 'yellow' | 'purple';
 interface GameContextProps {
     difficulty: Difficulty;
     setDifficulty: React.Dispatch<React.SetStateAction<Difficulty>>;
-    galaxyBgEnabled: boolean;
-    setGalaxyBgEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     playerColor: PlayerColorOption;
     setPlayerColor: React.Dispatch<React.SetStateAction<PlayerColorOption>>;
     troopSpeedSetting: number;
@@ -58,7 +56,6 @@ const GameContext = createContext<GameContextProps | undefined>(undefined);
 
 export const GameContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [difficulty, setDifficulty] = useState<Difficulty>('medium');
-    const [galaxyBgEnabled, setGalaxyBgEnabled] = useState<boolean>(true);
     const [playerColor, setPlayerColor] = useState<PlayerColorOption>('blue');
     const [troopSpeedSetting, setTroopSpeedSetting] = useState<number>(2.8);
     const [chaosModeEnabled, setChaosModeEnabled] = useState<boolean>(false);
@@ -191,8 +188,6 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
         <GameContext.Provider value={{
             difficulty,
             setDifficulty,
-            galaxyBgEnabled,
-            setGalaxyBgEnabled,
             playerColor,
             setPlayerColor,
             troopSpeedSetting,

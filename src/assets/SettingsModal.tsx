@@ -7,7 +7,6 @@ interface SettingsModalProps {
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
     const {
-        galaxyBgEnabled, setGalaxyBgEnabled,
         playerColor, setPlayerColor,
         troopSpeedSetting, setTroopSpeedSetting,
         doubleTapPercent, setDoubleTapPercent,
@@ -85,17 +84,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             <span>10%</span>
                             <span>100%</span>
                         </div>
-                    </div>
-
-                    {/* Galaxy Background */}
-                    <div className="flex items-center justify-between">
-                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Galaxy Background</label>
-                        <button
-                            onClick={() => setGalaxyBgEnabled(!galaxyBgEnabled)}
-                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${galaxyBgEnabled ? 'bg-blue-600' : 'bg-gray-600'}`}
-                        >
-                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${galaxyBgEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
-                        </button>
                     </div>
 
                     {/* Chaos Mode */}

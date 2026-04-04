@@ -24,8 +24,7 @@ export function GameScreen() {
         dragCurrentRef,
         dragSelectedRef,
         handleDoubleTapRef,
-        sendTroops,
-        galaxyBgEnabled
+        sendTroops
     } = useGameContext();
 
     const [showStats, setShowStats] = useState(false);
@@ -157,15 +156,13 @@ export function GameScreen() {
     return (
         <>
             <div className="absolute w-full h-full z-0">
-                {galaxyBgEnabled && (
-                    <Galaxy
-                        density={1}
-                        saturation={1}
-                    />
-                )}
+                <Galaxy
+                    density={1}
+                    saturation={1}
+                />
             </div>
 
-            <canvas ref={bgCanvasRef} className="absolute top-0 left-0 z-[5]" />
+            <canvas ref={bgCanvasRef} className="absolute top-0 left-0 z-5" />
             <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
 
             <StartGame />
