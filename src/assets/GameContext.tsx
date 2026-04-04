@@ -1,6 +1,7 @@
 import React, { createContext, RefObject, useContext, useRef, useState, useEffect, useCallback } from "react";
 import { Node, Troop, setPlayerColorVar, setTroopSpeedVar, setChaosModeVar, maxTroopPoolSize } from "../components/configs";
 import { setImposterModeVar, setMonopolyModeVar, setEqualityModeVar, setSpyModeVar, setSpyOwnerIdVar } from "../components/configs";
+import { buttonClickSound } from "./scripts/soundEngine";
 
 
 type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
@@ -99,6 +100,18 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     }, [playerColor]);
 
     useEffect(() => {
+        const handleGlobalClick = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (target.closest('button')) {
+                buttonClickSound()
+            }
+        };
+
+        window.addEventListener('mousedown', handleGlobalClick);
+        return () => window.removeEventListener('mousedown', handleGlobalClick);
+    }, []);
+
+    useEffect(() => {
         setTroopSpeedVar(troopSpeedSetting);
     }, [troopSpeedSetting]);
 
@@ -134,7 +147,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     useEffect(() => {
         playCountRef.current = playCount;
     }, [playCount]);
-  
+
     const populateTroopPool = useCallback(() => {
         if (troopPoolRef.current.length >= maxTroopPoolSize) return;
         const remaining = maxTroopPoolSize - troopPoolRef.current.length;

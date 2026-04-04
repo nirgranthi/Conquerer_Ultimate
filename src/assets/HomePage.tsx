@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { useGameContext } from "./GameContext";
 import { ShareButton } from './Buttons';
 import { SettingsModal } from './SettingsModal';
+import { buttonClickSound } from './scripts/soundEngine';
 
 const Hyperspeed = lazy(() => import('./hyperspeed/Hyperspeed'));
 
@@ -51,15 +52,15 @@ export function Homepage() {
                         {/* <!-- From Uiverse.io by m1her --> */}
                         <div className="radio-input">
                             <label className="label">
-                                <input name="value-radio" id="value-1" type="radio" checked={difficulty === "easy"} onChange={() => setDifficulty("easy")} />
+                                <input name="value-radio" id="value-1" onClick={buttonClickSound} type="radio" checked={difficulty === "easy"} onChange={() => setDifficulty("easy")} />
                                 <span className="text">Easy</span>
                             </label>
                             <label className="label">
-                                <input name="value-radio" id="value-2" type="radio" checked={difficulty === "medium"} onChange={() => setDifficulty("medium")} />
+                                <input name="value-radio" id="value-2" onClick={buttonClickSound} type="radio" checked={difficulty === "medium"} onChange={() => setDifficulty("medium")} />
                                 <span className="text">Medium</span>
                             </label>
                             <label className="label">
-                                <input name="value-radio" id="value-3" type="radio" checked={difficulty === "hard"} onChange={() => setDifficulty("hard")} />
+                                <input name="value-radio" id="value-3" onClick={buttonClickSound} type="radio" checked={difficulty === "hard"} onChange={() => setDifficulty("hard")} />
                                 <span className="text">Hard</span>
                             </label>
                         </div>
