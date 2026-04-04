@@ -2,7 +2,7 @@ import { MainMenu, PlayAgain } from "./Buttons";
 import { useGameContext } from "./GameContext";
 
 export function GameOverScreen() {
-    const { isWon, gameTimeRef, difficulty } = useGameContext()
+    const { isWon, gameTimeRef, difficulty, chaosModeEnabled, imposterModeEnabled, monopolyModeEnabled, spyModeEnabled, equalityModeEnabled } = useGameContext()
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -10,6 +10,14 @@ export function GameOverScreen() {
         return `${m}:${s}`;
     };
     const timeSurvived = formatTime(gameTimeRef.current);
+
+    const activeModes = [
+        { name: 'Chaos', enabled: chaosModeEnabled, color: 'text-red-400 bg-red-900/30 border-red-500/30' },
+        { name: 'Imposter', enabled: imposterModeEnabled, color: 'text-purple-400 bg-purple-900/30 border-purple-500/30' },
+        { name: 'Monopoly', enabled: monopolyModeEnabled, color: 'text-amber-400 bg-amber-900/30 border-amber-500/30' },
+        { name: 'Spy', enabled: spyModeEnabled, color: 'text-teal-400 bg-teal-900/30 border-teal-500/30' },
+        { name: 'Equality', enabled: equalityModeEnabled, color: 'text-indigo-400 bg-indigo-900/30 border-indigo-500/30' },
+    ].filter(m => m.enabled);
 
     return (
         <div className="screen bg-opacity-85 backdrop-blur-md z-50 justify-center">
@@ -29,6 +37,15 @@ export function GameOverScreen() {
                 <div className="text-yellow-400 font-bold mb-8 text-xl flex flex-col gap-2">
                     <div>Survived: <span className="font-mono text-white">{timeSurvived}</span></div>
                     <div className="text-sm text-gray-400 tracking-widest uppercase mt-1">Difficulty: <span className="text-white">{difficulty}</span></div>
+                    {activeModes.length > 0 && (
+                        <div className="flex flex-wrap justify-center gap-2 mt-3">
+                            {activeModes.map(mode => (
+                                <span key={mode.name} className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded border ${mode.color}`}>
+                                    {mode.name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex flex-col gap-3">
