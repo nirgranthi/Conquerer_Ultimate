@@ -17,6 +17,7 @@ export const monopolyLuckyNodePopulation = 150
 export let equalityMode = false;
 export let spyMode = false;
 export let spyOwnerId: number = -1;
+export let spectatorMode = false;
 
 const troopSize = 4;
 const nodeRadius = 24;
@@ -64,6 +65,10 @@ export function setSpyModeVar(val: boolean) {
 
 export function setSpyOwnerIdVar(id: number) {
     spyOwnerId = id;
+}
+
+export function setSpectatorModeVar(val: boolean) {
+    spectatorMode = val;
 }
 
 

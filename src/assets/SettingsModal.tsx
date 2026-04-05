@@ -14,7 +14,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         imposterModeEnabled, setImposterModeEnabled,
         monopolyModeEnabled, setMonopolyModeEnabled,
         equalityModeEnabled, setEqualityModeEnabled,
-        spyModeEnabled, setSpyModeEnabled
+        spyModeEnabled, setSpyModeEnabled,
+        spectatorModeEnabled, setSpectatorModeEnabled
     } = useGameContext();
 
     return (
@@ -143,6 +144,18 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             title="AI treats all nodes equally"
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${equalityModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+
+                    {/* Spectator Mode */}
+                    <div className="flex items-center justify-between">
+                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Spectator Mode</label>
+                        <button
+                            onClick={() => setSpectatorModeEnabled(!spectatorModeEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${spectatorModeEnabled ? 'bg-pink-600' : 'bg-gray-600'}`}
+                            title="Watch enemies fight each other without playing"
+                        >
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${spectatorModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
                     </div>
                 </div>

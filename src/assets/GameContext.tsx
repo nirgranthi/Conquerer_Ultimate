@@ -1,6 +1,6 @@
 import React, { createContext, RefObject, useContext, useRef, useState, useEffect, useCallback } from "react";
 import { Node, Troop, setPlayerColorVar, setTroopSpeedVar, setChaosModeVar, maxTroopPoolSize } from "../components/configs";
-import { setImposterModeVar, setMonopolyModeVar, setEqualityModeVar, setSpyModeVar, setSpyOwnerIdVar } from "../components/configs";
+import { setImposterModeVar, setMonopolyModeVar, setEqualityModeVar, setSpyModeVar, setSpyOwnerIdVar, setSpectatorModeVar } from "../components/configs";
 import { buttonClickSound } from "./scripts/soundEngine";
 
 
@@ -28,6 +28,8 @@ interface GameContextProps {
     setSpyModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     spyOwnerId: number;
     setSpyOwnerId: React.Dispatch<React.SetStateAction<number>>;
+    spectatorModeEnabled: boolean;
+    setSpectatorModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     doubleTapPercent: number;
     setDoubleTapPercent: React.Dispatch<React.SetStateAction<number>>;
 
@@ -36,6 +38,8 @@ interface GameContextProps {
     setGameState: React.Dispatch<React.SetStateAction<GameState>>;
     isWon: boolean | null;
     setIsWon: React.Dispatch<React.SetStateAction<boolean | null>>;
+    winnerId: number | null;
+    setWinnerId: React.Dispatch<React.SetStateAction<number | null>>;
     playCount: number;
     setPlayCount: React.Dispatch<React.SetStateAction<number>>;
     bgCanvasRef: RefObject<HTMLCanvasElement | null>;
@@ -65,10 +69,12 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const [equalityModeEnabled, setEqualityModeEnabled] = useState<boolean>(false);
     const [spyModeEnabled, setSpyModeEnabled] = useState<boolean>(false);
     const [spyOwnerId, setSpyOwnerId] = useState<number>(-1);
+    const [spectatorModeEnabled, setSpectatorModeEnabled] = useState<boolean>(false);
     const [doubleTapPercent, setDoubleTapPercent] = useState<number>(0.5);
 
     const [gameState, setGameState] = useState<GameState>('menu');
     const [isWon, setIsWon] = useState<boolean | null>(null);
+    const [winnerId, setWinnerId] = useState<number | null>(null);
     const [playCount, setPlayCount] = useState<number>(0);
 
     const gameStateRef = useRef<GameState>(gameState);
@@ -147,6 +153,10 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
         setSpyOwnerIdVar(spyOwnerId);
     }, [spyOwnerId]);
 
+    useEffect(() => {
+        setSpectatorModeVar(spectatorModeEnabled);
+    }, [spectatorModeEnabled]);
+
 
     useEffect(() => {
         gameStateRef.current = gameState;
@@ -215,6 +225,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setSpyModeEnabled,
             spyOwnerId,
             setSpyOwnerId,
+            spectatorModeEnabled,
+            setSpectatorModeEnabled,
             doubleTapPercent,
             setDoubleTapPercent,
 
@@ -223,6 +235,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setGameState,
             isWon,
             setIsWon,
+            winnerId,
+            setWinnerId,
             playCount,
             setPlayCount,
             bgCanvasRef,

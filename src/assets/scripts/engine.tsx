@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode, spectatorMode } from "../../components/configs";
 
 import { useGameContext } from "../GameContext";
 
 export function StartGame() {
-    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef, doubleTapPercent, setSpyOwnerId } = useGameContext();
+    const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef, doubleTapPercent, setSpyOwnerId, setWinnerId } = useGameContext();
     const doubleTapPercentRef = useRef(doubleTapPercent);
     doubleTapPercentRef.current = doubleTapPercent;
     const gameStateRef = useRef(gameState);
@@ -231,13 +231,29 @@ export function StartGame() {
             if (gameStateRef.current !== 'playing') return;
             const owners = new Set(nodes.map((node: Node) => node.owner));
             let won: boolean | null = null;
-            if (!owners.has(playerId) && !troops.some((troop: Troop) => troop.owner === playerId)) {
-                won = false;
-            } else if (owners.size === 1 && owners.has(playerId)) {
-                won = true;
-            } else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troops.some((troop: Troop) => troop.owner !== playerId)) {
-                won = true;
+            
+            if (spectatorMode) {
+                const activeOwners = new Set<number>();
+                nodes.forEach(n => { if (n.owner !== neutralId) activeOwners.add(n.owner); });
+                troops.forEach(t => { if (t.owner !== neutralId) activeOwners.add(t.owner); });
+                
+                if (activeOwners.size === 1) {
+                    won = true;
+                    setWinnerId(Array.from(activeOwners)[0]);
+                } else if (activeOwners.size === 0) {
+                    won = false;
+                    setWinnerId(null);
+                }
+            } else {
+                if (!owners.has(playerId) && !troops.some((troop: Troop) => troop.owner === playerId)) {
+                    won = false;
+                } else if (owners.size === 1 && owners.has(playerId)) {
+                    won = true;
+                } else if (owners.size === 2 && owners.has(playerId) && owners.has(neutralId) && !troops.some((troop: Troop) => troop.owner !== playerId)) {
+                    won = true;
+                }
             }
+            
             if (won !== null) {
                 setIsWon(won);
                 setGameState('gameover');
@@ -267,12 +283,15 @@ export function StartGame() {
                 if (valid) {
                     let owner = neutralId;
                     let pop = 10 + Math.floor(Math.random() * 25);
-                    if (newNodes.length === 0) {
+                    if (!spectatorMode && newNodes.length === 0) {
                         owner = playerId;
                         pop = 60;
                     }
                     else if (newNodes.length <= 10) {
                         owner = newNodes.length;
+                        if (spectatorMode && newNodes.length === 0) {
+                            owner = 10;
+                        }
                         pop = randomTroopSize();
                     }
                     newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
