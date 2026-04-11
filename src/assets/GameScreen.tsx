@@ -78,13 +78,19 @@ export function GameScreen() {
         }
     }
 
+    let isDoubleTapLive: boolean = false;
+    let doubleTapTimer: number|undefined  = undefined;
     function handleTouchStart(e: TouchEvent) {
         const currentTime = new Date().getTime();
         const timeDiff = currentTime - lastTapTimeRef.current;
-        if (timeDiff < 300 && timeDiff > 0) {
+        if (timeDiff < 300 && timeDiff > 0 && !isDoubleTapLive) {
             handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            isDoubleTapLive = true
+            doubleTapTimer = setTimeout(() => isDoubleTapLive = false, 300);
         } else {
             handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            clearInterval(doubleTapTimer);
+            isDoubleTapLive = false;
         }
         lastTapTimeRef.current = currentTime;
     }
