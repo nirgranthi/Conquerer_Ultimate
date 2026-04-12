@@ -89,6 +89,7 @@ class Node {
     growthTimer: number;
     pulse: number;
     lastTroopSentTime: number;
+    queuedTroops: number;
 
     constructor(id: number, x: number, y: number, ownerId: number, pop: number) {
         this.id = id;
@@ -101,6 +102,7 @@ class Node {
         this.growthTimer = 0;
         this.pulse = Math.random() * Math.PI;
         this.lastTroopSentTime = 0;
+        this.queuedTroops = 0;
     }
     update(dt: number, difficulty: Difficulty, globalPopRef: React.RefObject<Record<number, number>>) {
         let rate = growthRate;

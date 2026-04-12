@@ -179,27 +179,39 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     }, [populateTroopPool]);
 
     const sendTroops = useCallback((selectedNode: Node, target: Node, percent: number) => {
-        if (selectedNode.population < 2) return;
+        const queued = selectedNode.queuedTroops || 0;
+        const availablePop = selectedNode.population - queued;
+
+        if (availablePop < 2) return;
 
         selectedNode.lastTroopSentTime = gameTimeRef.current;
 
         const originalOwner = selectedNode.owner;
-        let noOfTroopsToSend = Math.floor(selectedNode.population * percent);
+        let noOfTroopsToSend = Math.floor(availablePop * percent);
         const sessionAtCall = playCountRef.current;
+
+        selectedNode.queuedTroops = queued + noOfTroopsToSend;
 
         for (let i = 0; i < noOfTroopsToSend; i++) {
             setTimeout(() => {
                 if (playCountRef.current === sessionAtCall) {
-                    // Only dispatch if still owned by the sender and pop hasn't drained
                     if (selectedNode.owner === originalOwner && selectedNode.population > 1) {
                         selectedNode.population -= 1;
+                        if (selectedNode.queuedTroops > 0) {
+                            selectedNode.queuedTroops -= 1;
+                        }
+
                         let troop = troopPoolRef.current.pop();
                         if (!troop) {
                             troop = new Troop();
                         }
                         troop.init(originalOwner, selectedNode, target);
                         troopsRef.current.push(troop);
+                    } else {
+                        selectedNode.queuedTroops = 0;
                     }
+                } else {
+                    selectedNode.queuedTroops = 0;
                 }
             }, i * 30);
         }
