@@ -68,6 +68,17 @@ export function GameScreen() {
         }
     }
 
+    function getCanvasCoordinates(clientX: number, clientY: number) {
+        if (!canvasRef.current) return { x: clientX, y: clientY };
+        const rect = canvasRef.current.getBoundingClientRect();
+        const scaleX = canvasRef.current.width / rect.width;
+        const scaleY = canvasRef.current.height / rect.height;
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        };
+    }
+
     function handleMouseDown(x: number, y: number) {
         if (gameStateRef.current !== 'playing') return;
         const selectedNode = nodesRef.current.find((node: any) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2 && node.owner === playerId);
@@ -83,12 +94,14 @@ export function GameScreen() {
     function handleTouchStart(e: TouchEvent) {
         const currentTime = new Date().getTime();
         const timeDiff = currentTime - lastTapTimeRef.current;
+        const { x, y } = getCanvasCoordinates(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+
         if (timeDiff < 300 && timeDiff > 0 && !isDoubleTapLive) {
-            handleDoubleTapRef.current(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            handleDoubleTapRef.current(x, y);
             isDoubleTapLive = true
             doubleTapTimer = setTimeout(() => isDoubleTapLive = false, 300);
         } else {
-            handleMouseDown(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            handleMouseDown(x, y);
             clearInterval(doubleTapTimer);
             isDoubleTapLive = false;
         }
@@ -125,18 +138,26 @@ export function GameScreen() {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const onMouseDown = (e: MouseEvent) => handleMouseDown(e.clientX, e.clientY);
+        const onMouseDown = (e: MouseEvent) => {
+            const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
+            handleMouseDown(x, y);
+        };
         const onMouseMove = (e: MouseEvent | TouchEvent) => {
             const clientX = 'touches' in e ? e.changedTouches[0].clientX : e.clientX;
             const clientY = 'touches' in e ? e.changedTouches[0].clientY : e.clientY;
-            handleMouseMove(clientX, clientY);
+            const { x, y } = getCanvasCoordinates(clientX, clientY);
+            handleMouseMove(x, y);
         };
         const onMouseUp = (e: MouseEvent | TouchEvent) => {
             const clientX = 'touches' in e ? e.changedTouches[0].clientX : e.clientX;
             const clientY = 'touches' in e ? e.changedTouches[0].clientY : e.clientY;
-            handleMouseUp(clientX, clientY);
+            const { x, y } = getCanvasCoordinates(clientX, clientY);
+            handleMouseUp(x, y);
         };
-        const onDoubleClick = (e: MouseEvent) => handleDoubleTapRef.current(e.clientX, e.clientY);
+        const onDoubleClick = (e: MouseEvent) => {
+            const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
+            handleDoubleTapRef.current(x, y);
+        };
 
         canvas.addEventListener('mousedown', onMouseDown);
         canvas.addEventListener('mousemove', onMouseMove);
