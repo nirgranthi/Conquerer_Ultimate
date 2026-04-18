@@ -70,12 +70,22 @@ export function GameScreen() {
 
     function getCanvasCoordinates(clientX: number, clientY: number) {
         if (!canvasRef.current) return { x: clientX, y: clientY };
-        const rect = canvasRef.current.getBoundingClientRect();
-        const scaleX = canvasRef.current.width / rect.width;
-        const scaleY = canvasRef.current.height / rect.height;
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        
+        const scaleX = rect.width / canvas.width;
+        const scaleY = rect.height / canvas.height;
+        const scale = Math.min(scaleX, scaleY);
+        
+        const drawnWidth = canvas.width * scale;
+        const drawnHeight = canvas.height * scale;
+        
+        const offsetX = (rect.width - drawnWidth) / 2;
+        const offsetY = (rect.height - drawnHeight) / 2;
+        
         return {
-            x: (clientX - rect.left) * scaleX,
-            y: (clientY - rect.top) * scaleY
+            x: (clientX - rect.left - offsetX) / scale,
+            y: (clientY - rect.top - offsetY) / scale
         };
     }
 
