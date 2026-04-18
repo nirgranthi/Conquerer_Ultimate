@@ -189,8 +189,8 @@ export function GameScreen() {
                 />
             </div>
 
-            <canvas ref={bgCanvasRef} className="absolute top-0 left-0 z-5" />
-            <canvas ref={canvasRef} className="absolute top-0 left-0 z-10" />
+            <canvas ref={bgCanvasRef} className="absolute top-0 left-0 z-5 w-full h-full object-contain" />
+            <canvas ref={canvasRef} className="absolute top-0 left-0 z-10 w-full h-full object-contain" />
 
             <StartGame />
 

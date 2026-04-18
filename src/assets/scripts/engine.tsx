@@ -342,19 +342,12 @@ export function StartGame() {
             drawBackground();
         }
 
-        const handleResize = () => {
-            if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                bgCanvas.width = window.innerWidth;
-                bgCanvas.height = window.innerHeight;
-                drawBackground();
-                draw();
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-        handleResize();
+        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        }
 
         handleDoubleTapRef.current = (x: number, y: number) => {
             const targetNode = nodes.find((node: Node) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2);
@@ -388,7 +381,6 @@ export function StartGame() {
 
         return () => {
             cancelAnimationFrame(animationId);
-            window.removeEventListener('resize', handleResize);
             aiWorker.terminate();
         };
     }, [playCount, difficulty]);
