@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode, spectatorMode } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode, spectatorMode, crowdedMode } from "../../components/configs";
 
 import { useGameContext } from "../GameContext";
 
@@ -267,7 +267,9 @@ export function StartGame() {
         function generateMap() {
             const newNodes: Node[] = [];
             let attempts = 0;
-            while (newNodes.length < nodeCount && attempts < 100) {
+            const targetNodeCount = crowdedMode ? 400 : nodeCount;
+            const maxAttempts = crowdedMode ? 4000 : 100;
+            while (newNodes.length < targetNodeCount && attempts < maxAttempts) {
                 attempts++;
                 const margin = 60;
                 if (!canvas) return;

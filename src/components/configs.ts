@@ -1,4 +1,5 @@
-import { Difficulty } from "../assets/GameContext";
+import React from "react";
+import { Difficulty } from "../assets/types";
 
 const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#84CC16', '#f40e6eff', '#14B8A6', '#4B5563'];
 const neutralId = 11;
@@ -18,6 +19,7 @@ export let equalityMode = false;
 export let spyMode = false;
 export let spyOwnerId: number = -1;
 export let spectatorMode = false;
+export let crowdedMode = false;
 
 const troopSize = 4;
 const nodeRadius = 24;
@@ -69,6 +71,10 @@ export function setSpyOwnerIdVar(id: number) {
 
 export function setSpectatorModeVar(val: boolean) {
     spectatorMode = val;
+}
+
+export function setCrowdedModeVar(val: boolean) {
+    crowdedMode = val;
 }
 
 

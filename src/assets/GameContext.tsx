@@ -1,13 +1,8 @@
 import React, { createContext, RefObject, useContext, useRef, useState, useEffect, useCallback } from "react";
 import { Node, Troop, setPlayerColorVar, setTroopSpeedVar, setChaosModeVar, maxTroopPoolSize } from "../components/configs";
-import { setImposterModeVar, setMonopolyModeVar, setEqualityModeVar, setSpyModeVar, setSpyOwnerIdVar, setSpectatorModeVar } from "../components/configs";
+import { setImposterModeVar, setMonopolyModeVar, setEqualityModeVar, setSpyModeVar, setSpyOwnerIdVar, setSpectatorModeVar, setCrowdedModeVar } from "../components/configs";
 import { buttonClickSound } from "./scripts/soundEngine";
-
-
-type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
-export type Difficulty = 'easy' | 'medium' | 'hard';
-
-export type PlayerColorOption = 'blue' | 'red' | 'green' | 'yellow' | 'purple';
+import { Difficulty, PlayerColorOption, GameState } from "./types";
 
 interface GameContextProps {
     difficulty: Difficulty;
@@ -30,6 +25,8 @@ interface GameContextProps {
     setSpyOwnerId: React.Dispatch<React.SetStateAction<number>>;
     spectatorModeEnabled: boolean;
     setSpectatorModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+    crowdedModeEnabled: boolean;
+    setCrowdedModeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     doubleTapPercent: number;
     setDoubleTapPercent: React.Dispatch<React.SetStateAction<number>>;
 
@@ -70,6 +67,7 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
     const [spyModeEnabled, setSpyModeEnabled] = useState<boolean>(false);
     const [spyOwnerId, setSpyOwnerId] = useState<number>(-1);
     const [spectatorModeEnabled, setSpectatorModeEnabled] = useState<boolean>(false);
+    const [crowdedModeEnabled, setCrowdedModeEnabled] = useState<boolean>(false);
     const [doubleTapPercent, setDoubleTapPercent] = useState<number>(0.5);
 
     const [gameState, setGameState] = useState<GameState>('menu');
@@ -157,6 +155,10 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
         setSpectatorModeVar(spectatorModeEnabled);
     }, [spectatorModeEnabled]);
 
+    useEffect(() => {
+        setCrowdedModeVar(crowdedModeEnabled);
+    }, [crowdedModeEnabled]);
+
 
     useEffect(() => {
         gameStateRef.current = gameState;
@@ -239,6 +241,8 @@ export const GameContextProvider = ({ children }: { children: React.ReactNode })
             setSpyOwnerId,
             spectatorModeEnabled,
             setSpectatorModeEnabled,
+            crowdedModeEnabled,
+            setCrowdedModeEnabled,
             doubleTapPercent,
             setDoubleTapPercent,
 

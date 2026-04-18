@@ -1,5 +1,6 @@
 import { monopolyLuckyNodePopulation, spyGrowthRate } from "../components/configs";
-import { useGameContext, PlayerColorOption } from "./GameContext";
+import { useGameContext } from "./GameContext";
+import { PlayerColorOption } from "./types";
 
 interface SettingsModalProps {
     onClose: () => void;
@@ -15,7 +16,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         monopolyModeEnabled, setMonopolyModeEnabled,
         equalityModeEnabled, setEqualityModeEnabled,
         spyModeEnabled, setSpyModeEnabled,
-        spectatorModeEnabled, setSpectatorModeEnabled
+        spectatorModeEnabled, setSpectatorModeEnabled,
+        crowdedModeEnabled, setCrowdedModeEnabled
     } = useGameContext();
 
     return (
@@ -156,6 +158,18 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                             title="Watch enemies fight each other without playing"
                         >
                             <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${spectatorModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+
+                    {/* Crowded Mode */}
+                    <div className="flex items-center justify-between">
+                        <label className="text-gray-400 text-xs font-bold uppercase tracking-wide">Crowded Mode</label>
+                        <button
+                            onClick={() => setCrowdedModeEnabled(!crowdedModeEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${crowdedModeEnabled ? 'bg-orange-600' : 'bg-gray-600'}`}
+                            title="Generate a map with 400 nodes"
+                        >
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${crowdedModeEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
                     </div>
                 </div>
