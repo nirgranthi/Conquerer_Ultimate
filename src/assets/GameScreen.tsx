@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { PauseButton, GameTimer } from "./Buttons";
 import { StartGame } from './scripts/engine';
-import { playerId } from "../components/configs";
+import { WORLD_WIDTH, WORLD_HEIGHT, playerId } from "../components/configs";
 import { GameOverScreen } from "./GameOverScreen";
 import { PauseMenuScreen } from "./PauseMenuScreen";
 
@@ -73,19 +73,29 @@ export function GameScreen() {
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         
-        const scaleX = rect.width / canvas.width;
-        const scaleY = rect.height / canvas.height;
-        const scale = Math.min(scaleX, scaleY);
+        const isPortrait = canvas.height > canvas.width;
+        const gameW = isPortrait ? WORLD_HEIGHT : WORLD_WIDTH;
+        const gameH = isPortrait ? WORLD_WIDTH : WORLD_HEIGHT;
         
-        const drawnWidth = canvas.width * scale;
-        const drawnHeight = canvas.height * scale;
+        const scale = Math.min(canvas.width / gameW, canvas.height / gameH);
         
-        const offsetX = (rect.width - drawnWidth) / 2;
-        const offsetY = (rect.height - drawnHeight) / 2;
+        // Map screen to canvas space
+        let cx = (clientX - rect.left) * (canvas.width / rect.width);
+        let cy = (clientY - rect.top) * (canvas.height / rect.height);
+        
+        // Logical relative coordinates from center
+        let rx = (cx - canvas.width / 2) / scale;
+        let ry = (cy - canvas.height / 2) / scale;
+        
+        if (isPortrait) {
+            let temp = rx;
+            rx = ry;
+            ry = -temp;
+        }
         
         return {
-            x: (clientX - rect.left - offsetX) / scale,
-            y: (clientY - rect.top - offsetY) / scale
+            x: rx + WORLD_WIDTH / 2,
+            y: ry + WORLD_HEIGHT / 2
         };
     }
 

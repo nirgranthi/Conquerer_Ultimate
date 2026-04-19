@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode, spectatorMode, crowdedMode } from "../../components/configs";
+import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode, spectatorMode, crowdedMode, WORLD_WIDTH, WORLD_HEIGHT } from "../../components/configs";
 
 import { useGameContext } from "../GameContext";
 import { seeder } from "./seedEngine";
@@ -45,9 +45,23 @@ export function StartGame() {
             }
         }
 
+        function applyTransform(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
+            const isPortrait = canvas.height > canvas.width;
+            const gameW = isPortrait ? WORLD_HEIGHT : WORLD_WIDTH;
+            const gameH = isPortrait ? WORLD_WIDTH : WORLD_HEIGHT;
+            const scale = Math.min(canvas.width / gameW, canvas.height / gameH);
+
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            if (isPortrait) ctx.rotate(Math.PI / 2);
+            ctx.scale(scale, scale);
+            ctx.translate(-WORLD_WIDTH / 2, -WORLD_HEIGHT / 2);
+        }
+
         function drawBackground() {
             if (!bgCtx || !bgCanvas) return;
             bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgCtx.save();
+            applyTransform(bgCtx, bgCanvas);
             bgCtx.lineWidth = 1;
             bgCtx.strokeStyle = '#374151';
             bgCtx.beginPath();
@@ -57,17 +71,21 @@ export function StartGame() {
                 bgCtx.lineTo(connection.nodeB.x, connection.nodeB.y);
             });
             bgCtx.stroke();
+            bgCtx.restore();
         }
 
         function draw() {
             if (!ctx || !canvas) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            applyTransform(ctx, canvas);
 
             nodes.forEach((node: Node) => {
                 node.drawBackground(ctx);
                 node.drawForeground(ctx, dragSelectedRef.current);
             });
+            particles.forEach((particle: Particle) => particle.draw(ctx));
 
             if (gameTime < 3 && gameStateRef.current === 'playing') {
                 const playerNode = nodes.find((node: Node) => node.owner === playerId);
@@ -128,7 +146,7 @@ export function StartGame() {
                 ctx.closePath();
             });
 
-            particles.forEach((particle: Particle) => particle.draw(ctx));
+            ctx.restore();
         }
 
         const aiWorker = new Worker(new URL('./ai.worker.ts', import.meta.url), { type: 'module' });
@@ -268,19 +286,12 @@ export function StartGame() {
             const targetNodeCount = crowdedMode ? 400 : nodeCount;
             const maxAttempts = crowdedMode ? 4000 : 100;
 
-            const V_WIDTH = 1600;
-            const V_HEIGHT = 900;
-            const scale = Math.min(canvas.width / V_WIDTH, canvas.height / V_HEIGHT);
-            const playWidth = V_WIDTH * scale;
-            const playHeight = V_HEIGHT * scale;
-            const offsetX = (canvas.width - playWidth) / 2;
-            const offsetY = (canvas.height - playHeight) / 2;
             const margin = 60;
 
             while (newNodes.length < targetNodeCount && attempts < maxAttempts) {
                 attempts++;
-                const x = offsetX + margin + seeder() * (playWidth - margin * 2);
-                const y = offsetY + margin + seeder() * (playHeight - margin * 2);
+                const x = margin + seeder() * (WORLD_WIDTH - margin * 2);
+                const y = margin + seeder() * (WORLD_HEIGHT - margin * 2);
                 console.log(x,y)
                 let valid = true;
                 for (let n of newNodes) {

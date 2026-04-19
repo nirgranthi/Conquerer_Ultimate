@@ -28,6 +28,9 @@ const aiStartDelay = 7;
 const enemyCooldown = 3;
 const maxTroopPoolSize = 2500;
 
+export const WORLD_WIDTH = 1600;
+export const WORLD_HEIGHT = 900;
+
 export let playerShadowColor = '#60A5FA';
 export let playerStrokeColor = '#BFDBFE';
 
