@@ -130,10 +130,11 @@ class Node {
         }
         this.pulse += dt * 2
     }
-    drawBackground(ctx: CanvasRenderingContext2D) {
+    drawBackground(ctx: CanvasRenderingContext2D, scale: number, dpr: number) {
         ctx.beginPath()
-        const r = this.radius;
-        ctx.arc(this.x, this.y, r, 0, Math.PI * 2)
+        // Draw at a size that results in a constant pixel radius on screen
+        const renderRadius = (this.radius * dpr) / scale;
+        ctx.arc(this.x, this.y, renderRadius, 0, Math.PI * 2)
         const isEnemy = this.owner !== playerId && this.owner !== neutralId;
         const apparentOwner = (isEnemy && imposterMode) ? playerId : this.owner;
         ctx.fillStyle = colors[apparentOwner]
@@ -143,7 +144,7 @@ class Node {
         }
         ctx.fill()
         ctx.shadowBlur = 0
-        ctx.lineWidth = 3
+        ctx.lineWidth = (3 * dpr) / scale
         ctx.strokeStyle = (apparentOwner === neutralId)
             ? '#6B7280'
             : '#ffffff'
@@ -152,31 +153,40 @@ class Node {
         ctx.closePath()
     }
 
-    drawForeground(ctx: CanvasRenderingContext2D, dragSelected: Node[]) {
+    drawForeground(ctx: CanvasRenderingContext2D, dragSelected: Node[], scale: number, rotation: number, dpr: number) {
         const isEnemy = this.owner !== playerId && this.owner !== neutralId;
         const apparentOwner = (isEnemy && imposterMode) ? playerId : this.owner;
+        const renderRadius = (this.radius * dpr) / scale;
+
         if (apparentOwner === playerId) {
             ctx.beginPath()
-            ctx.arc(this.x, this.y, this.radius + Math.sin(this.pulse) * 1.5, 0, Math.PI * 2)
+            ctx.arc(this.x, this.y, renderRadius + (Math.sin(this.pulse) * 1.5 * dpr) / scale, 0, Math.PI * 2)
             ctx.strokeStyle = playerShadowColor
-            ctx.lineWidth = 1.5
+            ctx.lineWidth = (1.5 * dpr) / scale
             ctx.stroke()
             ctx.closePath()
         }
 
         if (dragSelected.includes(this)) {
             ctx.beginPath()
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+            ctx.arc(this.x, this.y, renderRadius, 0, Math.PI * 2)
             ctx.strokeStyle = '#FCD34D'
-            ctx.lineWidth = 5
+            ctx.lineWidth = (5 * dpr) / scale
             ctx.stroke()
             ctx.closePath()
         }
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(-rotation);
+        ctx.scale(dpr / scale, dpr / scale);
+        
         ctx.fillStyle = '#fff'
         ctx.font = 'bold 13px sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        ctx.fillText(String(Math.floor(this.population)), this.x, this.y)
+        ctx.fillText(String(Math.floor(this.population)), 0, 0)
+        ctx.restore();
     }
 }
 
@@ -268,15 +278,16 @@ class Troop {
             }
         }
     }
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D, scale: number, dpr: number) {
         ctx.beginPath()
-        ctx.arc(this.x, this.y, troopSize, 0, Math.PI * 2)
+        const renderSize = (troopSize * dpr) / scale;
+        ctx.arc(this.x, this.y, renderSize, 0, Math.PI * 2)
         ctx.fillStyle = this.color
         ctx.fill()
         const isEnemy = this.owner !== playerId && this.owner !== neutralId;
         const apparentOwner = (isEnemy && imposterMode) ? playerId : this.owner;
         if (apparentOwner === playerId) {
-            ctx.lineWidth = 1.5
+            ctx.lineWidth = (1.5 * dpr) / scale
             ctx.strokeStyle = '#ffffff'
             ctx.stroke()
         }
@@ -311,11 +322,11 @@ class Particle {
         this.y += this.vy
         this.life -= this.decay
     }
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D, scale: number, dpr: number) {
         ctx.globalAlpha = Math.max(0, this.life)
         ctx.fillStyle = this.color
         ctx.beginPath()
-        ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2)
+        ctx.arc(this.x, this.y, (2.5 * dpr) / scale, 0, Math.PI * 2)
         ctx.fill()
         ctx.globalAlpha = 1.0
     }

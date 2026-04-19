@@ -46,15 +46,19 @@ export function StartGame() {
         }
 
         function applyTransform(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
+            const dpr = window.devicePixelRatio || 1;
             const isPortrait = canvas.height > canvas.width;
             const gameW = isPortrait ? WORLD_HEIGHT : WORLD_WIDTH;
             const gameH = isPortrait ? WORLD_WIDTH : WORLD_HEIGHT;
-            const scale = Math.min(canvas.width / gameW, canvas.height / gameH);
+            const scale = Math.min(canvas.width / (gameW * dpr), canvas.height / (gameH * dpr)) * dpr;
 
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
             ctx.translate(canvas.width / 2, canvas.height / 2);
             if (isPortrait) ctx.rotate(Math.PI / 2);
             ctx.scale(scale, scale);
             ctx.translate(-WORLD_WIDTH / 2, -WORLD_HEIGHT / 2);
+
+            return { scale, isPortrait };
         }
 
         function drawBackground() {
@@ -79,26 +83,36 @@ export function StartGame() {
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
-            applyTransform(ctx, canvas);
+            const { scale, isPortrait } = applyTransform(ctx, canvas);
+            const rotation = isPortrait ? Math.PI / 2 : 0;
+            const dpr = window.devicePixelRatio || 1;
 
             nodes.forEach((node: Node) => {
-                node.drawBackground(ctx);
-                node.drawForeground(ctx, dragSelectedRef.current);
+                node.drawBackground(ctx, scale, dpr);
+                node.drawForeground(ctx, dragSelectedRef.current, scale, rotation, dpr);
             });
-            particles.forEach((particle: Particle) => particle.draw(ctx));
+            particles.forEach((particle: Particle) => particle.draw(ctx, scale, dpr));
 
             if (gameTime < 3 && gameStateRef.current === 'playing') {
                 const playerNode = nodes.find((node: Node) => node.owner === playerId);
                 if (playerNode) {
                     ctx.save();
                     ctx.translate(playerNode.x, playerNode.y - 50 - Math.sin(gameTime * 5) * 10);
+                    
+                    // Counter-rotate and fixed size for "YOU" text
+                    ctx.rotate(-rotation);
+                    ctx.scale(dpr/scale, dpr/scale);
+                    
                     ctx.fillStyle = '#FCD34D';
                     ctx.beginPath();
+                    // Scale indicator arrow
                     ctx.moveTo(-10, 0);
                     ctx.lineTo(10, 0);
                     ctx.lineTo(0, 20);
                     ctx.fill();
+                    
                     ctx.font = "bold 16px sans-serif";
+                    ctx.textAlign = "center";
                     ctx.fillText("YOU", 0, -10);
                     ctx.restore();
                 }
@@ -106,11 +120,11 @@ export function StartGame() {
 
             if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
                 ctx.beginPath();
-                ctx.lineWidth = 4;
+                ctx.lineWidth = (4 * dpr) / scale; // Keep drag line width consistent
                 ctx.strokeStyle = '#FCD34D';
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
-                ctx.setLineDash([10, 10]);
+                ctx.setLineDash([(10 * dpr) / scale, (10 * dpr) / scale]);
                 ctx.moveTo(dragSelectedRef.current[0].x, dragSelectedRef.current[0].y);
                 dragSelectedRef.current.forEach((selectedNode: Node) => {
                     ctx.lineTo(selectedNode.x, selectedNode.y);
@@ -130,16 +144,17 @@ export function StartGame() {
                 const ownerTroops = troopsByOwner[ownerId];
                 if (ownerTroops.length === 0) return;
 
+                const troopRenderSize = (troopSize * dpr) / scale;
                 ctx.beginPath();
                 ctx.fillStyle = ownerTroops[0].color;
                 ownerTroops.forEach(troop => {
-                    ctx.moveTo(troop.x + troopSize, troop.y);
-                    ctx.arc(troop.x, troop.y, troopSize, 0, Math.PI * 2);
+                    ctx.moveTo(troop.x + troopRenderSize, troop.y);
+                    ctx.arc(troop.x, troop.y, troopRenderSize, 0, Math.PI * 2);
                 });
                 ctx.fill();
 
                 if (ownerId === playerId) {
-                    ctx.lineWidth = 1.5;
+                    ctx.lineWidth = (1.5 * dpr) / scale;
                     ctx.strokeStyle = '#ffffff';
                     ctx.stroke();
                 }
@@ -364,11 +379,12 @@ export function StartGame() {
             drawBackground();
         }
 
-        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        if (canvas.width !== window.innerWidth * dpr || canvas.height !== window.innerHeight * dpr) {
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            bgCanvas.width = window.innerWidth * dpr;
+            bgCanvas.height = window.innerHeight * dpr;
         }
 
         handleDoubleTapRef.current = (x: number, y: number) => {
