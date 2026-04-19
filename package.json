@@ -1,15 +1,19 @@
 {
   "name": "conquerer-ultimate",
+  "homepage": "https://conquerer.nirgranthi.in/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "gh-pages": "^6.3.0",
     "ogl": "^1.0.11",
     "postprocessing": "^6.38.3",
     "react": "^19.2.0",
