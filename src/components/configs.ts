@@ -9,6 +9,7 @@ const nodeCount = 40;
 const minimumDistance = 70;
 const maxPopulation = 200;
 const growthRate = 1.3;
+export const seed = 4433334;
 export const spyGrowthRate = 1.5;
 export let troopSpeed = 2.8;
 export let chaosMode = false;

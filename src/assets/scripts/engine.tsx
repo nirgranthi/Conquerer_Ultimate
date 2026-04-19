@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Node, Troop, Particle, nodeCount, neutralId, playerId, minimumDistance, troopSize, difficultyConfig, aiStartDelay, enemyCooldown, monopolyMode, equalityMode, monopolyLuckyNodePopulation, spyMode, spectatorMode, crowdedMode } from "../../components/configs";
 
 import { useGameContext } from "../GameContext";
+import { seeder } from "./seedEngine";
 
 export function StartGame() {
     const { bgCanvasRef, canvasRef, playCount, nodesRef, troopsRef, sendTroops, gameState, setGameState, setIsWon, difficulty, handleDoubleTapRef, isDraggingRef, dragSelectedRef, dragCurrentRef, gameTimeRef, troopPoolRef, globalPopulationRef, doubleTapPercent, setSpyOwnerId, setWinnerId } = useGameContext();
@@ -231,12 +232,12 @@ export function StartGame() {
             if (gameStateRef.current !== 'playing') return;
             const owners = new Set(nodes.map((node: Node) => node.owner));
             let won: boolean | null = null;
-            
+
             if (spectatorMode) {
                 const activeOwners = new Set<number>();
                 nodes.forEach(n => { if (n.owner !== neutralId) activeOwners.add(n.owner); });
                 troops.forEach(t => { if (t.owner !== neutralId) activeOwners.add(t.owner); });
-                
+
                 if (activeOwners.size === 1) {
                     won = true;
                     setWinnerId(Array.from(activeOwners)[0]);
@@ -253,28 +254,34 @@ export function StartGame() {
                     won = true;
                 }
             }
-            
+
             if (won !== null) {
                 setIsWon(won);
                 setGameState('gameover');
             }
         }
 
-        function randomTroopSize() {
-            return Math.ceil(Math.random() * 20) + 20;
-        }
-
         function generateMap() {
             const newNodes: Node[] = [];
             let attempts = 0;
+            if (!canvas) return;
             const targetNodeCount = crowdedMode ? 400 : nodeCount;
             const maxAttempts = crowdedMode ? 4000 : 100;
+
+            const V_WIDTH = 1600;
+            const V_HEIGHT = 900;
+            const scale = Math.min(canvas.width / V_WIDTH, canvas.height / V_HEIGHT);
+            const playWidth = V_WIDTH * scale;
+            const playHeight = V_HEIGHT * scale;
+            const offsetX = (canvas.width - playWidth) / 2;
+            const offsetY = (canvas.height - playHeight) / 2;
+            const margin = 60;
+
             while (newNodes.length < targetNodeCount && attempts < maxAttempts) {
                 attempts++;
-                const margin = 60;
-                if (!canvas) return;
-                const x = margin + Math.random() * (canvas.width - margin * 2);
-                const y = margin + Math.random() * (canvas.height - margin * 2);
+                const x = offsetX + margin + seeder() * (playWidth - margin * 2);
+                const y = offsetY + margin + seeder() * (playHeight - margin * 2);
+                console.log(x,y)
                 let valid = true;
                 for (let n of newNodes) {
                     if (((n.x - x) ** 2 + (n.y - y) ** 2) < minimumDistance ** 2) {
@@ -284,7 +291,7 @@ export function StartGame() {
                 }
                 if (valid) {
                     let owner = neutralId;
-                    let pop = 10 + Math.floor(Math.random() * 25);
+                    let pop = 10 + Math.floor(seeder() * 25);
                     if (!spectatorMode && newNodes.length === 0) {
                         owner = playerId;
                         pop = 60;
@@ -294,8 +301,10 @@ export function StartGame() {
                         if (spectatorMode && newNodes.length === 0) {
                             owner = 10;
                         }
-                        pop = randomTroopSize();
+                        pop = Math.ceil(seeder() * 20) + 20;
                     }
+                    /* console.log(Math.random()) */
+                    /* console.log(seeder()) */
                     newNodes.push(new Node(newNodes.length, Math.floor(x), Math.floor(y), owner, pop));
                 }
             }
@@ -303,13 +312,13 @@ export function StartGame() {
             if (monopolyMode) {
                 const enemyNodes = newNodes.filter(n => n.owner !== playerId && n.owner !== neutralId);
                 if (enemyNodes.length > 0) {
-                    const luckyEnemy = enemyNodes[Math.floor(Math.random() * enemyNodes.length)];
+                    const luckyEnemy = enemyNodes[Math.floor(seeder() * enemyNodes.length)];
                     luckyEnemy.population = monopolyLuckyNodePopulation;
 
                     if (spyMode) {
                         const enemyOwners = [...new Set(enemyNodes.map(n => n.owner))].filter(id => id !== luckyEnemy.owner);
                         if (enemyOwners.length > 0) {
-                            setSpyOwnerId(enemyOwners[Math.floor(Math.random() * enemyOwners.length)]);
+                            setSpyOwnerId(enemyOwners[Math.floor(seeder() * enemyOwners.length)]);
                         } else {
                             setSpyOwnerId(-1);
                         }
@@ -319,7 +328,7 @@ export function StartGame() {
                 const enemyNodes = newNodes.filter(n => n.owner !== playerId && n.owner !== neutralId);
                 const enemyOwners = [...new Set(enemyNodes.map(n => n.owner))];
                 if (enemyOwners.length > 0) {
-                    setSpyOwnerId(enemyOwners[Math.floor(Math.random() * enemyOwners.length)]);
+                    setSpyOwnerId(enemyOwners[Math.floor(seeder() * enemyOwners.length)]);
                 } else {
                     setSpyOwnerId(-1);
                 }
