@@ -97,20 +97,20 @@ export function StartGame() {
                 const playerNode = nodes.find((node: Node) => node.owner === playerId);
                 if (playerNode) {
                     ctx.save();
-                    ctx.translate(playerNode.x, playerNode.y - 50 - Math.sin(gameTime * 5) * 10);
-                    
-                    // Counter-rotate and fixed size for "YOU" text
+                    ctx.translate(playerNode.x, playerNode.y);
                     ctx.rotate(-rotation);
-                    ctx.scale(dpr/scale, dpr/scale);
-                    
+                    const visualOffset = (50 + Math.sin(gameTime * 5) * 10) * dpr / scale;
+                    ctx.translate(0, -visualOffset);
+
+                    ctx.scale(dpr / scale, dpr / scale);
                     ctx.fillStyle = '#FCD34D';
                     ctx.beginPath();
-                    // Scale indicator arrow
+                    // Arrow pointing down towards the node
                     ctx.moveTo(-10, 0);
                     ctx.lineTo(10, 0);
                     ctx.lineTo(0, 20);
                     ctx.fill();
-                    
+
                     ctx.font = "bold 16px sans-serif";
                     ctx.textAlign = "center";
                     ctx.fillText("YOU", 0, -10);
@@ -307,7 +307,6 @@ export function StartGame() {
                 attempts++;
                 const x = margin + seeder() * (WORLD_WIDTH - margin * 2);
                 const y = margin + seeder() * (WORLD_HEIGHT - margin * 2);
-                console.log(x,y)
                 let valid = true;
                 for (let n of newNodes) {
                     if (((n.x - x) ** 2 + (n.y - y) ** 2) < minimumDistance ** 2) {

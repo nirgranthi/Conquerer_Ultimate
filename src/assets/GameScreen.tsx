@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { PauseButton, GameTimer } from "./Buttons";
 import { StartGame } from './scripts/engine';
-import { WORLD_WIDTH, WORLD_HEIGHT, playerId } from "../components/configs";
+import { WORLD_WIDTH, WORLD_HEIGHT, playerId, Node } from "../components/configs";
 import { GameOverScreen } from "./GameOverScreen";
 import { PauseMenuScreen } from "./PauseMenuScreen";
 
@@ -101,7 +101,7 @@ export function GameScreen() {
 
     function handleMouseDown(x: number, y: number) {
         if (gameStateRef.current !== 'playing') return;
-        const selectedNode = nodesRef.current.find((node: any) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2 && node.owner === playerId);
+        const selectedNode = nodesRef.current.find((node: Node) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 3) ** 2 && node.owner === playerId);
         if (selectedNode) {
             isDraggingRef.current = true;
             dragSelectedRef.current = [selectedNode];
@@ -131,7 +131,7 @@ export function GameScreen() {
     function handleMouseMove(x: number, y: number) {
         if (isDraggingRef.current) {
             dragCurrentRef.current = { x, y };
-            nodesRef.current.forEach((node: any) => {
+            nodesRef.current.forEach((node: Node) => {
                 if (((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.5) ** 2 && node.owner === playerId) {
                     if (!dragSelectedRef.current.includes(node)) { dragSelectedRef.current.push(node); }
                 }
@@ -141,7 +141,7 @@ export function GameScreen() {
 
     function handleMouseUp(x: number, y: number) {
         if (isDraggingRef.current && dragSelectedRef.current.length > 0) {
-            let target = nodesRef.current.find((node: any) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 1.2) ** 2);
+            let target = nodesRef.current.find((node: Node) => ((node.x - x) ** 2 + (node.y - y) ** 2) < (node.radius * 3) ** 2);
             if (target) {
                 dragSelectedRef.current.forEach((selectedNode) => {
                     if (selectedNode !== target) {

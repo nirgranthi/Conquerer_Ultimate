@@ -6,7 +6,7 @@ const neutralId = 11;
 const playerId = 0;
 
 const nodeCount = 40;
-const minimumDistance = 70;
+const minimumDistance = 120;
 const maxPopulation = 200;
 const growthRate = 1.3;
 export const seed = 4433334;
@@ -23,7 +23,7 @@ export let spectatorMode = false;
 export let crowdedMode = false;
 
 const troopSize = 4;
-const nodeRadius = 24;
+const nodeRadius = 23;
 const aiStartDelay = 7;
 const enemyCooldown = 3;
 const maxTroopPoolSize = 2500;
@@ -180,7 +180,7 @@ class Node {
         ctx.translate(this.x, this.y);
         ctx.rotate(-rotation);
         ctx.scale(dpr / scale, dpr / scale);
-        
+
         ctx.fillStyle = '#fff'
         ctx.font = 'bold 13px sans-serif'
         ctx.textAlign = 'center'
