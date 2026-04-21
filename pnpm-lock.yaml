@@ -29,9 +29,6 @@ importers:
       three:
         specifier: ^0.183.1
         version: 0.183.1
-      workbox-window:
-        specifier: ^7.4.0
-        version: 7.4.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
